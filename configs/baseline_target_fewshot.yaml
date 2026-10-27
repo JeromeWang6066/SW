@@ -1,0 +1,27 @@
+# Group 1 — target-only ST-Net on DC with 3-day few-shot (no transfer / no KD).
+_base: default.yaml
+
+experiment:
+  group: 1
+  id: G1-tgt-3d
+  role: target_only
+
+cities:
+  source: null
+  target: dc
+
+splits:
+  few_shot_days: 3
+
+kd:
+  enabled: false
+  pearson_multiplier: false
+
+paths:
+  checkpoint_name: baseline_dc_3day_stnet.pt
+
+train:
+  epochs: 50
+  batch_size: 16   # smaller default for scarce data; tune later
+
+seed: 42

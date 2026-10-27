@@ -1,0 +1,24 @@
+# Group 1 — source teacher on NY (ST-Net). Training not implemented yet.
+_base: default.yaml
+
+experiment:
+  group: 1
+  id: G1-src-ny
+  role: teacher
+
+cities:
+  source: ny
+  target: null
+
+kd:
+  enabled: false
+  pearson_multiplier: false
+
+paths:
+  checkpoint_name: teacher_ny_stnet.pt
+
+train:
+  epochs: 50
+  batch_size: 32
+
+seed: 42
