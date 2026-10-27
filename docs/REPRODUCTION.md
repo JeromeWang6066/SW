@@ -2,7 +2,8 @@
 
 > **状态：尚未执行 / 待跑。** 本文档是后续真实实验的操作清单，不是已完成实验的报告。  
 > 约束：本阶段脚手架 **不下** 大数据进 git、**不训** 模型、**不写** 虚构指标。  
-> 上游对照总表：[UPSTREAM_MAP.md](UPSTREAM_MAP.md) · 数据直链：[DATA.md](DATA.md)
+> 上游对照总表：[UPSTREAM_MAP.md](UPSTREAM_MAP.md) · 数据直链：[DATA.md](DATA.md)  
+> Agent / 本地连续接手上下文：[HANDOFF.md](HANDOFF.md)
 
 面向：**Groups 1–2 优先**（ST-Net 基线 + 标准 KD，NY/CHI → DC，STBaT 式 3-day few-shot）。
 
@@ -15,7 +16,7 @@
 - [ ] `python scripts/00_check_env.py` 通过
 - [ ] `python scripts/02_smoke_import.py` 通过
 - [ ] `python scripts/03_synthetic_shapes.py` 通过（无真实数据）
-- [ ] 已阅读 [PAPERS.md](PAPERS.md)、[DATA.md](DATA.md)、[UPSTREAM_MAP.md](UPSTREAM_MAP.md)、[EXPERIMENT_PLAN.md](EXPERIMENT_PLAN.md)
+- [ ] 已阅读 [HANDOFF.md](HANDOFF.md)、[PAPERS.md](PAPERS.md)、[DATA.md](DATA.md)、[UPSTREAM_MAP.md](UPSTREAM_MAP.md)、[EXPERIMENT_PLAN.md](EXPERIMENT_PLAN.md)
 
 ```bash
 make env && make smoke
