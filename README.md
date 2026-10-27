@@ -51,15 +51,20 @@ pip install -r requirements.txt
 
 python scripts/00_check_env.py
 python scripts/02_smoke_import.py
+python scripts/03_synthetic_shapes.py     # 合成张量形状；无需真实数据
 python scripts/01_verify_data_layout.py   # 只检查目录，不下载
 ```
 
-训练入口目前会明确退出并提示下一步（见 `src/train/`）：
+训练入口：`--dry-run` 退出 0；无 dry-run 则明确拒绝（见 `src/train/`）：
 
 ```bash
+python -m src.train.train_teacher --config configs/teacher_ny.yaml --dry-run
+python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dry-run
+# 真训练尚未实现（会非零退出）：
 python -m src.train.train_teacher --config configs/teacher_ny.yaml
-python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml
 ```
+
+**数据：** 勿提交大文件。已核实直链与解压布局见 [docs/DATA.md](docs/DATA.md)（CrossTReS `crosstres_data.zip` / STBaT `data.zip`）。
 
 ## 目录结构
 
@@ -72,12 +77,14 @@ SW/
 ├── data/                   # 布局说明 + .gitkeep；大文件 gitignore
 ├── docs/
 │   ├── REPRODUCTION.md     # ★ 后续真实复现主手册
+│   ├── UPSTREAM_MAP.md     # 上游 ↔ 本仓映射
 │   ├── EXPERIMENT_PLAN.md
 │   ├── PAPERS.md
-│   ├── DATA.md
+│   ├── DATA.md             # 已核实下载直链
 │   └── advisor/选题汇报.html
-├── notes/progress.md       # 实验笔记模板
-├── scripts/                # 环境 / 数据布局 / 导入冒烟
+├── notes/progress.md       # 实验笔记
+├── scripts/                # 环境 / 数据布局 / 导入 / 合成形状冒烟
+├── tests/                  # 无真实数据的形状断言
 ├── src/
 │   ├── data/               # loader / few-shot split stubs
 │   ├── models/             # st_net.py, kd.py stubs
@@ -89,10 +96,11 @@ SW/
 
 ## 文档入口
 
-- **[docs/REPRODUCTION.md](docs/REPRODUCTION.md)** — 后续真实跑实验的主流程（环境 → 数据 → 教师 → few-shot 学生 → 指标）
+- **[docs/REPRODUCTION.md](docs/REPRODUCTION.md)** — 后续真实跑实验的主流程（Day 0–N）
+- **[docs/DATA.md](docs/DATA.md)** — **已核实** CrossTReS / STBaT zip 直链、网格形状、本仓布局
+- **[docs/UPSTREAM_MAP.md](docs/UPSTREAM_MAP.md)** — 上游文件路径 ↔ 本仓 stub / 下一步移植清单
 - **[docs/EXPERIMENT_PLAN.md](docs/EXPERIMENT_PLAN.md)** — Groups 1–4 与完成标准
-- **[docs/PAPERS.md](docs/PAPERS.md)** — 论文 / 代码链接（已做快速核验）
-- **[docs/DATA.md](docs/DATA.md)** — 期望张量形状、时区 / 网格、许可 TODO
+- **[docs/PAPERS.md](docs/PAPERS.md)** — 论文 / 代码链接
 - **[docs/advisor/选题汇报.html](docs/advisor/选题汇报.html)** — 选题汇报幻灯片
 
 ## 许可

@@ -59,10 +59,10 @@ def main(argv: list[str] | None = None) -> int:
 
     logger.error("Training is NOT IMPLEMENTED (scaffold only).")
     logger.error("Next steps:")
-    logger.error("  1) Acquire data (docs/DATA.md) and run scripts/01_verify_data_layout.py")
-    logger.error("  2) Port ST-Net from https://github.com/KL4805/CrossTReS")
+    logger.error("  1) Download zip per docs/DATA.md (do not commit); scripts/01_verify_data_layout.py")
+    logger.error("  2) Port ST-Net from KL4805/CrossTReS src/model.py (docs/UPSTREAM_MAP.md)")
     logger.error("  3) Implement the train loop in src/train/train_teacher.py")
-    logger.error("  4) Follow docs/REPRODUCTION.md Group 1")
+    logger.error("  4) Follow docs/REPRODUCTION.md Day 4+ Group 1")
     return 2
 
 

@@ -10,6 +10,54 @@
 
 ---
 
+## 2026-10-27 — 核实数据直链 + 上游映射文档
+
+**目标：** 在不下载进 git、不训练、不编造指标的前提下，钉死 NY/CHI/DC 数据包 URL，并写清上游↔本仓映射。  
+**配置：** 无训练配置变更（仍用 stub YAML）  
+**Git commit：** （本 PR）  
+**机器 / GPU：** Cloud Agent（无 GPU 训练）
+
+### 做了什么
+
+- 核实 CrossTReS / STBaT / SFMGTL 仓内 zip 直链；在 `/tmp` 解压核验布局与 `npy` 形状（**未**提交数据）。
+- 更新 `docs/DATA.md`（URL、SHA256、`T×H×W`、有效格数、本仓映射步骤）。
+- 新增 `docs/UPSTREAM_MAP.md`（ST-Net / few-shot / KD / metrics；stub vs 下一步）。
+- 扩展 `docs/REPRODUCTION.md` Day 0–N；同步 README / PAPERS / `data/README.md` TODO 指针。
+- 新增合成形状冒烟：`scripts/03_synthetic_shapes.py`、`tests/test_synthetic_shapes.py`。
+- Izadi 官方代码：**仍未找到** → 保持 PAPERS.md TODO。
+
+### 数据
+
+- CrossTReS 来源 URL：https://github.com/KL4805/CrossTReS/raw/main/data/crosstres_data.zip  
+- SHA256：`f322a145484f183042206cf42d54bca1311784024ec384a2046df83d8f637880`  
+- STBaT 等价 URL：https://github.com/ShaunHao/stbat/raw/main/data/data.zip  
+- SHA256：`18f8e2fab2b390498e849aae2ea835b37a314000c99d9b37896f4ef659f8cf21`  
+- 布局检查：本机仅验目录骨架；真实 zip **不入库**。
+
+### 运行命令
+
+```bash
+python scripts/02_smoke_import.py
+python scripts/03_synthetic_shapes.py
+python -m src.train.train_teacher --config configs/teacher_ny.yaml --dry-run
+python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dry-run
+```
+
+### 真实结果（仅实跑后填写）
+
+| split | MAE | RMSE | MAPE | notes |
+|---|---|---|---|---|
+| val | — | — | — | 本阶段无训练 |
+| test | — | — | — | 本阶段无训练 |
+
+### 问题 / 下一步
+
+- 本机按 DATA.md 下载 zip → 软链到 `data/processed/{ny,chi,dc}`  
+- 移植 CrossTReS `src/model.py` → `STNet.forward`  
+- 将 `splits.py` 与上游 `60*24` 对齐后实现 Group 1  
+
+---
+
 ## YYYY-MM-DD — 标题
 
 **目标：**  
@@ -47,7 +95,9 @@
 
 ## 待办速记
 
-- [ ] 确认 CrossTReS / STBaT 数据 zip 直链并写入 `docs/DATA.md`
+- [x] 确认 CrossTReS / STBaT 数据 zip 直链并写入 `docs/DATA.md`
+- [x] 编写 `docs/UPSTREAM_MAP.md`
+- [ ] 本机下载数据（不提交）并跑 `01_verify_data_layout.py`
 - [ ] 实现 ST-Net 最小训练环（对照上游 `model.py`）
 - [ ] Group 1 基线实跑
 - [ ] Group 2 标准 KD 实跑

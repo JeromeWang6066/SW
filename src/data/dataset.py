@@ -55,12 +55,18 @@ class GridFlowDataset:
 def load_city_array(city: str, processed_dir: str | Path = "data/processed") -> np.ndarray:
     """Try common filenames under ``processed/{city}/``.
 
-    Looks for ``flow.npy`` or ``data.npz`` (key ``flow``). Does not download.
+    Looks for ``flow.npy``, ``data.npz`` (key ``flow``), or CrossTReS-style
+    ``Taxi{CITY}_pickup.npy`` under ``upstream/`` soft-link. Does not download.
     """
     city = city.lower()
     root = Path(processed_dir) / city
     npy = root / "flow.npy"
     npz = root / "data.npz"
+    city_up = city.upper()
+    upstream_candidates = [
+        root / "upstream" / f"Taxi{city_up}_pickup.npy",
+        root / f"Taxi{city_up}_pickup.npy",
+    ]
 
     if npy.is_file():
         arr = np.load(npy)
@@ -75,9 +81,16 @@ def load_city_array(city: str, processed_dir: str | Path = "data/processed") -> 
         _assert_time_major(arr, city)
         return arr
 
+    for cand in upstream_candidates:
+        if cand.is_file():
+            arr = np.load(cand)
+            _assert_time_major(arr, city)
+            return arr
+
     raise FileNotFoundError(
         f"No processed array for city={city!r} under {root}. "
-        f"Expected {npy.name} or {npz.name}. See docs/DATA.md — download is TODO."
+        f"Expected {npy.name}, {npz.name}, or CrossTReS "
+        f"Taxi{city_up}_pickup.npy (see docs/DATA.md for verified download URLs)."
     )
 
 

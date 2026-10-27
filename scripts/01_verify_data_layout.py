@@ -37,7 +37,10 @@ def main() -> int:
         else:
             print(f"  [HAS FILES] data/processed/{city}/ → {len(files)} entries")
 
-    print("Layout dirs OK. Fill download URLs in docs/DATA.md when known (TODO).")
+    print(
+        "Layout dirs OK. Download steps + verified URLs: docs/DATA.md "
+        "(do not commit zip/npy)."
+    )
     return 0
 
 
