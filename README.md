@@ -4,6 +4,13 @@
 **仓库：** [JeromeWang6066/SW](https://github.com/JeromeWang6066/SW)  
 **阶段：** 实验前脚手架（Prep only）—— **未训练、未下载大数据、无虚构结果**
 
+### 快速入口
+
+- **[docs/HANDOFF.md](docs/HANDOFF.md)** — ★ **Agent / 本地接手冷启动**（项目身份、已完成 PR、数据事实、stub 契约、下一步任务）
+- [docs/DATA.md](docs/DATA.md) — 已核实 zip 直链 / SHA256 / 网格形状
+- [docs/UPSTREAM_MAP.md](docs/UPSTREAM_MAP.md) — 上游 ↔ 本仓移植清单
+- [docs/REPRODUCTION.md](docs/REPRODUCTION.md) — Day 0–N 真实复现手册
+
 ---
 
 ## English abstract
@@ -76,7 +83,8 @@ SW/
 ├── configs/                # YAML 占位（路径、城市、3-day、KD λ、seed）
 ├── data/                   # 布局说明 + .gitkeep；大文件 gitignore
 ├── docs/
-│   ├── REPRODUCTION.md     # ★ 后续真实复现主手册
+│   ├── HANDOFF.md          # ★ Agent / 本地接手冷启动
+│   ├── REPRODUCTION.md     # 后续真实复现主手册
 │   ├── UPSTREAM_MAP.md     # 上游 ↔ 本仓映射
 │   ├── EXPERIMENT_PLAN.md
 │   ├── PAPERS.md
@@ -96,6 +104,7 @@ SW/
 
 ## 文档入口
 
+- **[docs/HANDOFF.md](docs/HANDOFF.md)** — ★ Agent / 本地接手交接（冷启动必读）
 - **[docs/REPRODUCTION.md](docs/REPRODUCTION.md)** — 后续真实跑实验的主流程（Day 0–N）
 - **[docs/DATA.md](docs/DATA.md)** — **已核实** CrossTReS / STBaT zip 直链、网格形状、本仓布局
 - **[docs/UPSTREAM_MAP.md](docs/UPSTREAM_MAP.md)** — 上游文件路径 ↔ 本仓 stub / 下一步移植清单

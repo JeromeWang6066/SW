@@ -10,6 +10,30 @@
 
 ---
 
+## 2026-10-28 — 交接文档 HANDOFF（Agent / 本地连续接手）
+
+**目标：** 写清冷启动上下文，让另一位（本机）coding agent 或同学不丢上下文地继续；不开真实训练、不下载大数据进 git。  
+**配置：** 无训练配置变更  
+**Git commit：** （本 PR）  
+**机器 / GPU：** Cloud Agent（文档 only）
+
+### 做了什么
+
+- 新增 `docs/HANDOFF.md`：项目身份、PR #1/#2 已完成项、文档地图、DATA.md 核实事实（URL/SHA/形状）、stub/dry-run 契约、有序下一步、硬约束、clone 后命令。
+- README 顶部「快速入口」与文档入口突出链接 HANDOFF；`docs/REPRODUCTION.md` 增加指向 HANDOFF 的一行。
+- 事实均摘自当时 `main`（`1409c16`）上 DATA / UPSTREAM_MAP / REPRODUCTION，未编造指标或 Izadi URL。
+
+### 数据
+
+- 无新下载；沿用 2026-10-27 已核实直链与 SHA（见上一节 / DATA.md）。
+
+### 问题 / 下一步
+
+- 本机按 HANDOFF §6 / DATA.md：下载 → 软链 → 移植 ST-Net → Group 1 → Group 2  
+- Group 3 Pearson：仍仅 hook，勿超前实现  
+
+---
+
 ## 2026-10-27 — 核实数据直链 + 上游映射文档
 
 **目标：** 在不下载进 git、不训练、不编造指标的前提下，钉死 NY/CHI/DC 数据包 URL，并写清上游↔本仓映射。  
@@ -97,6 +121,7 @@ python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dr
 
 - [x] 确认 CrossTReS / STBaT 数据 zip 直链并写入 `docs/DATA.md`
 - [x] 编写 `docs/UPSTREAM_MAP.md`
+- [x] 编写 `docs/HANDOFF.md`（Agent / 本地交接）
 - [ ] 本机下载数据（不提交）并跑 `01_verify_data_layout.py`
 - [ ] 实现 ST-Net 最小训练环（对照上游 `model.py`）
 - [ ] Group 1 基线实跑
