@@ -1,0 +1,61 @@
+# Shared defaults for Phase-1 scaffold (Groups 1–2 first).
+# Paths are placeholders — fill after real data lands. No training implied.
+
+project: SW
+seed: 42
+device: cuda  # or cpu
+
+cities:
+  source: ny          # ny | chi
+  target: dc
+
+paths:
+  data_root: data
+  raw_dir: data/raw
+  processed_dir: data/processed
+  checkpoint_dir: checkpoints
+  log_dir: logs
+
+splits:
+  # STBaT-style target protocol (to be enforced by data code later)
+  few_shot_days: 3
+  source_train_val_ratio: [2, 1]
+  # target: last ~2 months test; preceding ~2 months val; train = few_shot_days before val
+  target_test_months: 2
+  target_val_months: 2
+
+data:
+  interval_minutes: 60
+  # Grid size TODO: fill after unzipping author packs
+  grid:
+    ny: {H: null, W: null}
+    chi: {H: null, W: null}
+    dc: {H: null, W: null}
+  channels: null       # e.g. in/out flow — TODO
+  normalize: minmax    # align with STBaT unless CrossTReS script differs
+
+model:
+  name: st_net
+  # Hyperparams are placeholders; match CrossTReS ST-Net when implementing
+  channels: 64
+  residual_blocks: 3
+  lstm_hidden: 128
+  history_len: 6
+  pred_len: 1
+
+train:
+  batch_size: 32
+  epochs: 50
+  lr: 0.001
+  weight_decay: 0.0
+  early_stop_patience: 5
+
+kd:
+  enabled: false
+  lambda_kd: 1.0
+  # Group 3 hook — keep off for Groups 1–2
+  pearson_multiplier: false
+
+logging:
+  print_every: 20
+  save_best: true

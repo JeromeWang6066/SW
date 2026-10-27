@@ -1,0 +1,77 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.venv/
+venv/
+env/
+
+# --- Env / secrets ---
+.env
+.env.*
+!.env.example
+
+# --- IDE / OS ---
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# --- Data & experiment artifacts (keep layout via .gitkeep) ---
+data/raw/**
+!data/raw/.gitkeep
+data/processed/**/*
+!data/processed/.gitkeep
+!data/processed/ny/
+!data/processed/ny/.gitkeep
+!data/processed/chi/
+!data/processed/chi/.gitkeep
+!data/processed/dc/
+!data/processed/dc/.gitkeep
+*.csv
+*.tsv
+*.h5
+*.hdf5
+*.npz
+*.npy
+*.npz
+*.pt
+*.pth
+*.ckpt
+*.pkl
+*.pickle
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# --- Checkpoints / logs ---
+checkpoints/**
+!checkpoints/.gitkeep
+runs/
+outputs/
+logs/
+wandb/
+lightning_logs/
+*.log
+
+# --- Notebooks checkpoints ---
+.ipynb_checkpoints/
+
+# --- Large binaries / papers (link only; do not commit PDFs) ---
+*.pdf
+*.bin
+*.onnx

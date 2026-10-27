@@ -1,0 +1,19 @@
+# SW scaffold dependencies — pin loosely; CUDA/torch wheels are machine-dependent.
+# Install matching torch from https://pytorch.org first if you need GPU, then:
+#   pip install -r requirements.txt
+
+# --- deep learning (CPU wheel OK for smoke tests; swap for CUDA build as needed) ---
+torch>=2.0.0          # TODO: pin to the CUDA build used on your GPU box
+numpy>=1.23
+pandas>=1.5
+scipy>=1.10
+
+# --- config / IO / UX ---
+pyyaml>=6.0
+tqdm>=4.65
+matplotlib>=3.7
+
+# --- optional later (uncomment when logging/experiments need them) ---
+# tensorboard>=2.14
+# wandb>=0.15
+# scikit-learn>=1.2
