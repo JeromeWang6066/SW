@@ -73,9 +73,9 @@ def main(argv: list[str] | None = None) -> int:
     logger.error("Student KD training is NOT IMPLEMENTED (scaffold only).")
     logger.error("Next steps:")
     logger.error("  1) Finish Group 1 teacher checkpoint")
-    logger.error("  2) Implement frozen-teacher KD loop (Group 2)")
+    logger.error("  2) Implement frozen-teacher KD (docs/UPSTREAM_MAP.md §3; TransGTR MSE)")
     logger.error("  3) Keep pearson_multiplier=false until Group 3 design is fixed")
-    logger.error("  4) Follow docs/REPRODUCTION.md Group 2")
+    logger.error("  4) Follow docs/REPRODUCTION.md Day N Group 2")
     return 2
 
 

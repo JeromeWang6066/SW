@@ -1,13 +1,16 @@
 """Few-shot and train/val/test index helpers (stubs).
 
-Align with STBaT-style target protocol when implementing for real:
-  test ≈ last 2 months; val ≈ preceding 2 months; train = few_shot_days before val.
+Upstream (CrossTReS / STBaT ``utils.split_x_y``):
+  val_num = test_num = 60 * 24  # ~2 months of 30-day months
+  few-shot: after split, train = train[-data_amount * 24:]
+
+See ``docs/UPSTREAM_MAP.md`` §2 and ``docs/DATA.md``.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Dict, Optional
 
 
 @dataclass(frozen=True)
@@ -15,6 +18,41 @@ class SplitIndices:
     train: slice
     val: slice
     test: Optional[slice] = None
+
+
+def upstream_style_cut_lengths(
+    num_timesteps: int,
+    few_shot_days: int = 3,
+    hours_per_day: int = 24,
+    val_hours: int = 60 * 24,
+    test_hours: int = 60 * 24,
+) -> Dict[str, int]:
+    """Lengths matching CrossTReS/STBaT ``split_x_y`` + ``data_amount`` trim.
+
+    Does **not** build lag windows; only reports how many timesteps fall into
+    each bucket after the upstream contiguous cut. Use this when porting the
+    real loader so configs stay honest about ``60*24`` (not calendar months).
+    """
+    if few_shot_days < 0:
+        raise ValueError("few_shot_days must be >= 0")
+    need = val_hours + test_hours
+    if num_timesteps < need:
+        raise ValueError(
+            f"T={num_timesteps} < val+test={need} (upstream uses 60*24 each)"
+        )
+    remainder_train = num_timesteps - val_hours - test_hours
+    few = few_shot_days * hours_per_day
+    if few > remainder_train:
+        raise ValueError(
+            f"few_shot_train={few} > remainder_train={remainder_train}"
+        )
+    return {
+        "total": num_timesteps,
+        "remainder_train": remainder_train,
+        "few_shot_train": few,
+        "val": val_hours,
+        "test": test_hours,
+    }
 
 
 def few_shot_split_indices(
@@ -27,9 +65,9 @@ def few_shot_split_indices(
 ) -> SplitIndices:
     """Return index slices for a target-city few-shot protocol.
 
-    This is a **schema helper** only. Month lengths and exact calendar cuts
-    must be verified against upstream CrossTReS/STBaT preprocessing before
-    claiming paper-faithful splits.
+    **Schema helper** using ``30*24`` month approximations. For paper-faithful
+    cuts prefer ``upstream_style_cut_lengths`` (``60*24``) and port
+    ``split_x_y`` windowing from upstream ``utils.py``.
 
     Raises if the timeline is too short for the requested protocol.
     """

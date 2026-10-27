@@ -75,15 +75,21 @@
 
 - **题名：** Knowledge Distillation on Spatial-Temporal Graph Convolutional Network for Traffic Prediction  
 - **arXiv：** https://arxiv.org/abs/2401.11798  
-- **代码：** **TODO**（公开页未在快速检索中确认独立官方实现仓库；有代码时补链）  
+- **代码：** **TODO — 仍无官方公开仓**（2026-10-27 复查 arXiv HTML / DOI / GitHub 搜索，未见作者挂出的独立实现链接；有代码时补链）  
 - **作用：** 同城压缩相关；仅作背景。
 
 ---
 
 ## 数据相关说明
 
-CrossTReS / STBaT README 均指向独立 **`data` 仓库 / zip**（`crosstres_data.zip` / `data.zip`）。  
-**完整下载 URL：TODO**（勿猜测组织名或私有链接）。确认后写入 [DATA.md](DATA.md)。
+CrossTReS / STBaT README 写 “Go to `data` repo…”，实际为**各自仓内 `data/` 目录**中的 zip（非独立 org）：
+
+| 包 | 直链（已核验） |
+|---|---|
+| CrossTReS `crosstres_data.zip` | https://github.com/KL4805/CrossTReS/raw/main/data/crosstres_data.zip |
+| STBaT `data.zip`（同内容布局） | https://github.com/ShaunHao/stbat/raw/main/data/data.zip |
+
+形状、SHA256、本仓目录映射见 [DATA.md](DATA.md)；上游代码路径见 [UPSTREAM_MAP.md](UPSTREAM_MAP.md)。
 
 ---
 

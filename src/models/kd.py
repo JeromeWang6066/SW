@@ -2,6 +2,11 @@
 
 Group 2: frozen teacher + standard KD loss.
 Group 3: optional non-learnable weekday Pearson ρ̃ multiplier (hook only).
+
+Upstream references (patterns only — different data domain):
+  - TransGTR ``engine.py`` / ``train_distil.py``: teacher.eval + MSE distill
+  - ST-MLP ``run_student.py`` / ``models/losses.py``: task + KD combination
+See ``docs/UPSTREAM_MAP.md`` §3.
 """
 
 from __future__ import annotations
