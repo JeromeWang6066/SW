@@ -1,0 +1,29 @@
+# G1-C — fine-tune CHI ST-Net on DC 3-day data. Task loss only, no KD.
+_base: default.yaml
+
+experiment:
+  group: 1
+  id: G1C-CHI2DC
+  role: finetune
+
+cities:
+  source: chi
+  target: dc
+
+splits:
+  few_shot_days: 3
+
+kd:
+  enabled: false
+  pearson_multiplier: false
+  teacher_checkpoint: checkpoints/teacher_chi_stnet.pt
+
+paths:
+  checkpoint_name: finetune_chi2dc.pt
+
+train:
+  epochs: 50
+  batch_size: 8
+  weight_decay: 5.0e-5
+
+seed: 42

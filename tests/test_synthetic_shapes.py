@@ -14,7 +14,7 @@ if str(ROOT) not in sys.path:
 
 torch = pytest.importorskip("torch")
 
-from src.data.splits import few_shot_split_indices, upstream_style_cut_lengths
+from src.data.splits import few_shot_split_indices, split_x_y, trim_few_shot, upstream_style_cut_lengths
 from src.models.kd import KDWrapper, freeze_module
 from src.models.st_net import STNet, expected_io_shapes
 
@@ -25,11 +25,15 @@ def test_expected_io_shapes() -> None:
     assert s["y_valid"] == (4, 1, 207)
 
 
-def test_stnet_construct_and_refuse_forward() -> None:
-    m = STNet(in_channels=1, residual_blocks=3, lstm_hidden=128)
+def test_stnet_forward_shape() -> None:
+    m = STNet(in_channels=1, residual_blocks=1, lstm_hidden=128)
     x = torch.zeros(2, 6, 8, 8)
-    with pytest.raises(NotImplementedError):
-        m(x)
+    y = m(x)
+    assert y.shape == (2, 1, 64)
+    mask = torch.zeros(8, 8, dtype=torch.bool)
+    mask.view(-1)[:10] = True
+    y_m = m(x, spatial_mask=mask)
+    assert y_m.shape == (2, 1, 10)
 
 
 def test_kd_loss_shapes_and_freeze() -> None:
@@ -52,8 +56,14 @@ def test_kd_pearson_mask_hook() -> None:
     wrap = KDWrapper(student, teacher, lambda_kd=1.0, pearson_mask=mask)
     s = torch.ones(2, 1, 8)
     t = torch.zeros(2, 1, 8)
-    # residual=1, mask=0.5 → mean 0.5
-    assert abs(float(wrap.kd_loss(s, t)) - 0.5) < 1e-6
+    # residual=1, mask=0.5, mean over batch then sum over 8 cells → 4
+    assert abs(float(wrap.kd_loss(s, t)) - 4.0) < 1e-6
+    wrap.train()
+    assert wrap.student.training
+    assert not wrap.teacher.training
+    x = torch.zeros(2, 6, 8, 8)
+    student_out, teacher_out = wrap(x)
+    assert student_out.shape == teacher_out.shape == (2, 1, 64)
 
 
 def test_upstream_cut_lengths_match_stbat() -> None:
@@ -61,6 +71,17 @@ def test_upstream_cut_lengths_match_stbat() -> None:
     assert cuts["val"] == cuts["test"] == 1440
     assert cuts["few_shot_train"] == 72
     assert cuts["remainder_train"] == 8784 - 1440 - 1440
+
+
+def test_split_x_y_window_counts() -> None:
+    data = np.zeros((200, 2, 2), dtype=np.float32)
+    tx, ty, vx, vy, sx, sy = split_x_y(data, val_num=40, test_num=40)
+    assert tx.shape == (200 - 6 - 40 - 40, 6, 2, 2)
+    assert ty.shape[0] == tx.shape[0] and ty.shape[1:] == (1, 2, 2)
+    assert vx.shape[0] == vy.shape[0] == 40
+    assert sx.shape[0] == sy.shape[0] == 40
+    trimmed_x, trimmed_y = trim_few_shot(tx, ty, few_shot_days=3)
+    assert len(trimmed_x) == len(trimmed_y) == 72
 
 
 def test_few_shot_schema_helper() -> None:

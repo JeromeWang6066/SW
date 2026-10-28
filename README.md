@@ -34,8 +34,9 @@ Cross-city few-shot **grid traffic flow / demand** prediction with knowledge dis
 
 | Group | 内容 | 阶段 |
 |---|---|---|
-| **1** | Source-only / target few-shot 基线（ST-Net，CrossTReS 风格） | **先做复现** |
-| **2** | 标准 KD（冻结教师 → 学生），STBaT 3-day，NY/CHI→DC | **先做复现** |
+| **1** | Source-only / target few-shot 基线（ST-Net，CrossTReS 风格） | 已实跑，见 RESULTS |
+| **2** | 标准 KD（冻结教师 → 学生），STBaT 3-day，NY/CHI→DC | 已实跑，见 RESULTS |
+| **1-C** | 源城权重在 DC 上微调，无 KD | 已实跑，见 RESULTS |
 | 3 | 冻结教师 + 工作日 Pearson ρ̃ 乘子调制 KD | Groups 1–2 之后 |
 | 4 | Ablation / matching 变体（TBD） | 更后 |
 
@@ -45,9 +46,9 @@ Cross-city few-shot **grid traffic flow / demand** prediction with knowledge dis
 |---|---|
 | 文档与配置骨架 | ✅ 本仓库已提供 |
 | 代码 stub / smoke 检查 | ✅ 可导入、可加载 YAML、可检查目录 |
-| 真实训练循环 | ❌ **尚未实现** |
+| 真实训练循环 | Group 1、G1-C、Group 2 已在本机跑完 |
 | 数据集下载 / 预处理产物 | ❌ **不在本仓库；勿提交大文件** |
-| 实验结果表 | ❌ **无虚构 MAE/RMSE** |
+| 实验结果表 | ✅ 真实指标见 [docs/RESULTS.md](docs/RESULTS.md)；权重不入库 |
 
 ## 快速开始（仅环境与冒烟）
 
@@ -62,13 +63,13 @@ python scripts/03_synthetic_shapes.py     # 合成张量形状；无需真实数
 python scripts/01_verify_data_layout.py   # 只检查目录，不下载
 ```
 
-训练入口：`--dry-run` 退出 0；无 dry-run 则明确拒绝（见 `src/train/`）：
+`--dry-run` 只加载配置并退出 0。下面的命令会在本机 GPU 上真训练：
 
 ```bash
 python -m src.train.train_teacher --config configs/teacher_ny.yaml --dry-run
-python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dry-run
-# 真训练尚未实现（会非零退出）：
-python -m src.train.train_teacher --config configs/teacher_ny.yaml
+python -u scripts/run_group1.py
+python -u scripts/run_group2.py
+python -u scripts/run_g1c.py
 ```
 
 **数据：** 勿提交大文件。已核实直链与解压布局见 [docs/DATA.md](docs/DATA.md)（CrossTReS `crosstres_data.zip` / STBaT `data.zip`）。
@@ -90,14 +91,14 @@ SW/
 │   ├── PAPERS.md
 │   ├── DATA.md             # 已核实下载直链
 │   └── advisor/选题汇报.html
-├── notes/progress.md       # 实验笔记
+├── notes/progress.md       # 实验笔记（逐步记录）
 ├── scripts/                # 环境 / 数据布局 / 导入 / 合成形状冒烟
 ├── tests/                  # 无真实数据的形状断言
 ├── src/
-│   ├── data/               # loader / few-shot split stubs
-│   ├── models/             # st_net.py, kd.py stubs
-│   ├── train/              # teacher / student CLI stubs
-│   ├── eval/               # MAE / RMSE / MAPE stubs
+│   ├── data/               # 窗口、mask、min-max
+│   ├── models/             # ST-Net 与 KD
+│   ├── train/              # Group 1 / G1-C / Group 2
+│   ├── eval/               # MAE / RMSE / MAPE
 │   └── utils/              # seed, logging, pearson_weekday_profile
 └── checkpoints/            # 本地权重目录（不入库）
 ```
@@ -105,7 +106,8 @@ SW/
 ## 文档入口
 
 - **[docs/HANDOFF.md](docs/HANDOFF.md)** — ★ Agent / 本地接手交接（冷启动必读）
-- **[docs/REPRODUCTION.md](docs/REPRODUCTION.md)** — 后续真实跑实验的主流程（Day 0–N）
+- **[docs/RESULTS.md](docs/RESULTS.md)** — 已跑完的 Group 1 / G1-C / Group 2 指标
+- **[docs/REPRODUCTION.md](docs/REPRODUCTION.md)** — 复现操作清单
 - **[docs/DATA.md](docs/DATA.md)** — **已核实** CrossTReS / STBaT zip 直链、网格形状、本仓布局
 - **[docs/UPSTREAM_MAP.md](docs/UPSTREAM_MAP.md)** — 上游文件路径 ↔ 本仓 stub / 下一步移植清单
 - **[docs/EXPERIMENT_PLAN.md](docs/EXPERIMENT_PLAN.md)** — Groups 1–4 与完成标准

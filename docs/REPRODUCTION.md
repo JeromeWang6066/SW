@@ -1,7 +1,7 @@
 # 复现手册（Phase-1）
 
-> **状态：尚未执行 / 待跑。** 本文档是后续真实实验的操作清单，不是已完成实验的报告。  
-> 约束：本阶段脚手架 **不下** 大数据进 git、**不训** 模型、**不写** 虚构指标。  
+> **状态：Group 1、G1-C、Group 2 已于 2026-10-28 跑完。** 数字见 [RESULTS.md](RESULTS.md)。本文保留操作清单。  
+> 约束：大数据与权重 **不** 进 git；指标只写真实评估。  
 > 上游对照总表：[UPSTREAM_MAP.md](UPSTREAM_MAP.md) · 数据直链：[DATA.md](DATA.md)  
 > Agent / 本地连续接手上下文：[HANDOFF.md](HANDOFF.md)
 

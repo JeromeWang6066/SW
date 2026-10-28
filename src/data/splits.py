@@ -1,4 +1,4 @@
-"""Few-shot and train/val/test index helpers (stubs).
+"""Few-shot and train/val/test splits aligned with CrossTReS / STBaT.
 
 Upstream (CrossTReS / STBaT ``utils.split_x_y``):
   val_num = test_num = 60 * 24  # ~2 months of 30-day months
@@ -10,7 +10,9 @@ See ``docs/UPSTREAM_MAP.md`` §2 and ``docs/DATA.md``.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Dict, Optional, Sequence, Tuple
+
+import numpy as np
 
 
 @dataclass(frozen=True)
@@ -53,6 +55,77 @@ def upstream_style_cut_lengths(
         "val": val_hours,
         "test": test_hours,
     }
+
+
+LAG_6H: Tuple[int, ...] = (-6, -5, -4, -3, -2, -1)
+
+
+def split_x_y(
+    data: np.ndarray,
+    lag: Sequence[int] = LAG_6H,
+    val_num: int = 60 * 24,
+    test_num: int = 60 * 24,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Window a ``T×H×W`` grid the way CrossTReS / STBaT ``utils.split_x_y`` does.
+
+    ``lag = [-6, ..., -1]`` and the loop starts at ``i = 6``, so each sample's
+    ``x`` is six past hours and ``y`` is hour ``i``. Validation and test are the
+    last ``60*24`` prediction hours each. Returns
+    ``train_x, train_y, val_x, val_y, test_x, test_y`` with
+    ``x`` shaped ``(N, len(lag), H, W)`` and ``y`` shaped ``(N, 1, H, W)``.
+    """
+    data = np.asarray(data)
+    if data.ndim != 3:
+        raise ValueError(f"expected T×H×W, got {data.shape}")
+    num_samples = int(data.shape[0])
+    need = val_num + test_num
+    if num_samples < need:
+        raise ValueError(f"T={num_samples} < val+test={need}")
+    start = -int(min(lag))
+    if start >= num_samples - need:
+        raise ValueError(f"lag start {start} leaves no train hours before val/test")
+
+    train_x, train_y = [], []
+    val_x, val_y = [], []
+    test_x, test_y = [], []
+    for i in range(start, num_samples):
+        x_idx = [int(step + i) for step in lag]
+        x_ = data[x_idx]
+        y_ = data[i : i + 1]
+        if i < num_samples - val_num - test_num:
+            train_x.append(x_)
+            train_y.append(y_)
+        elif i < num_samples - test_num:
+            val_x.append(x_)
+            val_y.append(y_)
+        else:
+            test_x.append(x_)
+            test_y.append(y_)
+    return (
+        np.stack(train_x, axis=0),
+        np.stack(train_y, axis=0),
+        np.stack(val_x, axis=0),
+        np.stack(val_y, axis=0),
+        np.stack(test_x, axis=0),
+        np.stack(test_y, axis=0),
+    )
+
+
+def trim_few_shot(
+    train_x: np.ndarray,
+    train_y: np.ndarray,
+    few_shot_days: int,
+    hours_per_day: int = 24,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """Keep the last ``few_shot_days * 24`` train windows (STBaT ``data_amount``)."""
+    if few_shot_days < 0:
+        raise ValueError("few_shot_days must be >= 0")
+    if few_shot_days == 0:
+        return train_x, train_y
+    n = few_shot_days * hours_per_day
+    if n > len(train_x):
+        raise ValueError(f"few_shot windows {n} > train windows {len(train_x)}")
+    return train_x[-n:], train_y[-n:]
 
 
 def few_shot_split_indices(

@@ -57,29 +57,35 @@ class KDWrapper(nn.Module if nn is not None else object):  # type: ignore[misc]
         else:
             self.pearson_mask = None
 
-    def forward(self, x: "torch.Tensor") -> "torch.Tensor":  # noqa: F821
-        raise NotImplementedError(
-            "KDWrapper.forward is TODO. Implement student forward + teacher "
-            "no_grad forward when STNet is ready."
-        )
+    def train(self, mode: bool = True):  # noqa: ANN001
+        super().train(mode)
+        self.teacher.eval()
+        return self
+
+    def forward(self, x: "torch.Tensor", spatial_mask=None):  # noqa: F821, ANN001
+        """Student prediction and a frozen teacher prediction on the same input."""
+        student_out = self.student(x, spatial_mask=spatial_mask)
+        with torch.no_grad():
+            teacher_out = self.teacher(x, spatial_mask=spatial_mask)
+        return student_out, teacher_out
 
     def kd_loss(
         self,
         student_out: "torch.Tensor",  # noqa: F821
         teacher_out: "torch.Tensor",  # noqa: F821
     ) -> "torch.Tensor":  # noqa: F821
-        """Masked MSE between student and teacher outputs.
+        """MSE on valid-cell outputs, reduced like CrossTReS task loss.
 
-        If ``pearson_mask`` is set (Group 3), multiply the per-element residual
-        energy by the mask before reduction. Matching / multi-channel profile
-        details remain TODO.
+        ``mean`` over the batch, then ``sum`` over cells. A plain ``mean`` would
+        make λ = 1 about ``N_valid`` times too small. If ``pearson_mask`` is set
+        (Group 3), it scales the residual before reduction. Matching stays TODO.
         """
         if torch is None:
             raise ImportError("PyTorch is required")
         residual = (student_out - teacher_out) ** 2
         if self.pearson_mask is not None:
             residual = residual * self.pearson_mask
-        return residual.mean()
+        return residual.mean(0).sum()
 
     def total_loss(
         self,

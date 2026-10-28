@@ -1,0 +1,29 @@
+# G1-C — fine-tune NY ST-Net on DC 3-day data. Task loss only, no KD.
+_base: default.yaml
+
+experiment:
+  group: 1
+  id: G1C-NY2DC
+  role: finetune
+
+cities:
+  source: ny
+  target: dc
+
+splits:
+  few_shot_days: 3
+
+kd:
+  enabled: false
+  pearson_multiplier: false
+  teacher_checkpoint: checkpoints/teacher_ny_stnet.pt
+
+paths:
+  checkpoint_name: finetune_ny2dc.pt
+
+train:
+  epochs: 50
+  batch_size: 8
+  weight_decay: 5.0e-5
+
+seed: 42

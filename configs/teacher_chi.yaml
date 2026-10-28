@@ -1,4 +1,4 @@
-# Group 1 — source teacher on CHI (ST-Net). Training not implemented yet.
+# Group 1 — source teacher on CHI (CrossTReS ST-Net).
 _base: default.yaml
 
 experiment:
@@ -19,6 +19,7 @@ paths:
 
 train:
   epochs: 50
-  batch_size: 32
+  batch_size: 8
+  weight_decay: 5.0e-5
 
 seed: 42

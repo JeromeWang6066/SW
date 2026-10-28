@@ -1,12 +1,12 @@
-"""ST-Net stub — Phase-1 backbone.
+"""CrossTReS ST-Net (Phase-1 backbone).
 
-Point of truth for architecture details:
-  https://github.com/KL4805/CrossTReS  (see ``src/model.py`` → ``class STNet``)
+Ported from https://github.com/KL4805/CrossTReS ``src/model.py`` ``class STNet``
+and ``class ResUnit`` (the ``forward`` path, not ``functional_forward``).
+Cross-check: https://github.com/ShaunHao/stbat ``model.py`` ``class STNet``.
 
-Cross-check: https://github.com/ShaunHao/stbat ``model.py`` → ``STNet``
-
-Do not invent layer shapes that diverge from upstream without documenting why.
-See ``docs/UPSTREAM_MAP.md``.
+Upstream hardcodes conv width 64 and LSTM hidden 128. Those are the defaults
+here. ``functional_forward`` (meta-learning) is not ported; Phase-1 does not
+use region re-weighting.
 """
 
 from __future__ import annotations
@@ -16,9 +16,11 @@ from typing import Dict, Optional, Tuple
 try:
     import torch
     from torch import nn
+    import torch.nn.functional as F
 except ImportError:  # pragma: no cover - smoke environments without torch
     torch = None  # type: ignore
     nn = None  # type: ignore
+    F = None  # type: ignore
 
 
 def expected_io_shapes(
@@ -29,10 +31,11 @@ def expected_io_shapes(
     n_valid: Optional[int] = None,
     channels: int = 1,
 ) -> Dict[str, Tuple[int, ...]]:
-    """Document upstream-style tensor shapes for smoke tests (no real forward).
+    """Document upstream-style tensor shapes.
 
     CrossTReS / STBaT use ``lag = [-6,...,-1]`` → ``history_len=6``.
-    Output after spatial mask is typically ``(B, 1, N_valid)``.
+    With one flow channel, ``X`` is ``(B, history_len, H, W)``.
+    After the spatial mask, ``STNet`` returns ``(B, 1, N_valid)``.
     """
     if n_valid is None:
         n_valid = height * width
@@ -47,12 +50,36 @@ def expected_io_shapes(
     }
 
 
-class STNet(nn.Module if nn is not None else object):  # type: ignore[misc]
-    """Placeholder ST-Net.
+class ResUnit(nn.Module if nn is not None else object):  # type: ignore[misc]
+    """CrossTReS residual unit: BN-ReLU-Conv ×2, then add the input."""
 
-    Intended structure (CrossTReS ``src/model.py``):
-      Conv2d(in→64) → ResUnit×``num_convs`` → LSTM(64→128) → Linear → sigmoid.
-    Replace ``forward`` with a faithful port; keep ``expected_io_shapes`` in sync.
+    def __init__(self, in_channels: int, out_channels: int) -> None:
+        if nn is None:
+            raise ImportError("PyTorch is required for ResUnit. pip install torch")
+        super().__init__()
+        self.bn1 = nn.BatchNorm2d(in_channels)
+        self.conv1 = nn.Conv2d(in_channels, out_channels, 3, 1, 1)
+        self.bn2 = nn.BatchNorm2d(out_channels)
+        self.conv2 = nn.Conv2d(out_channels, out_channels, 3, 1, 1)
+
+    def forward(self, x: "torch.Tensor") -> "torch.Tensor":  # noqa: F821
+        z = self.bn1(x)
+        z = F.relu(z)
+        z = self.conv1(z)
+        z = self.bn2(z)
+        z = F.relu(z)
+        z = self.conv2(z)
+        return z + x
+
+
+class STNet(nn.Module if nn is not None else object):  # type: ignore[misc]
+    """CrossTReS ``STNet``: per-lag conv stack, LSTM over lags, sigmoid on valid cells.
+
+    Parameters match the previous stub names (``in_channels``, ``residual_blocks``,
+    ``lstm_hidden``) so configs and smoke tests keep working. ``spatial_mask``
+    is optional at init; ``forward`` can also receive one. A missing mask keeps
+    every grid cell (useful for shape tests). Training passes the upstream
+    ``sum(time) > 0`` mask.
     """
 
     def __init__(
@@ -62,6 +89,7 @@ class STNet(nn.Module if nn is not None else object):  # type: ignore[misc]
         residual_blocks: int = 3,
         lstm_hidden: int = 128,
         pred_len: int = 1,
+        spatial_mask: Optional["torch.Tensor"] = None,  # noqa: F821
     ) -> None:
         if nn is None:
             raise ImportError("PyTorch is required for STNet. pip install torch")
@@ -71,26 +99,69 @@ class STNet(nn.Module if nn is not None else object):  # type: ignore[misc]
         self.residual_blocks = residual_blocks
         self.lstm_hidden = lstm_hidden
         self.pred_len = pred_len
-        # Honest stub: a single identity-ish proj so construction/smoke works.
-        # Real ResUnit/LSTM weights land when porting CrossTReS.
-        self._proj = nn.Conv2d(in_channels, in_channels, kernel_size=1)
-        self._implemented = False
+        self.num_channels = in_channels
+        self.num_convs = residual_blocks
+        self._implemented = True
 
-    def forward(self, x: "torch.Tensor") -> "torch.Tensor":  # noqa: F821
-        """Forward is not implemented for real training yet.
-
-        Parameters
-        ----------
-        x :
-            Upstream-style windowed grid batch, e.g. ``(B, L, H, W)`` with
-            ``L=6`` (see ``expected_io_shapes``). Finalize channel layout when
-            porting CrossTReS ``STNet.forward``.
-        """
-        raise NotImplementedError(
-            "STNet.forward is TODO. Port from KL4805/CrossTReS src/model.py "
-            "(class STNet) before any training run. Refusing to return pretend "
-            "predictions. See docs/UPSTREAM_MAP.md."
+        self.conv1 = nn.Conv2d(in_channels, channels, 3, 1, 1)
+        self.layers = nn.ModuleList(
+            [ResUnit(channels, channels) for _ in range(residual_blocks)]
         )
+        self.lstm = nn.LSTM(channels, lstm_hidden)
+        self.linear = nn.Linear(lstm_hidden * 2, pred_len)
+
+        if spatial_mask is not None:
+            mask = torch.as_tensor(spatial_mask).bool()
+            self.register_buffer("spatial_mask", mask)
+        else:
+            self.spatial_mask = None
+
+    def forward(
+        self,
+        x: "torch.Tensor",  # noqa: F821
+        spatial_mask: Optional["torch.Tensor"] = None,  # noqa: F821
+        return_feat: bool = False,
+    ):
+        """Return ``(B, pred_len, N_valid)``. With ``return_feat``, also the pre-mask features."""
+        if spatial_mask is None:
+            spatial_mask = self.spatial_mask
+        if spatial_mask is None:
+            spatial_mask = torch.ones(
+                x.shape[2], x.shape[3], dtype=torch.bool, device=x.device
+            )
+        else:
+            spatial_mask = spatial_mask.to(device=x.device)
+            if spatial_mask.dtype != torch.bool:
+                spatial_mask = spatial_mask.bool()
+            spatial_mask = spatial_mask.reshape(x.shape[2], x.shape[3])
+
+        num_lag = x.shape[1] // self.num_channels
+        batch_size = x.shape[0]
+        outs = []
+        for i in range(num_lag):
+            step = x[:, i * self.num_channels : (i + 1) * self.num_channels, :, :]
+            z = self.conv1(step)
+            for layer in self.layers:
+                z = layer(z)
+            z = z.permute(0, 2, 3, 1).reshape(batch_size, -1, self.channels).contiguous()
+            outs.append(z.reshape(-1, self.channels))
+
+        # (lag, B*H*W, C) — each cell is its own sequence, as in CrossTReS.
+        seq = torch.stack(outs, dim=0)
+        temporal_out, (temporal_hid, _) = self.lstm(seq)
+        temporal_out = temporal_out[-1:, :]
+        temporal = torch.cat(
+            [
+                temporal_out.reshape(batch_size, -1, self.lstm_hidden),
+                temporal_hid.reshape(batch_size, -1, self.lstm_hidden),
+            ],
+            dim=-1,
+        )
+        temporal_valid = temporal[:, spatial_mask.reshape(-1), :]
+        output = torch.sigmoid(self.linear(temporal_valid)).permute(0, 2, 1)
+        if return_feat:
+            return temporal, output
+        return output
 
     def extra_repr(self) -> str:
         return (

@@ -53,7 +53,7 @@
 | 非目标 | 说明 |
 |---|---|
 | ❌ 大文件进 git | 不提交 zip / npy / 原始 trip / checkpoint |
-| ❌ 真实训练 | `train_*` 无 dry-run 时 **拒绝并 exit 2** |
+| ❌ 虚构训练结果 | 只记录真实评估。`--max-steps` 的输出不是实验结果。数字见 RESULTS.md |
 | ❌ 虚构指标表 | 无假 MAE/RMSE；`notes/progress.md` 实跑前填 `—` |
 | ❌ 多 GB 下载进 git 工作树再 commit | 本机下载到 `data/raw/`（已 gitignore）即可 |
 
@@ -143,7 +143,7 @@ python scripts/01_verify_data_layout.py
 ### 时间划分（与上游一致；实现时勿用错）
 
 CrossTReS / STBaT `split_x_y`：`val_num = test_num = 60 * 24`（各 **1440** 小时）→ 再对目标 train 截 `[-few_shot_days*24:]`（`few_shot_days=3` → **72** 小时）。  
-注意：本仓 `src/data/splits.py` 里 `few_shot_split_indices` 仍用 `30*24` **近似月**；移植时以 `upstream_style_cut_lengths`（已用 `60*24`）+ 上游 `utils.py` 为准。
+训练切分用 `split_x_y`（`60*24`）。`few_shot_split_indices` 仍是 `30*24` 的旧示意图函数，不要拿它做正式划分。
 
 ---
 
@@ -153,13 +153,16 @@ CrossTReS / STBaT `split_x_y`：`val_num = test_num = 60 * 24`（各 **1440** �
 
 | 组件 | 状态 | 行为 |
 |---|---|---|
-| `STNet` | **stub** | 可构造（占位 `Conv2d`）；`forward` → **`NotImplementedError`**（拒绝假预测） |
-| `KDWrapper.forward` | **stub** | **`NotImplementedError`** |
-| `KDWrapper.kd_loss` / `total_loss` | **可用公式** | MSE；若设 `pearson_mask` 则乘残差（Group 3 hook） |
+| `STNet` | **已移植 `forward`** | Conv → ResUnit×N → LSTM → Linear → sigmoid；输出 `(B, 1, N_valid)`。无 meta 用的 `functional_forward` |
+| `KDWrapper.forward` | **Group 2 已接** | 学生前向 + 冻结教师 `no_grad` 前向；`train()` 保持教师为 `eval` |
+| `KDWrapper.kd_loss` / `total_loss` | **可用公式** | 与任务损失相同归约：batch 上 `mean`，格子上 `sum`。`pearson_mask` 仍是 Group 3 hook |
 | `freeze_module` | **可用** | `eval()` + `requires_grad=False` |
-| `train_teacher` / `train_student_kd` | **CLI stub** | `--dry-run` → 加载 config + seed → **exit 0**；无 dry-run → 打印 next steps → **exit 2** |
-| `GridFlowDataset` | **stub** | `load_city_array` 可找 `flow.npy` / `upstream/Taxi*_pickup.npy`；`__len__` / `__getitem__` 未实现 |
-| `few_shot_split_indices` | **schema helper** | `30*24` 近似；**须对齐** `60*24` |
+| `train_teacher` | **Group 1 已跑** | 源城只用训练窗口。`--dry-run` 退出 0。`--max-steps` 只做接线检查 |
+| `train_finetune` | **G1-C 已跑** | 源城权重复制到 DC 后全参数微调，无 KD |
+| `train_student_kd` | **Group 2 已跑** | 冻结教师 + `L_task + λ L_kd`。`--dry-run` 退出 0。`pearson_multiplier=true` 退出 2 |
+| `GridFlowDataset` | **可用** | 窗口对 `(x, y)`；`prepare_city_windows` 做 mask、min-max、`split_x_y` |
+| `split_x_y` / `trim_few_shot` | **已对齐上游** | `val=test=60*24`；few-shot 取训练窗口末尾 `days*24` |
+| `few_shot_split_indices` | **旧示意图** | 仍用 `30*24`；正式实验不要调用 |
 | `upstream_style_cut_lengths` | **可用长度表** | 与上游 `60*24` 一致的切分长度 |
 | `metrics.py` | **可用公式** | 仅对真实预测调用；禁止填虚构实验表 |
 | `pearson_weekday_profile.py` | **Group 3 hook** | 轮廓 / 行 Pearson 助手；**跨城 matching TBD** — **勿实现 Group 3 最终算法** |
@@ -171,7 +174,7 @@ CrossTReS / STBaT `split_x_y`：`val_num = test_num = 60 * 24`（各 **1440** �
 | `00_check_env.py` | 打印 Python / numpy / torch 等 | 不下载、不训练 |
 | `01_verify_data_layout.py` | 检查 `data/{raw,processed/{ny,chi,dc}}` 目录 | **不下载**；空目录仅警告 EMPTY |
 | `02_smoke_import.py` | 导入、YAML、合成 Pearson、metrics、split 长度 | 不用真实城市数据出指标 |
-| `03_synthetic_shapes.py` | ST-Net 构造、KD loss 形状、`forward` 应拒绝、`8784` cut lengths | 不调用真 forward 预测 |
+| `03_synthetic_shapes.py` | ST-Net 构造与 `forward` 形状、KD loss 形状、`8784` cut lengths | 不用真实城市数据出指标 |
 | `tests/test_synthetic_shapes.py` | 同上契约的 pytest | 无真实数据 / 无训练 |
 
 ### Pearson hook 位置（Group 3+ only）
@@ -196,6 +199,8 @@ Phase-1 **不做**：CrossTReS region re-weighting 全框架、STBaT RIAM、Tran
 ## 6. 下一步任务（有序、可执行）
 
 面向：**本机学生 / 本地 coding agent**。Cloud / docs agent **不要**编造训练结果或把多 GB 数据拉进 git tree。
+
+步骤 1–4 已在 2026-10-28 完成，数字见 [RESULTS.md](RESULTS.md) 与 `notes/progress.md`。下面保留当时的操作顺序。
 
 1. **本机数据落地**  
    按 [DATA.md](DATA.md) 下载 CrossTReS（或 STBaT）zip → 校验 SHA256 → 解压 → 软链到 `data/processed/{ny,chi,dc}/` → `python scripts/01_verify_data_layout.py` → 在 `notes/progress.md` 记 URL / 日期 / SHA。
@@ -256,7 +261,8 @@ python scripts/01_verify_data_layout.py   # 只查目录
 # CLI 诚实契约
 python -m src.train.train_teacher --config configs/teacher_ny.yaml --dry-run          # exit 0
 python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dry-run  # exit 0
-# 无 --dry-run → 应 exit 2（尚未实现训练）
+# 教师入口无 --dry-run 会开始 Group 1 训练（本机 8GB 请用 config 里的 batch 8）
+# 学生 KD 入口无 --dry-run 会开始 Group 2 训练
 
 # 然后按 §6：本机按 docs/DATA.md 下载数据 → 移植 → Group 1 → Group 2
 ```
@@ -284,7 +290,7 @@ python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dr
 
 - [ ] 已读本文 + DATA.md + UPSTREAM_MAP.md  
 - [ ] `make smoke` / `make shapes` 通过  
-- [ ] 理解：无 `--dry-run` 的 train CLI 必须失败（exit 2），直到真实现训环  
+- [ ] 理解：`train_teacher` / `train_student_kd` / `train_finetune` 无 `--dry-run` 会真训练；已跑结果见 RESULTS.md  
 - [ ] 本机数据按 DATA.md 落地且 **未** `git add` zip/npy  
 - [ ] 计划中的下一 PR 只做 Groups 1–2 路径上的一项（移植或基线），不夹带 Group 3 最终公式  
 - [ ] 任何实跑指标只写进 `notes/progress.md`，并带来源 seed / config / commit  

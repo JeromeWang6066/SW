@@ -45,13 +45,10 @@ def main() -> int:
     assert abs(float(total) - (0.25 + 0.5 * float(kd))) < 1e-6
     print("  KDWrapper kd_loss/total_loss shapes OK")
 
-    # forward must still refuse pretend predictions
-    try:
-        student(__import__("torch").zeros(*shapes["x"]))
-        print("  ERROR: STNet.forward should raise NotImplementedError")
-        return 1
-    except NotImplementedError:
-        print("  STNet.forward correctly refuses (NotImplementedError)")
+    y = student(__import__("torch").zeros(*shapes["x"]))
+    # No mask → every cell is valid. n_valid=40 above only documents a masked case.
+    assert tuple(y.shape) == (shapes["x"][0], 1, shapes["x"][2] * shapes["x"][3])
+    print("  STNet.forward shape OK:", tuple(y.shape))
 
     T = 8784  # matches verified upstream year length
     cuts = upstream_style_cut_lengths(T, few_shot_days=3)

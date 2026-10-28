@@ -26,6 +26,7 @@ paths:
 
 train:
   epochs: 50
-  batch_size: 16
+  batch_size: 8
+  weight_decay: 5.0e-5
 
 seed: 42

@@ -1,21 +1,22 @@
 # 上游仓库 ↔ 本仓库映射
 
-> 中文主文档。路径均来自 2026-10-27 拉取的 **live GitHub 树**；本仓库对应文件多为 **stub**，勿当作已完成移植。  
+> 中文主文档。路径均来自 2026-10-27 拉取的 **live GitHub 树**。ST-Net、Group 1、G1-C 与 Group 2 已在本机跑完，指标见 [RESULTS.md](RESULTS.md)。  
 > 相关： [DATA.md](DATA.md) · [REPRODUCTION.md](REPRODUCTION.md) · [PAPERS.md](PAPERS.md)
 
 ## 总览
 
 | 本仓库 | 上游对照 | 状态 |
 |---|---|---|
-| `src/models/st_net.py` | CrossTReS / STBaT `model.py` 中 `STNet` | **stub** — 须移植 |
-| `src/train/train_teacher.py` | CrossTReS `run_crosstres.py` 源训环；STBaT `main.py` 源预训练段 | **stub** — dry-run OK，真训拒绝 |
-| `src/data/splits.py` | CrossTReS/STBaT `utils.py::split_x_y` + `data_amount` 截断 | **schema helper** — 近似月长，须对齐 `60*24` |
-| `configs/baseline_target_fewshot.yaml` | STBaT `--data_amount 3` / CrossTReS 同名参数 | 配置占位 |
-| `src/models/kd.py` | TransGTR `engine.py::distil_trainer`；ST-MLP student 训环 | **stub** — `kd_loss` 已有 MSE 形；`forward` 未实现 |
-| `src/train/train_student_kd.py` | 上列 KD 训环 + STBaT 3-day 目标侧 | **stub** |
+| `src/models/st_net.py` | CrossTReS / STBaT `model.py` 中 `STNet` | **已移植** `forward`（无 `functional_forward`） |
+| `src/train/train_teacher.py` | CrossTReS `run_crosstres.py` 源训环；STBaT `main.py` 源预训练段 | **Group 1 训环已接**；`--dry-run` 仍只加载配置。不含 region re-weighting |
+| `src/data/splits.py` | CrossTReS/STBaT `utils.py::split_x_y` + `data_amount` 截断 | **已对齐** `60*24`；`few_shot_split_indices` 仍是旧的 `30*24` 示意图 |
+| `configs/baseline_target_fewshot.yaml` | STBaT `--data_amount 3` / CrossTReS 同名参数 | **G1-tgt-3d 已跑** |
+| `src/models/kd.py` | TransGTR `engine.py::distil_trainer`；ST-MLP student 训环 | **Group 2 已接**；Pearson 乘子仍是 hook |
+| `src/train/train_student_kd.py` | 上列 KD 训环 + STBaT 3-day 目标侧 | **Group 2 已跑** |
+| `src/train/train_finetune.py` | 源城权重在目标城上继续训练 | **G1-C 已跑**，无 KD |
 | `src/eval/metrics.py` | CrossTReS/STBaT `evaluate`；TransGTR `util.masked_*` | **可用公式**（仅对真实预测调用） |
 | `src/utils/pearson_weekday_profile.py` | （本工作新增 hook） | Group 3+；**勿超前实现最终匹配** |
-| `src/data/dataset.py` | 上游 `np.load("../data/...")` | stub loader |
+| `src/data/dataset.py` | 上游 `np.load("../data/...")` | **可加载** Taxi pickup，并做 min-max 与窗口 |
 
 ---
 
@@ -25,10 +26,10 @@
 
 | 上游路径 | 内容 | 本仓库 |
 |---|---|---|
-| `src/model.py` → `class STNet`（约 L369+） | Conv2d → `ResUnit`×`num_convs` → LSTM(64→128) → Linear → sigmoid；可选 `return_feat` | `src/models/st_net.py`（**stub**） |
+| `src/model.py` → `class STNet`（约 L369+） | Conv2d → `ResUnit`×`num_convs` → LSTM(64→128) → Linear → sigmoid；可选 `return_feat` | `src/models/st_net.py`（**已移植 `forward`**） |
 | `src/model.py` → `STNet_nobn` / `STResNet*` | 无 BN / ResNet 变体；`run_crosstres.py` 默认常为 `STNet_nobn` | 移植时按 config 选型；Phase-1 优先 **STNet** 与 STBaT 对齐 |
 | `src/model.py` → `ResUnit` / `functional_lstm` | 残差块与 meta 用 functional LSTM | 随 ST-Net 一并移植 |
-| `src/run_crosstres.py` | 数据加载、`split_x_y`、源训、区域重加权等全流程 | `src/train/train_teacher.py`（仅 CLI stub）；**不**优先复现 region re-weighting |
+| `src/run_crosstres.py` | 数据加载、`split_x_y`、源训、区域重加权等全流程 | `src/train/train_teacher.py`（源城拼接训练 + 目标 3-day）；**不**复现 region re-weighting |
 | `src/utils.py` | `split_x_y`、`min_max_normalize`、图构造 | `src/data/splits.py` + 日后 preprocess |
 | `src/run_crosstres_rt.py` / `gen_rt_dict.py` | RegionTrans 微调 | Phase-1 非必须 |
 | `configs/teacher_{ny,chi}.yaml` | （本仓）源城教师超参占位 | 对照 `run_crosstres.py` argparse |
@@ -62,7 +63,7 @@
 2. 再对 **train** 截最后 `few_shot_days * 24`  
 3. Phase-1：`few_shot_days=3`；零样本 `0` 非本阶段默认  
 
-**stub vs 下一步：** `splits.py` 可测长度算术；需补：与上游一致的 `60*24` 切分、lag 窗口化、min-max 统计写入 config。
+`split_x_y` 与 `trim_few_shot` 已按上游 `60*24` 和 `data_amount*24` 实现。归一化统计量保存在 checkpoint 里（`max_val` / `min_val`），不写回 YAML。
 
 ---
 
@@ -115,10 +116,11 @@ Phase-1 **不**跑 TransGTR/ST-MLP 数据；只借 **冻结教师 + 蒸馏损失
 | 优先级 | 项 | 说明 |
 |---|---|---|
 | P0 | 按 [DATA.md](DATA.md) 本地下载 zip（勿提交） | 链接已核实 |
-| P0 | 移植 `STNet`（CrossTReS `src/model.py`） | 替换 stub `forward` |
-| P0 | `split_x_y` + `data_amount` 对齐 | 修正 `splits.py` 与上游 `60*24` |
-| P0 | `train_teacher` 真训环 | Group 1 |
-| P1 | `KDWrapper.forward` + `train_student_kd` | Group 2；对照 TransGTR MSE KD |
+| P0 | 移植 `STNet`（CrossTReS `src/model.py`） | 已做 `forward`；未做 `functional_forward` |
+| P0 | `split_x_y` + `data_amount` 对齐 | 已做 |
+| P0 | `train_teacher` 真训环 | Group 1 已实跑，见 RESULTS.md |
+| P1 | `KDWrapper.forward` + `train_student_kd` | Group 2 已实跑 |
+| P1 | `train_finetune` | G1-C 已实跑 |
 | P1 | Dataset 读 `Taxi{CITY}_pickup.npy` 等 | 见 DATA.md 文件名 |
 | P2 | Pearson 乘子 | 仅 hook；等顾问定稿 |
 | — | Izadi 代码 | **仍无官方仓**（见 PAPERS.md） |
