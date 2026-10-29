@@ -330,6 +330,43 @@ python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dr
 
 ---
 
+## 2026-10-29 — 用修正 MAPE 重算种子 42 的旧 checkpoint
+
+**目标：** 不重新训练，把 Group 1 三城、两组蒸馏、两组微调的已有 checkpoint 按新 MAPE 重算验证集和测试集。  
+**配置：** 无新训练。checkpoint 为 `teacher_ny_stnet.pt`、`teacher_chi_stnet.pt`、`baseline_dc_3day_stnet.pt`、`student_kd_ny2dc.pt`、`student_kd_chi2dc.pt`、`finetune_ny2dc.pt`、`finetune_chi2dc.pt`。  
+**Git commit：** 本 PR  
+**机器 / GPU：** Windows 本机，RTX 4060 Laptop。只做评估。
+
+### 做了什么
+
+- 调用更新后的 `evaluate`。RMSE / MAE 与原先 `logs/*.json` 在打印到小数点后六位时一致。
+- 早先 progress 里千万量级的 MAPE 是旧分母 `max(|y|, 1e-6)` 的记录，这一节的数字取代它们用于比较。
+
+### 真实结果（仅实跑后填写）
+
+| run | split | MAE | RMSE | MAPE |
+|---|---|---|---|---|
+| G1-src-ny | val | 4.1881 | 15.4229 | 59.9577 |
+| G1-src-ny | test | 4.3245 | 15.5533 | 57.2310 |
+| G1-src-chi | val | 1.8711 | 6.0326 | 49.3779 |
+| G1-src-chi | test | 1.8539 | 6.3722 | 51.6097 |
+| G1-tgt-3d | val | 2.1333 | 6.2564 | 75.1337 |
+| G1-tgt-3d | test | 1.8701 | 5.5528 | 75.9919 |
+| G2-NY2DC | val | 2.0248 | 6.3896 | 57.9803 |
+| G2-NY2DC | test | 1.7519 | 5.5064 | 59.2878 |
+| G2-CHI2DC | val | 2.0314 | 6.1986 | 64.7428 |
+| G2-CHI2DC | test | 1.7485 | 5.4130 | 65.3868 |
+| G1C-NY2DC | val | 2.0548 | 6.1937 | 75.6398 |
+| G1C-NY2DC | test | 1.7153 | 5.2786 | 72.3947 |
+| G1C-CHI2DC | val | 1.7130 | 5.5809 | 72.9796 |
+| G1C-CHI2DC | test | 1.4773 | 5.0578 | 73.3157 |
+
+### 问题 / 下一步
+
+- 芝加哥 λ 扫描尚未开始
+
+---
+
 ## YYYY-MM-DD — 标题
 
 **目标：**  
