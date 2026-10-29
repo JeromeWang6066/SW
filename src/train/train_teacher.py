@@ -55,6 +55,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Continue from checkpoints/<name>.latest.pt if that file exists",
     )
+    p.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="Override config seed. Result json and checkpoint names include this seed.",
+    )
     return p.parse_args(argv)
 
 
@@ -74,12 +80,17 @@ def evaluate(
     scale: float,
     min_val: float,
 ) -> tuple[float, float, float, float]:
-    """Normalized RMSE, plus denormalized RMSE / MAE / MAPE on valid cells."""
+    """Normalized RMSE, plus denormalized RMSE / MAE / MAPE.
+
+    RMSE and MAE use every valid cell. MAPE uses only cells whose denormalized
+    true flow is strictly greater than zero, with that flow as the denominator.
+    """
     net.eval()
     se = 0.0
     ae_raw = 0.0
     ape = 0.0
     valid_points = 0.0
+    mape_points = 0.0
     n_valid = float(mask.sum().item())
     for x, y in loader:
         x = x.to(device)
@@ -90,13 +101,16 @@ def evaluate(
         y_raw = y_valid * scale + min_val
         p_raw = out * scale + min_val
         ae_raw += float((p_raw - y_raw).abs().sum().item())
-        denom = torch.clamp(y_raw.abs(), min=1e-6)
-        ape += float(((p_raw - y_raw).abs() / denom).sum().item())
+        positive = y_raw > 0
+        if bool(positive.any()):
+            ape += float((p_raw[positive] - y_raw[positive]).abs().div(y_raw[positive]).sum().item())
+            mape_points += float(positive.sum().item())
         valid_points += x.shape[0] * n_valid
     if valid_points <= 0:
         raise RuntimeError("evaluation saw no valid points")
     rmse_norm = (se / valid_points) ** 0.5
-    return rmse_norm, rmse_norm * scale, ae_raw / valid_points, ape / valid_points * 100.0
+    mape = float("nan") if mape_points <= 0 else ape / mape_points * 100.0
+    return rmse_norm, rmse_norm * scale, ae_raw / valid_points, mape
 
 
 def _loaders(train_ds, val_ds, test_ds, batch_size: int):
@@ -112,7 +126,8 @@ def _loaders(train_ds, val_ds, test_ds, batch_size: int):
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     cfg = load_config(args.config)
-    seed = int(cfg.get("seed", 42))
+    seed_override = args.seed is not None
+    seed = int(args.seed) if seed_override else int(cfg.get("seed", 42))
     set_seed(seed)
 
     exp = cfg.get("experiment", {})
@@ -193,11 +208,14 @@ def main(argv: list[str] | None = None) -> int:
     ckpt_dir = Path(paths.get("checkpoint_dir", "checkpoints"))
     ckpt_dir.mkdir(parents=True, exist_ok=True)
     ckpt_name = paths.get("checkpoint_name", f"{exp.get('id', city)}_stnet.pt")
+    run_id = str(exp.get("id", city))
+    if seed_override:
+        ckpt_name = f"{Path(ckpt_name).stem}_seed{seed}{Path(ckpt_name).suffix}"
+        run_id = f"{run_id}_seed{seed}"
     ckpt_path = ckpt_dir / ckpt_name
     latest_path = ckpt_dir / f"{Path(ckpt_name).stem}.latest.pt"
     log_dir = Path(paths.get("log_dir", "logs"))
     log_dir.mkdir(parents=True, exist_ok=True)
-    run_id = str(exp.get("id", city))
     scale = float(prepared["max_val"] - prepared["min_val"])
     min_val = float(prepared["min_val"])
 

@@ -19,6 +19,18 @@ from src.models.kd import KDWrapper, freeze_module
 from src.models.st_net import STNet, expected_io_shapes
 
 
+def test_mape_excludes_zero_true_flow() -> None:
+    from src.eval.metrics import mae, mape, rmse
+
+    y_true = np.array([0.0, 2.0, 4.0, 0.0])
+    y_pred = np.array([9.0, 3.0, 2.0, 1.0])
+    # Positive cells only: |3-2|/2 = 0.5 and |2-4|/4 = 0.5 → 50%.
+    assert abs(mape(y_true, y_pred) - 50.0) < 1e-6
+    assert abs(mae(y_true, y_pred) - np.mean(np.abs(y_true - y_pred))) < 1e-9
+    assert abs(rmse(y_true, y_pred) - np.sqrt(np.mean((y_true - y_pred) ** 2))) < 1e-9
+    assert np.isnan(mape(np.zeros(3), np.ones(3)))
+
+
 def test_expected_io_shapes() -> None:
     s = expected_io_shapes(batch=4, history_len=6, height=21, width=20, n_valid=207)
     assert s["x"] == (4, 6, 21, 20)

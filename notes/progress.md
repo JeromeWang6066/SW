@@ -6,7 +6,7 @@
 
 - 学生：Tianyao Wang (Jerome)
 - 仓库：https://github.com/JeromeWang6066/SW
-- 当前阶段：Group 1、G1-C 微调和 Group 2 已实跑。对比用反归一化 RMSE / MAE。MAPE 被接近 0 的流量格放大。
+- 当前阶段：Group 1、G1-C、Group 2 和微调加蒸馏已实跑。新 MAPE 只统计真实流量大于 0 的格子。旧实验的 MAPE 仍是放大后的数字，待重算。
 
 ---
 
@@ -261,6 +261,38 @@ python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dr
 
 - 这一轮里，复制源城权重再微调比随机初始化加蒸馏下降更多
 - Group 3 仍未做
+
+---
+
+## 2026-10-29 — 微调加蒸馏（种子 42，λ = 1）
+
+**目标：** 学生复制源城教师权重后再做标准蒸馏，看华盛顿 3 天协议上是否同时好于随机初始化蒸馏和纯微调。  
+**配置：** `configs/student_kd_ny2dc_init.yaml`、`configs/student_kd_chi2dc_init.yaml`（`init_from_teacher: true`，λ = 1，seed 42，batch 8，weight decay 5e-5，最多 50 epoch，patience 5）  
+**Git commit：** 本 PR  
+**机器 / GPU：** Windows 本机，RTX 4060 Laptop。12:35–12:37，约 2.5 分钟，退出码 0。
+
+### 做了什么
+
+- MAPE 改为只在反归一化后真实流量大于 0 的格子上计算，分母用真实流量。RMSE / MAE 的累加方式不变。
+- `kd.init_from_teacher` 把教师权重复制到学生（去掉 `spatial_mask`），教师另存一份并冻结。损失仍是 `L_task + λ L_kd`。
+- 三个训练入口增加 `--seed`。传入时结果 JSON 和 checkpoint 文件名带种子后缀，不覆盖种子 42 的已有文件。本项没有传 `--seed`，用的是配置里的 42 和新的 checkpoint 名。
+- 命令：`.\.venv\Scripts\python.exe -u -m src.train.train_student_kd --config configs/student_kd_ny2dc_init.yaml --resume`，随后同样跑芝加哥配置。`tests/test_synthetic_shapes.py` 8 项通过。
+
+### 真实结果（仅实跑后填写）
+
+数字来自 `logs/G2-NY2DC-init.json` 与 `logs/G2-CHI2DC-init.json`，四位小数。MAPE 是修正后的定义。
+
+| run | best epoch | split | MAE | RMSE | MAPE | checkpoint |
+|---|---|---|---|---|---|---|
+| G2-NY2DC-init | 5 | val | 2.0879 | 6.6986 | 66.3591 | `checkpoints/student_kd_ny2dc_init.pt` |
+| G2-NY2DC-init | 5 | test | 1.7360 | 5.6687 | 64.4227 | 同上 |
+| G2-CHI2DC-init | 17 | val | 2.0078 | 5.7935 | 83.1331 | `checkpoints/student_kd_chi2dc_init.pt` |
+| G2-CHI2DC-init | 17 | test | 1.7242 | 5.1286 | 82.2489 | 同上 |
+
+### 问题 / 下一步
+
+- 种子 43、44 的华盛顿七类设定尚未重跑
+- 种子 42 旧 checkpoint 的 MAPE 尚未按新定义重算
 
 ---
 

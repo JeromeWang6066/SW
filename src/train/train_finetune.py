@@ -37,6 +37,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Continue from checkpoints/<name>.latest.pt if that file exists",
     )
+    p.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="Override config seed. Result json and checkpoint names include this seed.",
+    )
     return p.parse_args(argv)
 
 
@@ -55,7 +61,8 @@ def _load_source_weights(net: STNet, ckpt_path: Path, device: torch.device) -> N
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     cfg = load_config(args.config)
-    seed = int(cfg.get("seed", 42))
+    seed_override = args.seed is not None
+    seed = int(args.seed) if seed_override else int(cfg.get("seed", 42))
     set_seed(seed)
 
     exp = cfg.get("experiment", {})
@@ -138,11 +145,14 @@ def main(argv: list[str] | None = None) -> int:
     ckpt_dir = Path(paths.get("checkpoint_dir", "checkpoints"))
     ckpt_dir.mkdir(parents=True, exist_ok=True)
     ckpt_name = paths.get("checkpoint_name", f"{exp.get('id', target)}_finetune.pt")
+    run_id = str(exp.get("id", target))
+    if seed_override:
+        ckpt_name = f"{Path(ckpt_name).stem}_seed{seed}{Path(ckpt_name).suffix}"
+        run_id = f"{run_id}_seed{seed}"
     ckpt_path = ckpt_dir / ckpt_name
     latest_path = ckpt_dir / f"{Path(ckpt_name).stem}.latest.pt"
     log_dir = Path(paths.get("log_dir", "logs"))
     log_dir.mkdir(parents=True, exist_ok=True)
-    run_id = str(exp.get("id", target))
 
     best_val = float("inf")
     best_epoch = -1

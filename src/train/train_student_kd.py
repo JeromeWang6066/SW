@@ -3,6 +3,10 @@
 The teacher is applied to the target grid directly: conv / LSTM / linear weights
 are shared across cells, so no region matching is used. Both networks see the
 DC-normalized windows. KD uses the same reduction as the task loss.
+
+``kd.init_from_teacher`` copies those teacher weights onto the student (the
+source ``spatial_mask`` is dropped) and keeps a separate frozen teacher. The
+loss stays ``L_task + lambda * L_kd``.
 """
 
 from __future__ import annotations
@@ -39,7 +43,22 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Continue from checkpoints/<name>.latest.pt if that file exists",
     )
+    p.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="Override config seed. Result json and checkpoint names include this seed.",
+    )
     return p.parse_args(argv)
+
+
+def _init_student_from_teacher(student: STNet, teacher: STNet) -> None:
+    """Copy teacher weights onto the student, leaving the student's spatial mask."""
+    state = {k: v.detach().clone() for k, v in teacher.state_dict().items() if k != "spatial_mask"}
+    missing, unexpected = student.load_state_dict(state, strict=False)
+    bad_missing = [k for k in missing if k != "spatial_mask"]
+    if bad_missing or unexpected:
+        raise RuntimeError(f"teacher init mismatch missing={bad_missing} unexpected={unexpected}")
 
 
 def _load_teacher(ckpt_path: Path, device: torch.device) -> STNet:
@@ -64,7 +83,8 @@ def _load_teacher(ckpt_path: Path, device: torch.device) -> STNet:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     cfg = load_config(args.config)
-    seed = int(cfg.get("seed", 42))
+    seed_override = args.seed is not None
+    seed = int(args.seed) if seed_override else int(cfg.get("seed", 42))
     set_seed(seed)
 
     kd = cfg.get("kd", {})
@@ -74,10 +94,11 @@ def main(argv: list[str] | None = None) -> int:
     logger.info("Loaded config: %s", args.config)
     logger.info("experiment=%s cities=%s seed=%s", exp, cities, seed)
     logger.info(
-        "KD: enabled=%s lambda_kd=%s freeze_teacher=%s pearson_multiplier=%s",
+        "KD: enabled=%s lambda_kd=%s freeze_teacher=%s init_from_teacher=%s pearson_multiplier=%s",
         kd.get("enabled"),
         kd.get("lambda_kd"),
         kd.get("freeze_teacher", True),
+        bool(kd.get("init_from_teacher", False)),
         kd.get("pearson_multiplier", False),
     )
     logger.info("few_shot_days=%s", splits.get("few_shot_days", 3))
@@ -107,6 +128,7 @@ def main(argv: list[str] | None = None) -> int:
     weight_decay = float(train_cfg.get("weight_decay", 0.0))
     patience = int(train_cfg.get("early_stop_patience", 5))
     lambda_kd = float(kd.get("lambda_kd", 1.0))
+    init_from_teacher = bool(kd.get("init_from_teacher", False))
     few_shot_days = int(splits.get("few_shot_days", 3))
     device_name = str(cfg.get("device", "cuda"))
     if device_name.startswith("cuda") and not torch.cuda.is_available():
@@ -154,6 +176,12 @@ def main(argv: list[str] | None = None) -> int:
     torch.set_rng_state(cpu_rng)
     if cuda_rng is not None:
         torch.cuda.set_rng_state_all(cuda_rng)
+    if init_from_teacher:
+        _init_student_from_teacher(student, teacher)
+        logger.info(
+            "student initialized from %s (spatial_mask kept); teacher copy stays frozen",
+            ckpt_file,
+        )
 
     wrap = KDWrapper(student, teacher, lambda_kd=lambda_kd).to(device)
     train_loader, val_loader, test_loader = _loaders(
@@ -172,11 +200,14 @@ def main(argv: list[str] | None = None) -> int:
     ckpt_dir = Path(paths.get("checkpoint_dir", "checkpoints"))
     ckpt_dir.mkdir(parents=True, exist_ok=True)
     ckpt_name = paths.get("checkpoint_name", f"{exp.get('id', target)}_student.pt")
+    run_id = str(exp.get("id", target))
+    if seed_override:
+        ckpt_name = f"{Path(ckpt_name).stem}_seed{seed}{Path(ckpt_name).suffix}"
+        run_id = f"{run_id}_seed{seed}"
     ckpt_path = ckpt_dir / ckpt_name
     latest_path = ckpt_dir / f"{Path(ckpt_name).stem}.latest.pt"
     log_dir = Path(paths.get("log_dir", "logs"))
     log_dir.mkdir(parents=True, exist_ok=True)
-    run_id = str(exp.get("id", target))
 
     best_val = float("inf")
     best_epoch = -1
@@ -210,6 +241,7 @@ def main(argv: list[str] | None = None) -> int:
                 "seed": seed,
                 "run_id": run_id,
                 "lambda_kd": lambda_kd,
+                "init_from_teacher": init_from_teacher,
                 "teacher_checkpoint": str(ckpt_file),
             },
             latest_path,
@@ -266,6 +298,7 @@ def main(argv: list[str] | None = None) -> int:
                     "seed": seed,
                     "run_id": run_id,
                     "lambda_kd": lambda_kd,
+                    "init_from_teacher": init_from_teacher,
                     "teacher_checkpoint": str(ckpt_file),
                 },
                 ckpt_path,
@@ -308,6 +341,7 @@ def main(argv: list[str] | None = None) -> int:
         "config": args.config,
         "seed": seed,
         "lambda_kd": lambda_kd,
+        "init_from_teacher": init_from_teacher,
         "best_epoch": best_epoch,
         "checkpoint": str(ckpt_path),
         "teacher_checkpoint": str(ckpt_file),

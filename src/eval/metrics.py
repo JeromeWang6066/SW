@@ -27,18 +27,21 @@ def rmse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     return float(np.sqrt(np.mean((y_true - y_pred) ** 2)))
 
 
-def mape(
-    y_true: np.ndarray,
-    y_pred: np.ndarray,
-    eps: float = 1e-6,
-) -> float:
-    """Mean absolute percentage error; zeros in ``y_true`` are masked via ``eps``."""
+def mape(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    """MAPE (%) on entries whose true value is strictly positive.
+
+    Cells with true flow equal to zero are excluded. The denominator is the
+    true value itself. RMSE and MAE are unchanged and still use every cell.
+    """
     y_true = np.asarray(y_true, dtype=np.float64)
     y_pred = np.asarray(y_pred, dtype=np.float64)
     if y_true.shape != y_pred.shape:
         raise ValueError(f"shape mismatch {y_true.shape} vs {y_pred.shape}")
-    denom = np.maximum(np.abs(y_true), eps)
-    return float(np.mean(np.abs(y_true - y_pred) / denom) * 100.0)
+    positive = y_true > 0
+    if not np.any(positive):
+        return float("nan")
+    denom = y_true[positive]
+    return float(np.mean(np.abs(y_true[positive] - y_pred[positive]) / denom) * 100.0)
 
 
 def summarize(y_true: np.ndarray, y_pred: np.ndarray) -> Dict[str, float]:
