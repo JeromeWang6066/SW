@@ -1,0 +1,32 @@
+# Group 2 — CHI teacher to DC student. lambda_kd=5.0. init_from_teacher=false.
+_base: default.yaml
+
+experiment:
+  group: 2
+  id: G2-CHI2DC-l5
+  role: student_kd
+
+cities:
+  source: chi
+  target: dc
+
+splits:
+  few_shot_days: 3
+
+kd:
+  enabled: true
+  lambda_kd: 5.0
+  init_from_teacher: false
+  teacher_checkpoint: checkpoints/teacher_chi_stnet.pt
+  freeze_teacher: true
+  pearson_multiplier: false
+
+paths:
+  checkpoint_name: student_kd_chi2dc_l5.pt
+
+train:
+  epochs: 50
+  batch_size: 8
+  weight_decay: 5.0e-5
+
+seed: 42
