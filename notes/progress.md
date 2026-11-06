@@ -475,6 +475,47 @@ python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dr
 
 ---
 
+## 2026-11-06 — 协议内的轮廓相似度
+
+**目标：** 用出租车上车量的工作日轮廓计算城市级和格子级 Pearson，并检查 72 小时轮廓与 5904 小时轮廓是否一致。不训练。  
+**配置：** 无训练配置  
+**Git commit：** 本 PR  
+**机器 / GPU：** Windows 本机。只读 `Taxi{CITY}_pickup.npy` 和已有 `docs/profiles/*_taxi_pickup.json`。
+
+### 做了什么
+
+- 目标城轮廓取最后 72 个训练标签，原始下标 `[5832, 5904)`，日期 2016-08-31 至 2016-09-02。每个钟点有 3 个工作日样本。源城轮廓用前 5904 小时。
+- 重算的 5904 小时轮廓与已提交的 `train_prefix.weekday_profile` 一致，否则脚本失败。
+- 常数轮廓记为无定义。0.5 和 0.8 只描述格子级最大相关的分布。
+- 结果在 `docs/profiles/similarity.md` 与 `similarity.json`。`tests/test_profile_similarity.py` 3 项通过。
+
+### 数据
+
+- 同一座城，72 小时对 5904 小时的城市平均轮廓相关：纽约 0.9174，芝加哥 0.9883，华盛顿 0.9944。格子中位数分别是 0.5646、0.6810、0.6054。纽约剔除 111 个常数格，芝加哥 110 个，华盛顿 18 个。
+- 协议内城市级相关随方向变化。纽约→华盛顿 0.8598，华盛顿→纽约 0.8519；芝加哥→华盛顿 0.9444，华盛顿→芝加哥 0.9643。
+- 格子级最大相关的中位数在 0.6559 到 0.7951 之间。六个方向里，落在 0.5 以下的格子比例最高是华盛顿→纽约的 0.2536，其余方向大多低于 0.03。完整比例见 `similarity.md`。
+
+### 运行命令
+
+```bash
+.\.venv\Scripts\python.exe -m pytest tests/test_profile_similarity.py -q
+.\.venv\Scripts\python.exe scripts\05_profile_similarity.py
+```
+
+### 真实结果（仅实跑后填写）
+
+| split | MAE | RMSE | MAPE | notes |
+|---|---|---|---|---|
+| val | — | — | — | 本阶段无训练 |
+| test | — | — | — | 本阶段无训练 |
+
+### 问题 / 下一步
+
+- 下车、单车、兴趣点和路网仍未算
+- 这些相关还没有用来选择微调或蒸馏
+
+---
+
 ## YYYY-MM-DD — 标题
 
 **目标：**  
