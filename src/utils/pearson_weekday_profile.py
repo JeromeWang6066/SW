@@ -1,8 +1,11 @@
 """Weekday 24h Pearson ρ̃ multiplier — Group 3 hook.
 
-Approved direction (advisor):
-  Non-learnable weekday 24-hour Pearson correlation multiplier modulating KD,
-  based on region / hour profile similarity between source and target.
+Approved direction (advisor, updated 2026-11-05):
+  Pearson correlation first chooses the method: high similarity -> fine-tune,
+  medium similarity -> distillation. Thresholds 0.8 / 0.5 are examples only.
+  The non-learnable weekday 24-hour multiplier stays a hook until Group 5
+  shows distillation wins in the medium band. See
+  docs/advisor/2026-11-05-meeting.md.
 
 NOT finalized:
   - Region matching / alignment across cities with different grids
@@ -13,9 +16,18 @@ Do not treat the helpers below as the final paper formula.
 
 from __future__ import annotations
 
+from datetime import date, timedelta
 from typing import Optional, Tuple
 
 import numpy as np
+
+# CrossTReS Table 2 lists New York taxi/bike as 1 Jan–31 Dec 2016.
+# Chicago and Washington use the same 8784-hour length, so they share this origin.
+# Hour 0 is 00:00. No daylight-saving insertion or deletion is applied.
+CALENDAR_START = date(2016, 1, 1)
+EXPECTED_SERIES_HOURS = 8784
+VAL_OR_TEST_HOURS = 60 * 24
+TRAIN_PREFIX_HOURS = EXPECTED_SERIES_HOURS - 2 * VAL_OR_TEST_HOURS
 
 
 def weekday_24h_profile(
@@ -79,6 +91,77 @@ def weekday_24h_profile(
             continue
         profile[:, h] = x[sel].mean(axis=0)
     return profile
+
+
+def hourly_calendar(
+    num_timesteps: int,
+    start: date = CALENDAR_START,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """Hour-of-day and Monday–Friday mask for a series that starts at midnight.
+
+    Parameters
+    ----------
+    num_timesteps :
+        Length ``T``. Must be a multiple of 24.
+    start :
+        Calendar date of hour 0. Default is 2016-01-01, a Friday.
+
+    Returns
+    -------
+    hour : int64 ndarray, shape ``(T,)``
+        ``0 .. 23``. Index ``t`` is ``start`` plus ``t`` hours, without a
+        daylight-saving adjustment.
+    is_weekday : bool ndarray, shape ``(T,)``
+        True on Monday through Friday.
+    """
+    if num_timesteps < 0 or num_timesteps % 24 != 0:
+        raise ValueError(f"T={num_timesteps} must be a non-negative multiple of 24")
+    hour = np.arange(num_timesteps, dtype=np.int64) % 24
+    n_days = num_timesteps // 24
+    day_is_weekday = np.fromiter(
+        ((start + timedelta(days=i)).weekday() < 5 for i in range(n_days)),
+        dtype=bool,
+        count=n_days,
+    )
+    return hour, np.repeat(day_is_weekday, 24)
+
+
+def grid_hour_profile(
+    flow: np.ndarray,
+    select: np.ndarray,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """Mean 24-hour profile on every cell, plus how many hours were averaged.
+
+    Parameters
+    ----------
+    flow :
+        ``(T, H, W)`` counts. ``T`` must be a multiple of 24 and hour 0 of this
+        array must be local midnight. A train-prefix slice is valid only when
+        it still starts at midnight.
+    select :
+        Boolean length-``T`` mask, typically weekdays or weekends.
+
+    Returns
+    -------
+    profile : float64 ndarray, shape ``(H, W, 24)``
+        ``profile[row, col, h]`` is the mean of ``flow`` on selected steps
+        whose hour-of-day is ``h``. Cells that are zero all year are kept.
+    hour_counts : int64 ndarray, shape ``(24,)``
+        Number of selected timesteps for each hour-of-day.
+    """
+    x = np.asarray(flow, dtype=np.float64)
+    if x.ndim != 3:
+        raise ValueError(f"expected (T, H, W), got {x.shape}")
+    t, h, w = x.shape
+    if t % 24 != 0:
+        raise ValueError(f"T={t} must be a multiple of 24")
+    mask = np.asarray(select, dtype=bool)
+    if mask.shape != (t,):
+        raise ValueError(f"select must have shape {(t,)}, got {mask.shape}")
+    flat = weekday_24h_profile(x, weekday_mask=mask)
+    hours = np.arange(t) % 24
+    counts = np.bincount(hours[mask], minlength=24).astype(np.int64)
+    return flat.reshape(h, w, 24), counts
 
 
 def pearson_corr_rows(a: np.ndarray, b: np.ndarray, eps: float = 1e-8) -> np.ndarray:

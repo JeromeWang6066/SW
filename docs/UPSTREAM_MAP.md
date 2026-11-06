@@ -40,7 +40,7 @@
 - batch `X`：`(B, L, H, W)`（`L=6`，单通道时 `num_channels=1`）  
 - 输出：有效格上的 `(B, 1, N_valid)`（mask 后）或特征  
 
-**下一步必须移植：** `STNet.forward` + `ResUnit` + 与 mask 一致的输出形状；在 `train_teacher.py` 实现真实 train/val 环。
+`STNet.forward`、`ResUnit` 和 `train_teacher.py` 的训练环已经接上。没有移植 `functional_forward`，也不做 region re-weighting。
 
 ---
 
@@ -50,7 +50,7 @@
 
 | 上游路径 | 内容 | 本仓库 |
 |---|---|---|
-| `utils.py` → `split_x_y` | `val_num=test_num=60*24`；按时间切 train/val/test 窗口 | `few_shot_split_indices`（用 `30*24` 近似「月」—— **移植时应改为与上游相同的 `60*24` 小时**） |
+| `utils.py` → `split_x_y` | `val_num=test_num=60*24`；按时间切 train/val/test 窗口 | `split_x_y` 已对齐 `60*24`。`few_shot_split_indices` 仍是旧的 `30*24` 示意图，正式实验不要调用 |
 | `main.py` L161–163 | `if data_amount != 0: train = train[-data_amount*24:]` | `few_shot_days: 3` → 72 小时 |
 | `main.py` argparse `--data_amount` | `0` 全量；`30/7/3` 天 | `configs/baseline_target_fewshot.yaml`、`student_kd_*.yaml` |
 | `main.py` L156–157 | `np.load("%s%s/%s%s_%s.npy" % (data_dir, city, dataname, city, datatype))` | `src/data/dataset.py` 期望路径见 DATA.md |
@@ -136,4 +136,4 @@ python scripts/03_synthetic_shapes.py
 python -m pytest tests/test_synthetic_shapes.py -q
 ```
 
-仅断言 ST-Net 构造、KD `kd_loss` / `total_loss` 张量形状与 split 长度；**不**调用未实现的 `forward` 真预测。
+仅断言 ST-Net 构造、`forward` 形状、KD `kd_loss` / `total_loss` 张量形状与 split 长度。不用真实城市数据出指标。
