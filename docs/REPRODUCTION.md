@@ -1,6 +1,6 @@
 # 复现手册（Phase-1）
 
-> **状态：Group 1、G1-C、Group 2 已于 2026-10-28 跑完。** 数字见 [RESULTS.md](RESULTS.md)。本文保留操作清单。  
+> **状态：Group 1、G1-C、Group 2 已于 2026-10-28 跑完。** 教师初始化蒸馏、种子 43/44 和芝加哥 λ 扫描见 [RESULTS.md](RESULTS.md)。本文保留操作清单。  
 > 约束：大数据与权重 **不** 进 git；指标只写真实评估。  
 > 上游对照总表：[UPSTREAM_MAP.md](UPSTREAM_MAP.md) · 数据直链：[DATA.md](DATA.md)  
 > Agent / 本地连续接手上下文：[HANDOFF.md](HANDOFF.md)

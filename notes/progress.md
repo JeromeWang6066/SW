@@ -6,7 +6,7 @@
 
 - 学生：Tianyao Wang (Jerome)
 - 仓库：https://github.com/JeromeWang6066/SW
-- 当前阶段：Group 1、G1-C、Group 2 和微调加蒸馏已实跑。新 MAPE 只统计真实流量大于 0 的格子。旧实验的 MAPE 仍是放大后的数字，待重算。
+- 当前阶段：Group 1、G1-C、Group 2、教师初始化蒸馏、种子 43/44 和芝加哥 λ 扫描已实跑。比较用的 MAPE 只统计真实流量大于 0 的格子。10 月 28 日各节里的千万级 MAPE 是旧分母，比较时用 10 月 29 日重算的那一节。
 
 ---
 
@@ -406,6 +406,75 @@ python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dr
 
 ---
 
+## 2026-11-05 — 导师会议：分流规则与格子功能
+
+**目标：** 记录会上的三条建议，并写进实验计划。不训练、不改模型。  
+**配置：** 无  
+**Git commit：** 未提交  
+**机器 / GPU：** 文档
+
+### 做了什么
+
+- 新增 `docs/advisor/2026-11-05-meeting.md`。三条建议分开写：微调已更好时为何还蒸馏；用 Pearson 相关选择微调或蒸馏；用兴趣点、路网和上下车给格子做功能预划分。
+- `docs/EXPERIMENT_PLAN.md` 增加 Group 5（分流）和 Group 6（功能标签）。原 Group 3 的 ρ̃ 乘子改到分流实验之后。研究问题改成“按相关选择方法”，不再默认蒸馏是主方法。
+- 0.8 和 0.5 记为导师举例。ρ 低于下阈值时退回只训目标城，会上没定，标成待确认。
+
+### 真实结果（仅实跑后填写）
+
+| split | MAE | RMSE | MAPE | notes |
+|---|---|---|---|---|
+| val | — | — | — | 本阶段无训练 |
+| test | — | — | — | 本阶段无训练 |
+
+### 问题 / 下一步
+
+- 离线统计三城兴趣点占比、路网度、上下车比和工作日轮廓 Pearson。不训练
+- 六个有向城市对上补从零、微调、标准蒸馏。阈值只在验证集上定
+- 下次确认：低相关是否退回只训目标城；ρ 是城市级还是格子级；华盛顿可否作源城
+
+---
+
+## 2026-11-06 — 三城每个格子的 24 小时轮廓
+
+**目标：** 计算纽约、芝加哥、华盛顿每个格子的出租车上车量轮廓。不训练，不做跨城匹配。  
+**配置：** 无训练配置  
+**Git commit：** 本 PR  
+**机器 / GPU：** Windows 本机。只读 `Taxi{CITY}_pickup.npy`，不使用 GPU。
+
+### 做了什么
+
+- `hourly_calendar` 与 `grid_hour_profile`：第 0 小时为 2016-01-01 00:00，工作日为周一到周五，不做夏令时插删。纽约日期来自 CrossTReS 附录 Table 2；芝加哥和华盛顿因同为 8784 小时而共用该起点。
+- `scripts/04_grid_profiles.py` 写出 `docs/profiles/{ny,chi,dc}_taxi_pickup.json`。每城含全年和训练段前缀（前 5904 小时）的工作日与周末轮廓，形状 `(H, W, 24)`，无效格保留。
+- `tests/test_grid_profiles.py` 3 项通过。
+
+### 数据
+
+- 来源仍是已核验的 CrossTReS 包，未重新下载。
+- 有效格与 DATA.md 一致：纽约 458 / 460，芝加哥 270 / 476，华盛顿 207 / 420。
+- 全年每个钟点：工作日 261 个样本，周末 105 个。训练段每个钟点：工作日 176，周末 70。
+- 有效格平均后的 24 个数见 `docs/profiles/README.md`。JSON 保留完整精度。
+
+### 运行命令
+
+```bash
+.\.venv\Scripts\python.exe -m pytest tests/test_grid_profiles.py -q
+.\.venv\Scripts\python.exe scripts\04_grid_profiles.py
+```
+
+### 真实结果（仅实跑后填写）
+
+| split | MAE | RMSE | MAPE | notes |
+|---|---|---|---|---|
+| val | — | — | — | 本阶段无训练 |
+| test | — | — | — | 本阶段无训练 |
+
+### 问题 / 下一步
+
+- 下车、单车、兴趣点和路网还没算
+- 城市之间的 Pearson 和 ρ̃ 乘子还没做
+
+---
+
 ## YYYY-MM-DD — 标题
 
 **目标：**  
@@ -450,4 +519,6 @@ python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dr
 - [x] 实现 ST-Net 最小训练环（对照上游 `model.py`）
 - [x] Group 1 基线实跑
 - [x] Group 2 标准 KD 实跑
-- [ ] Group 3 Pearson 乘子：等公式定稿
+- [ ] Group 5：六个方向的粗 Pearson，以及从零 / 微调 / 蒸馏（阈值未定，0.8 与 0.5 只是举例）
+- [ ] Group 6：兴趣点、路网度、上下车比的功能标签，按类报告误差
+- [ ] Group 3 Pearson 乘子：等 Group 5 说明中等相关区间里蒸馏更好，再定公式

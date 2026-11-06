@@ -4,8 +4,10 @@
 > 中文为主；论文 / 代码专名保留英文。  
 > **请先读本文，再改代码。** 事实均摘自当前 `main` 上已合并文档（PR #1 / #2），勿凭记忆编造 URL、SHA、形状或指标。
 
-**仓库 HEAD（文档撰写时 `main`）：** `1409c16` — `docs: verified NY/CHI/DC data URLs + UPSTREAM_MAP (prep, no training) (#2)`  
+**仓库 HEAD（2026-11-04 与 `origin/main` 对齐）：** `056f5c9` — `Record the Chicago-to-DC lambda sweep.`  
 **公开仓：** https://github.com/JeromeWang6066/SW
+
+**进度：** Group 1、G1-C、标准 KD、教师初始化后再蒸馏、种子 43/44、芝加哥 λ 扫描都已写入 [RESULTS.md](RESULTS.md)。2026-11-05 导师会后的计划见 [advisor/2026-11-05-meeting.md](advisor/2026-11-05-meeting.md)：先按 Pearson 相关选择微调或蒸馏（Group 5），并用兴趣点 / 路网 / 上下车做格子功能标定（Group 6）。Pearson 乘子仍未实现，排在 Group 5 之后。比较用的 MAPE 只统计真实流量大于 0 的格子；`logs/` 里种子 42 主实验 JSON 的 MAPE 仍是旧分母。下文 §2 保留 PR #1 / #2 的历史记录，分组是否已跑完以本节和 RESULTS.md 为准。
 
 ---
 
@@ -16,13 +18,13 @@
 | 学生 | Tianyao Wang / Jerome（GitHub [@JeromeWang6066](https://github.com/JeromeWang6066)） |
 | 项目 | Duke Kunshan University（DKU）CS **Signature Work（毕业设计）** |
 | 仓库 | https://github.com/JeromeWang6066/SW （**public**） |
-| 顾问认可主题 | **冻结源城教师** +（后续）**不可学习的工作日 24h Pearson ρ̃ 乘子** 调制 KD，用于跨城市网格流量 / 需求预测 |
+| 顾问认可主题 | 跨城少样本网格流量。2026-11-05 起：按工作日 Pearson 相关选择微调或蒸馏；格子功能事先标定。ρ̃ 乘子后置 |
 | Phase-1 骨干 | **CrossTReS ST-Net**（先复现，不先造新网络） |
 | 协议 | **STBaT 式 3-day few-shot**（目标城 train ≈ 72 小时） |
 | 城市 | Source：**NY** / **CHI** → Target：**DC** |
 | 实验优先级 | **Groups 1–2 先做**；Pearson / region matching = **Group 3+ hooks only**（勿超前实现最终公式） |
 
-一句话研究问题（见 [EXPERIMENT_PLAN.md](EXPERIMENT_PLAN.md)）：在跨城网格少样本设定下，冻结源城教师 +（后续）工作日 Pearson ρ̃ 调制的 KD，能否相对标准 KD / 无迁移基线稳定提升 DC 预测？
+一句话研究问题（见 [EXPERIMENT_PLAN.md](EXPERIMENT_PLAN.md)）：按源–目标工作日轮廓的 Pearson 相关选择微调或蒸馏，能否比一律微调或一律蒸馏更稳。
 
 ---
 
@@ -200,7 +202,7 @@ Phase-1 **不做**：CrossTReS region re-weighting 全框架、STBaT RIAM、Tran
 
 面向：**本机学生 / 本地 coding agent**。Cloud / docs agent **不要**编造训练结果或把多 GB 数据拉进 git tree。
 
-步骤 1–4 已在 2026-10-28 完成，数字见 [RESULTS.md](RESULTS.md) 与 `notes/progress.md`。下面保留当时的操作顺序。
+步骤 1–4 已在 2026-10-28 完成。其后又跑完 G1-C、教师初始化蒸馏、种子 43/44 和芝加哥 λ 扫描，数字都在 [RESULTS.md](RESULTS.md)。下面保留当时的操作顺序。当前要做的是第 5 步。
 
 1. **本机数据落地**  
    按 [DATA.md](DATA.md) 下载 CrossTReS（或 STBaT）zip → 校验 SHA256 → 解压 → 软链到 `data/processed/{ny,chi,dc}/` → `python scripts/01_verify_data_layout.py` → 在 `notes/progress.md` 记 URL / 日期 / SHA。
@@ -217,8 +219,11 @@ Phase-1 **不做**：CrossTReS region re-weighting 全框架、STBaT RIAM、Tran
    `NY→DC`、`CHI→DC`；`L_task + λ_kd * L_kd`；**`pearson_multiplier=false`**。  
    配置：`configs/student_kd_ny2dc.yaml`、`student_kd_chi2dc.yaml`。
 
-5. **仅此后：Pearson ρ̃ 乘子（Group 3）**  
-   等公式 / matching 定稿；再接 `pearson_weekday_profile` → `KDWrapper.pearson_mask`。
+5. **Group 5 / 6（当前）**  
+   先离线算粗 Pearson 和功能标签，不改损失。再把迁移扩成六个有向城市对，每对跑从零、微调、标准蒸馏。阈值在验证集上定。详见 [advisor/2026-11-05-meeting.md](advisor/2026-11-05-meeting.md)。
+
+6. **仅此后：Pearson ρ̃ 乘子（Group 3）**  
+   等 Group 5 说明中等相关区间里蒸馏更好，再接 `pearson_weekday_profile` → `KDWrapper.pearson_mask`。
 
 **GPU：** 真实训练在学生本机（或自备 GPU）完成。文档 / cloud agent 只维护脚手架与诚实 stub，**禁止**提交假表。
 
@@ -232,7 +237,7 @@ Phase-1 **不做**：CrossTReS region re-weighting 全框架、STBaT RIAM、Tran
 4. **不发明 Izadi 官方代码 URL**（目前仍无；见 PAPERS.md）。  
 5. 文档保持 **中文为主、专名英文** 的现有风格。  
 6. 有实质代码 / 文档改动时 **开 PR 进 `main`**（不要 silent push 到 main，除非维护者明确要求）。  
-7. Groups 1–2 完成前 **不要实现 Group 3 最终 matching**；只留 hook。  
+7. Group 5 的验证集结果出来之前 **不要实现 Group 3 最终 matching**；只留 hook。0.8 和 0.5 是导师举例，不要写进损失。  
 8. 移植 ST-Net 时 **对照上游 `model.py`**，勿凭记忆编层形状；差异必须记入 progress / UPSTREAM_MAP。
 
 ---
@@ -242,7 +247,7 @@ Phase-1 **不做**：CrossTReS region re-weighting 全框架、STBaT RIAM、Tran
 ```bash
 git clone https://github.com/JeromeWang6066/SW.git
 cd SW
-git log -1 --oneline          # 确认接近 1409c16 或更新的 main
+git log -1 --oneline          # 2026-11-04 的 main 是 056f5c9
 
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
@@ -279,10 +284,12 @@ python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dr
 
 | Group | 内容 | 现在该不该做 |
 |---|---|---|
-| **1** | Source-only / target 3-day ST-Net 基线 | **下一步（移植后）** |
-| **2** | 冻结教师 + 标准 KD，NY/CHI→DC | Group 1 可跑后 |
-| **3** | 工作日 Pearson ρ̃ 乘子调制 KD | **仅 hook；勿提前实现** |
-| **4** | Ablation / matching 变体 | Groups 1–2 稳定后 |
+| **1** | Source-only / target 3-day ST-Net 基线 | 已实跑，见 RESULTS.md |
+| **2** | 冻结教师 + 标准 KD，NY/CHI→DC | 已实跑。另有教师初始化蒸馏、种子 43/44、芝加哥 λ 扫描 |
+| **3** | 工作日 Pearson ρ̃ 乘子调制 KD | **仅 hook；排在 Group 5 之后** |
+| **4** | Ablation / matching 变体 | 未做。λ 扫描只覆盖芝加哥、一个种子 |
+| **5** | 按 Pearson 相关选择微调或蒸馏 | 未做。0.8 / 0.5 只是会上的例子 |
+| **6** | 兴趣点、路网、上下车的格子功能标签 | 未做。不移植 `functional_forward` |
 
 ---
 
@@ -292,7 +299,7 @@ python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dr
 - [ ] `make smoke` / `make shapes` 通过  
 - [ ] 理解：`train_teacher` / `train_student_kd` / `train_finetune` 无 `--dry-run` 会真训练；已跑结果见 RESULTS.md  
 - [ ] 本机数据按 DATA.md 落地且 **未** `git add` zip/npy  
-- [ ] 计划中的下一 PR 只做 Groups 1–2 路径上的一项（移植或基线），不夹带 Group 3 最终公式  
+- [ ] 下一改动若还没做 Group 3，不要把 Pearson 匹配写成已经完成  
 - [ ] 任何实跑指标只写进 `notes/progress.md`，并带来源 seed / config / commit  
 
 ---
