@@ -1,0 +1,260 @@
+{
+  "channel": "taxi_pickup",
+  "few_shot_label_start": 5832,
+  "few_shot_label_end": 5904,
+  "few_shot_first_date": "2016-08-31",
+  "few_shot_last_date": "2016-09-02",
+  "short_weekday_hour_counts": [
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3
+  ],
+  "cities": {
+    "ny": {
+      "n_valid": 458,
+      "short_hour_counts": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "stability_city_mean": 0.9174141923914335,
+      "stability_cells": {
+        "n_defined": 347,
+        "n_excluded": 111,
+        "median": 0.5646323970727734,
+        "frac_le_0.5": 0.44668587896253603,
+        "frac_gt_0.5_le_0.8": 0.30547550432276654,
+        "frac_gt_0.8": 0.2478386167146974
+      }
+    },
+    "chi": {
+      "n_valid": 270,
+      "short_hour_counts": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "stability_city_mean": 0.9883152108095586,
+      "stability_cells": {
+        "n_defined": 160,
+        "n_excluded": 110,
+        "median": 0.6809724714568985,
+        "frac_le_0.5": 0.375,
+        "frac_gt_0.5_le_0.8": 0.2375,
+        "frac_gt_0.8": 0.3875
+      }
+    },
+    "dc": {
+      "n_valid": 207,
+      "short_hour_counts": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "stability_city_mean": 0.9943581073373285,
+      "stability_cells": {
+        "n_defined": 189,
+        "n_excluded": 18,
+        "median": 0.6053942381203395,
+        "frac_le_0.5": 0.3915343915343915,
+        "frac_gt_0.5_le_0.8": 0.26455026455026454,
+        "frac_gt_0.8": 0.3439153439153439
+      }
+    }
+  },
+  "city_level_protocol": [
+    {
+      "source": "ny",
+      "target": "chi",
+      "rho": 0.9358659986673882
+    },
+    {
+      "source": "ny",
+      "target": "dc",
+      "rho": 0.8597545024598802
+    },
+    {
+      "source": "chi",
+      "target": "ny",
+      "rho": 0.9321900320289296
+    },
+    {
+      "source": "chi",
+      "target": "dc",
+      "rho": 0.9443863707629797
+    },
+    {
+      "source": "dc",
+      "target": "ny",
+      "rho": 0.8518513343614023
+    },
+    {
+      "source": "dc",
+      "target": "chi",
+      "rho": 0.964335915111357
+    }
+  ],
+  "city_level_same_window_5904": [
+    {
+      "a": "ny",
+      "b": "chi",
+      "rho": 0.9353278941096423
+    },
+    {
+      "a": "ny",
+      "b": "dc",
+      "rho": 0.8745985276365591
+    },
+    {
+      "a": "chi",
+      "b": "dc",
+      "rho": 0.9600981428344262
+    }
+  ],
+  "cell_level": [
+    {
+      "source": "ny",
+      "target": "chi",
+      "n_defined": 160,
+      "n_excluded": 110,
+      "median": 0.794759975734572,
+      "frac_le_0.5": 0.00625,
+      "frac_gt_0.5_le_0.8": 0.525,
+      "frac_gt_0.8": 0.46875
+    },
+    {
+      "source": "ny",
+      "target": "dc",
+      "n_defined": 189,
+      "n_excluded": 18,
+      "median": 0.737431243010557,
+      "frac_le_0.5": 0.015873015873015872,
+      "frac_gt_0.5_le_0.8": 0.5873015873015873,
+      "frac_gt_0.8": 0.3968253968253968
+    },
+    {
+      "source": "chi",
+      "target": "ny",
+      "n_defined": 347,
+      "n_excluded": 111,
+      "median": 0.7761935175392315,
+      "frac_le_0.5": 0.02881844380403458,
+      "frac_gt_0.5_le_0.8": 0.5446685878962536,
+      "frac_gt_0.8": 0.4265129682997118
+    },
+    {
+      "source": "chi",
+      "target": "dc",
+      "n_defined": 189,
+      "n_excluded": 18,
+      "median": 0.7869631677688859,
+      "frac_le_0.5": 0.015873015873015872,
+      "frac_gt_0.5_le_0.8": 0.5291005291005291,
+      "frac_gt_0.8": 0.455026455026455
+    },
+    {
+      "source": "dc",
+      "target": "ny",
+      "n_defined": 347,
+      "n_excluded": 111,
+      "median": 0.6558659933588098,
+      "frac_le_0.5": 0.25360230547550433,
+      "frac_gt_0.5_le_0.8": 0.4409221902017291,
+      "frac_gt_0.8": 0.30547550432276654
+    },
+    {
+      "source": "dc",
+      "target": "chi",
+      "n_defined": 160,
+      "n_excluded": 110,
+      "median": 0.7951146039047896,
+      "frac_le_0.5": 0.1,
+      "frac_gt_0.5_le_0.8": 0.41875,
+      "frac_gt_0.8": 0.48125
+    }
+  ]
+}
