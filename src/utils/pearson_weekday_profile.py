@@ -31,6 +31,9 @@ TRAIN_PREFIX_HOURS = EXPECTED_SERIES_HOURS - 2 * VAL_OR_TEST_HOURS
 LABEL_LAG_HOURS = 6
 FEW_SHOT_LABEL_HOURS = 3 * 24
 PROFILE_STD_EPS = 1e-8
+BIN_LOW = 0.5
+BIN_HIGH = 0.8
+BIN_AGREEMENT_GATE = 0.7
 
 
 def weekday_24h_profile(
@@ -251,6 +254,49 @@ def max_source_pearson(
     ).T
     rho[defined] = corr.max(axis=1)
     return rho, defined
+
+
+def assign_similarity_bin(
+    rho: np.ndarray,
+    low: float = BIN_LOW,
+    high: float = BIN_HIGH,
+) -> np.ndarray:
+    """Map correlations to bins. Undefined values stay ``-1``.
+
+    ``0`` is ``rho <= low``, ``1`` is ``low < rho <= high``, ``2`` is ``rho > high``.
+    These cuts describe the distribution. They are not a fitted decision rule.
+    """
+    values = np.asarray(rho, dtype=np.float64)
+    bins = np.full(values.shape, -1, dtype=np.int64)
+    finite = np.isfinite(values)
+    bins[finite & (values <= low)] = 0
+    bins[finite & (values > low) & (values <= high)] = 1
+    bins[finite & (values > high)] = 2
+    return bins
+
+
+def bin_agreement(
+    protocol_bins: np.ndarray,
+    control_bins: np.ndarray,
+    gate: float = BIN_AGREEMENT_GATE,
+) -> dict:
+    """Share of cells whose bin matches when both profiles are defined."""
+    protocol = np.asarray(protocol_bins, dtype=np.int64).reshape(-1)
+    control = np.asarray(control_bins, dtype=np.int64).reshape(-1)
+    if protocol.shape != control.shape:
+        raise ValueError(f"bin length {protocol.shape} != {control.shape}")
+    both = (protocol >= 0) & (control >= 0)
+    n_both = int(both.sum())
+    n_same = int((both & (protocol == control)).sum())
+    agreement = None if n_both == 0 else n_same / n_both
+    return {
+        "n_both_defined": n_both,
+        "n_same": n_same,
+        "agreement": agreement,
+        "passes_gate": agreement is not None and agreement >= gate,
+        "n_only_protocol": int(((protocol >= 0) & (control < 0)).sum()),
+        "n_only_control": int(((protocol < 0) & (control >= 0)).sum()),
+    }
 
 
 def pearson_corr_rows(a: np.ndarray, b: np.ndarray, eps: float = 1e-8) -> np.ndarray:
