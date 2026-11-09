@@ -7,6 +7,7 @@ not the average of the two RMSEs.
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -26,18 +27,21 @@ from src.train.train_teacher import add_totals, evaluate_totals, metrics_from_to
 from src.utils.config import load_config
 from src.utils.seed import set_seed
 
-PAIRS = {
-    "ny": (
-        "cal-stitch-ny",
-        "checkpoints/calendar/finetune_ny_weekday.pt",
-        "checkpoints/calendar/finetune_ny_weekend.pt",
-    ),
-    "chi": (
-        "cal-stitch-chi",
-        "checkpoints/calendar/finetune_chi_weekday.pt",
-        "checkpoints/calendar/finetune_chi_weekend.pt",
-    ),
-}
+def _pairs(seed: int) -> dict:
+    """Seed 42 keeps the unsuffixed filenames. Later seeds match ``--seed`` training."""
+    suffix = "" if seed == 42 else f"_seed{seed}"
+    return {
+        "ny": (
+            f"cal-stitch-ny{suffix}",
+            f"checkpoints/calendar/finetune_ny_weekday{suffix}.pt",
+            f"checkpoints/calendar/finetune_ny_weekend{suffix}.pt",
+        ),
+        "chi": (
+            f"cal-stitch-chi{suffix}",
+            f"checkpoints/calendar/finetune_chi_weekday{suffix}.pt",
+            f"checkpoints/calendar/finetune_chi_weekend{suffix}.pt",
+        ),
+    }
 
 
 def _net(mask: torch.Tensor, device: torch.device, model_cfg: dict) -> STNet:
@@ -61,8 +65,8 @@ def _row(totals: dict, scale: float) -> dict:
     return {"rmse": rmse, "mae": mae, "mape": mape, "hours": int(totals["hours"])}
 
 
-def stitch_one(source: str, device: torch.device) -> dict:
-    run_id, weekday_path, weekend_path = PAIRS[source]
+def stitch_one(source: str, device: torch.device, seed: int) -> dict:
+    run_id, weekday_path, weekend_path = _pairs(seed)[source]
     cfg = load_config("configs/calendar/finetune_ny_weekday.yaml")
     prepared = prepare_city_windows("dc", cfg["paths"].get("processed_dir", "data/processed"), few_shot_days=0)
     mask = torch.as_tensor(prepared["mask"], device=device)
@@ -78,7 +82,7 @@ def stitch_one(source: str, device: torch.device) -> dict:
         "status": "complete",
         "city": "dc",
         "source": source,
-        "seed": 42,
+        "seed": seed,
         "weekday_checkpoint": weekday_path,
         "weekend_checkpoint": weekend_path,
         "routing": "weekend model on Saturday, Sunday, and listed US federal holidays; weekday model otherwise",
@@ -122,7 +126,10 @@ def stitch_one(source: str, device: torch.device) -> dict:
 
 
 def main() -> int:
-    set_seed(42)
+    parser = argparse.ArgumentParser(description="Stitch weekday and weekend fine-tunes")
+    parser.add_argument("--seed", type=int, default=42)
+    args = parser.parse_args()
+    set_seed(args.seed)
     device_name = "cuda" if torch.cuda.is_available() else "cpu"
     if device_name != "cuda":
         print("CUDA is not available; stitch eval needs the same device as training")
@@ -131,7 +138,7 @@ def main() -> int:
     log_dir = _ROOT / "logs" / "calendar"
     log_dir.mkdir(parents=True, exist_ok=True)
     for source in ("ny", "chi"):
-        result = stitch_one(source, device)
+        result = stitch_one(source, device, args.seed)
         path = log_dir / f"{result['run_id']}.json"
         path.write_text(json.dumps(result, indent=2), encoding="utf-8")
         print(

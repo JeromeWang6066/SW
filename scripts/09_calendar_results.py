@@ -57,6 +57,106 @@ def _table(rows: list[tuple[str, str]]) -> str:
     return "\n".join(lines)
 
 
+def _seed_run_id(base: str, seed: int) -> str:
+    return base if seed == 42 else f"{base}_seed{seed}"
+
+
+def _cell(payload: dict, kind: str) -> str:
+    row = payload["test_slices"][kind]
+    return f"{row['mae']:.4f} / {row['rmse']:.4f}"
+
+
+def _append_extra_seeds(parts: list[str]) -> None:
+    """Seeds 43 and 44 rerun Washington only. Skip the section until both exist."""
+    bases = [
+        ("cal-dc-scratch", "华盛顿从零"),
+        ("cal-finetune-ny", "纽约一个模型"),
+        ("cal-finetune-chi", "芝加哥一个模型"),
+        ("cal-kd-ny", "纽约随机初始化蒸馏"),
+        ("cal-kd-chi", "芝加哥随机初始化蒸馏"),
+        ("cal-stitch-ny", "纽约分开拼接"),
+        ("cal-stitch-chi", "芝加哥分开拼接"),
+    ]
+    seeds = (42, 43, 44)
+    ids = [_seed_run_id(base, seed) for base, _ in bases for seed in seeds]
+    if any(not (_ROOT / "logs" / "calendar" / f"{run_id}.json").is_file() for run_id in ids):
+        return
+    loaded = {run_id: _load(run_id) for run_id in ids}
+    parts.extend(
+        [
+            "## 种子 43 和 44",
+            "",
+            "这两次只重跑华盛顿。旧教师和这一轮的工作日、周末教师都仍是种子 42 的权重。从零训练和蒸馏的学生换了随机初始化。微调从同一份教师权重出发，种子改变的是样本顺序。验证集和测试集没有换。",
+            "",
+            "下表是测试集全部小时，格子里是 MAE / RMSE。均值是三个种子的算术平均。",
+            "",
+            "| 设定 | 种子 42 | 种子 43 | 种子 44 | 均值 |",
+            "|---|---:|---:|---:|---:|",
+        ]
+    )
+    for base, label in bases:
+        rows = [loaded[_seed_run_id(base, seed)]["test_slices"]["all"] for seed in seeds]
+        mean_mae = sum(row["mae"] for row in rows) / 3
+        mean_rmse = sum(row["rmse"] for row in rows) / 3
+        parts.append(
+            "| "
+            + " | ".join(
+                [label, *(_cell(loaded[_seed_run_id(base, seed)], "all") for seed in seeds)]
+            )
+            + f" | {mean_mae:.4f} / {mean_rmse:.4f} |"
+        )
+    parts.extend(
+        [
+            "",
+            "周末加节假日的测试 MAE。分开拼接低于同一个 120 小时的一个模型，才算分开训练有用。",
+            "",
+            "| 对照 | 种子 42 | 种子 43 | 种子 44 |",
+            "|---|---:|---:|---:|",
+        ]
+    )
+    notes: list[str] = []
+    for source, mixed_base, stitch_base, label in (
+        ("ny", "cal-finetune-ny", "cal-stitch-ny", "纽约"),
+        ("chi", "cal-finetune-chi", "cal-stitch-chi", "芝加哥"),
+    ):
+        mixed_text = []
+        stitch_text = []
+        verdicts = []
+        for seed in seeds:
+            mixed = loaded[_seed_run_id(mixed_base, seed)]["test_slices"]["weekend"]["mae"]
+            stitch = loaded[_seed_run_id(stitch_base, seed)]["test_slices"]["weekend"]["mae"]
+            mixed_text.append(f"{mixed:.4f}")
+            stitch_text.append(f"{stitch:.4f}")
+            if stitch < mixed:
+                verdicts.append("低于")
+            elif stitch > mixed:
+                verdicts.append("高于")
+            else:
+                verdicts.append("等于")
+        parts.append(f"| {label}一个模型 | {' | '.join(mixed_text)} |")
+        parts.append(f"| {label}分开拼接 | {' | '.join(stitch_text)} |")
+        notes.append(
+            f"{label}三个种子上，分开拼接的周末 MAE 依次{'、'.join(verdicts)}一个模型。"
+            + ("这个方向三个种子相同。" if len(set(verdicts)) == 1 else "这个方向随种子改变。")
+        )
+        rmse_signs = []
+        for seed in seeds:
+            mixed_rmse = loaded[_seed_run_id(mixed_base, seed)]["test_slices"]["all"]["rmse"]
+            stitch_rmse = loaded[_seed_run_id(stitch_base, seed)]["test_slices"]["all"]["rmse"]
+            if stitch_rmse < mixed_rmse:
+                rmse_signs.append("低于")
+            elif stitch_rmse > mixed_rmse:
+                rmse_signs.append("高于")
+            else:
+                rmse_signs.append("等于")
+        notes.append(
+            f"{label}全部小时的测试 RMSE，分开拼接依次{'、'.join(rmse_signs)}一个模型。"
+        )
+    parts.append("")
+    parts.extend(notes)
+    parts.append("")
+
+
 def main() -> int:
     loaded = {run_id: _load(run_id) for run_id, _ in RUNS}
     teachers = [
@@ -148,6 +248,8 @@ def main() -> int:
                 f"{split} 周末加节假日 MAE：分开拼接 {stitch_weekend:.4f}，一个模型 {mixed_weekend:.4f}，分开拼接{verdict}一个模型。"
             )
         parts.append("")
+
+    _append_extra_seeds(parts)
 
     parts.extend(["## 源城教师", ""])
     parts.append("早停看验证集里同一类小时。下表仍是全部小时，以及拆开的两类。")
