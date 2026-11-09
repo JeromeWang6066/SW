@@ -658,6 +658,48 @@ python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dr
 
 ---
 
+## 2026-11-09 — 模态之间的城市级相关
+
+**目标：** 看出租上车、出租下车、单车上车之间，有没有城市级工作日相关落到 0.8 以下。不训练。  
+**配置：** 无训练配置。工作日是周一到周五。源侧前 5904 小时，目标侧 `[5832, 5904)`。  
+**Git commit：** 本 PR  
+**机器 / GPU：** Windows 本机。只读 `npy`，不使用 GPU。
+
+### 做了什么
+
+- `scripts/10_modality_similarity.py` 读 9 条序列。形状与 `docs/DATA.md` 一致。出租上车有效格 458 / 270 / 207，单车上车 108 / 229 / 125。出租下车是 460 / 284 / 208。
+- 已有的出租上车跨城相关与 `docs/profiles/similarity.md` 的差不超过 `1e-4`。
+- `tests/test_modality_similarity.py` 4 项通过。常数轮廓无定义，相同非常数轮廓为 1，72 小时每个钟点 3 个样本。
+
+### 数据
+
+- 沿用 `data/processed/{city}/upstream/` 里的 `Taxi*_pickup.npy`、`Taxi*_dropoff.npy`、`Bike*_pickup.npy`。单车下车没算。没有改文件。
+
+### 运行命令
+
+```bash
+.\.venv\Scripts\python.exe -m pytest tests/test_modality_similarity.py -q
+.\.venv\Scripts\python.exe scripts\10_modality_similarity.py
+```
+
+### 真实结果（仅实跑后填写）
+
+同窗口相关里，出租上车和出租下车，包括跨城，都高于 0.8。出租和单车的同窗口相关多数在 0.5 到 0.8 之间。纽约出租下车对芝加哥单车上车是 0.4854，是唯一不超过 0.5 的一对。
+
+72 个有向对里，34 个同窗口相关不超过 0.8，记为以后的训练候选。纽约单车上车到芝加哥出租上车的协议内相关是 0.7897，同窗口是 0.8342，记成短窗口压低，不是候选。这一步没有训练。
+
+| split | MAE | RMSE | MAPE | notes |
+|---|---|---|---|---|
+| val | — | — | — | 未训练 |
+| test | — | — | — | 未训练 |
+
+### 问题 / 下一步
+
+- 训练候选都涉及单车，还没有跑从零、微调、蒸馏
+- 单车下车和功能区没有做
+
+---
+
 ## YYYY-MM-DD — 标题
 
 **目标：**  

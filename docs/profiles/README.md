@@ -57,3 +57,4 @@ python scripts/04_grid_profiles.py
 ```
 
 协议内的城市级和格子级相关见 [similarity.md](similarity.md)。
+跨通道的城市级相关见 [modality_similarity.md](modality_similarity.md)。
