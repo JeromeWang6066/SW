@@ -12,7 +12,8 @@
     "weekend_first_date": "2016-08-27",
     "weekend_last_date": "2016-08-28",
     "weekday_first_date": "2016-08-31",
-    "weekday_last_date": "2016-09-02"
+    "weekday_last_date": "2016-09-02",
+    "holiday_hours_in_prefix": 120
   },
   "weekend_hour_counts": [
     2,
@@ -68,11 +69,11 @@
   ],
   "weekday_pairs": [
     {
-      "agreement": 0.4656084656084656,
+      "agreement": 0.48148148148148145,
       "passes_gate": false,
       "gate": 0.7,
       "n_both_defined": 189,
-      "n_same": 88,
+      "n_same": 91,
       "n_only_protocol": 0,
       "n_only_control": 18,
       "protocol_counts": {
@@ -86,8 +87,8 @@
         "n_defined": 207,
         "n_undefined": 0,
         "le_0.5": 0,
-        "gt_0.5_le_0.8": 41,
-        "gt_0.8": 166
+        "gt_0.5_le_0.8": 43,
+        "gt_0.8": 164
       },
       "source": "ny",
       "target": "dc",
@@ -95,19 +96,19 @@
       "n_target_valid": 207
     },
     {
-      "agreement": 0.5026455026455027,
+      "agreement": 0.49206349206349204,
       "passes_gate": false,
       "gate": 0.7,
       "n_both_defined": 189,
-      "n_same": 95,
+      "n_same": 93,
       "n_only_protocol": 0,
       "n_only_control": 18,
       "protocol_counts": {
         "n_defined": 189,
         "n_undefined": 18,
         "le_0.5": 3,
-        "gt_0.5_le_0.8": 100,
-        "gt_0.8": 86
+        "gt_0.5_le_0.8": 101,
+        "gt_0.8": 85
       },
       "control_counts": {
         "n_defined": 207,
@@ -124,26 +125,26 @@
   ],
   "weekend_pairs": [
     {
-      "agreement": 0.5722543352601156,
+      "agreement": 0.6127167630057804,
       "passes_gate": false,
       "gate": 0.7,
       "n_both_defined": 173,
-      "n_same": 99,
+      "n_same": 106,
       "n_only_protocol": 0,
       "n_only_control": 30,
       "protocol_counts": {
         "n_defined": 173,
         "n_undefined": 34,
-        "le_0.5": 11,
-        "gt_0.5_le_0.8": 120,
-        "gt_0.8": 42
+        "le_0.5": 10,
+        "gt_0.5_le_0.8": 123,
+        "gt_0.8": 40
       },
       "control_counts": {
         "n_defined": 203,
         "n_undefined": 4,
-        "le_0.5": 6,
-        "gt_0.5_le_0.8": 111,
-        "gt_0.8": 86
+        "le_0.5": 5,
+        "gt_0.5_le_0.8": 107,
+        "gt_0.8": 91
       },
       "source": "ny",
       "target": "dc",
@@ -151,26 +152,26 @@
       "n_target_valid": 207
     },
     {
-      "agreement": 0.49710982658959535,
+      "agreement": 0.48554913294797686,
       "passes_gate": false,
       "gate": 0.7,
       "n_both_defined": 173,
-      "n_same": 86,
+      "n_same": 84,
       "n_only_protocol": 0,
       "n_only_control": 30,
       "protocol_counts": {
         "n_defined": 173,
         "n_undefined": 34,
-        "le_0.5": 13,
+        "le_0.5": 14,
         "gt_0.5_le_0.8": 112,
-        "gt_0.8": 48
+        "gt_0.8": 47
       },
       "control_counts": {
         "n_defined": 203,
         "n_undefined": 4,
         "le_0.5": 6,
-        "gt_0.5_le_0.8": 83,
-        "gt_0.8": 114
+        "gt_0.5_le_0.8": 84,
+        "gt_0.8": 113
       },
       "source": "chi",
       "target": "dc",
