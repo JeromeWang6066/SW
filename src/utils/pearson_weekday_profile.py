@@ -233,6 +233,43 @@ def paired_profile_pearson(
     return rho, defined
 
 
+def max_source_match(
+    source: np.ndarray,
+    target: np.ndarray,
+    std_eps: float = PROFILE_STD_EPS,
+    tie_atol: float = 1e-8,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Max Pearson from each target row, and which source rows attain it.
+
+    Flat target rows, and targets with no usable source row, are undefined.
+    ``argmax`` is the first source row within ``tie_atol`` of that maximum, or
+    ``-1`` when the target is undefined. ``tied[i, j]`` is true when source row
+    ``j`` is within ``tie_atol`` of target ``i``'s maximum.
+    """
+    source_c, source_n = _centered_norm(source)
+    target_c, target_n = _centered_norm(target)
+    n_target = target_c.shape[0]
+    n_source = source_c.shape[0]
+    defined = target_n >= std_eps
+    usable_source = source_n >= std_eps
+    rho = np.full(n_target, np.nan, dtype=np.float64)
+    argmax = np.full(n_target, -1, dtype=np.int64)
+    tied = np.zeros((n_target, n_source), dtype=bool)
+    if not np.any(defined) or not np.any(usable_source):
+        return rho, np.zeros(n_target, dtype=bool), argmax, tied
+    usable_index = np.flatnonzero(usable_source)
+    corr = (target_c[defined] / target_n[defined, None]) @ (
+        source_c[usable_source] / source_n[usable_source, None]
+    ).T
+    best = corr.max(axis=1)
+    local = np.argmax(np.abs(corr - best[:, None]) <= tie_atol, axis=1)
+    rows = np.flatnonzero(defined)
+    rho[defined] = best
+    argmax[defined] = usable_index[local]
+    tied[rows[:, None], usable_index[None, :]] = np.abs(corr - best[:, None]) <= tie_atol
+    return rho, defined, argmax, tied
+
+
 def max_source_pearson(
     source: np.ndarray,
     target: np.ndarray,
@@ -242,17 +279,7 @@ def max_source_pearson(
 
     Flat target rows, and targets with no usable source row, are undefined.
     """
-    source_c, source_n = _centered_norm(source)
-    target_c, target_n = _centered_norm(target)
-    defined = target_n >= std_eps
-    usable_source = source_n >= std_eps
-    rho = np.full(target_c.shape[0], np.nan, dtype=np.float64)
-    if not np.any(defined) or not np.any(usable_source):
-        return rho, np.zeros(target_c.shape[0], dtype=bool)
-    corr = (target_c[defined] / target_n[defined, None]) @ (
-        source_c[usable_source] / source_n[usable_source, None]
-    ).T
-    rho[defined] = corr.max(axis=1)
+    rho, defined, _argmax, _tied = max_source_match(source, target, std_eps=std_eps)
     return rho, defined
 
 
