@@ -24,6 +24,7 @@ if str(_ROOT) not in sys.path:
 
 from src.data.dataset import prepare_city_windows
 from src.models.st_net import STNet
+from src.train.calendar_hooks import append_slices, early_stop_dataset, with_calendar
 from src.utils.config import load_config
 from src.utils.logging_utils import get_logger
 from src.utils.seed import set_seed
@@ -72,18 +73,18 @@ def masked_mse(out: torch.Tensor, y: torch.Tensor, mask: torch.Tensor) -> torch.
 
 
 @torch.no_grad()
-def evaluate(
+def evaluate_totals(
     net: STNet,
     loader: DataLoader,
     mask: torch.Tensor,
     device: torch.device,
     scale: float,
     min_val: float,
-) -> tuple[float, float, float, float]:
-    """Normalized RMSE, plus denormalized RMSE / MAE / MAPE.
+) -> dict[str, float]:
+    """Summed errors. RMSE and MAE use every valid cell.
 
-    RMSE and MAE use every valid cell. MAPE uses only cells whose denormalized
-    true flow is strictly greater than zero, with that flow as the denominator.
+    MAPE uses only cells whose denormalized true flow is strictly greater than
+    zero, with that flow as the denominator.
     """
     net.eval()
     se = 0.0
@@ -91,6 +92,7 @@ def evaluate(
     ape = 0.0
     valid_points = 0.0
     mape_points = 0.0
+    n_windows = 0
     n_valid = float(mask.sum().item())
     for x, y in loader:
         x = x.to(device)
@@ -106,11 +108,49 @@ def evaluate(
             ape += float((p_raw[positive] - y_raw[positive]).abs().div(y_raw[positive]).sum().item())
             mape_points += float(positive.sum().item())
         valid_points += x.shape[0] * n_valid
+        n_windows += int(x.shape[0])
     if valid_points <= 0:
         raise RuntimeError("evaluation saw no valid points")
-    rmse_norm = (se / valid_points) ** 0.5
-    mape = float("nan") if mape_points <= 0 else ape / mape_points * 100.0
-    return rmse_norm, rmse_norm * scale, ae_raw / valid_points, mape
+    return {
+        "se": se,
+        "ae_raw": ae_raw,
+        "ape": ape,
+        "valid_points": valid_points,
+        "mape_points": mape_points,
+        "hours": float(n_windows),
+    }
+
+
+def metrics_from_totals(totals: dict[str, float], scale: float) -> tuple[float, float, float, float]:
+    """Normalized RMSE, denormalized RMSE, MAE, and MAPE."""
+    rmse_norm = (totals["se"] / totals["valid_points"]) ** 0.5
+    mape = (
+        float("nan")
+        if totals["mape_points"] <= 0
+        else totals["ape"] / totals["mape_points"] * 100.0
+    )
+    return rmse_norm, rmse_norm * scale, totals["ae_raw"] / totals["valid_points"], mape
+
+
+def add_totals(left: dict[str, float], right: dict[str, float]) -> dict[str, float]:
+    keys = ("se", "ae_raw", "ape", "valid_points", "mape_points", "hours")
+    return {key: left[key] + right[key] for key in keys}
+
+
+@torch.no_grad()
+def evaluate(
+    net: STNet,
+    loader: DataLoader,
+    mask: torch.Tensor,
+    device: torch.device,
+    scale: float,
+    min_val: float,
+) -> tuple[float, float, float, float]:
+    """Normalized RMSE, plus denormalized RMSE / MAE / MAPE."""
+    return metrics_from_totals(
+        evaluate_totals(net, loader, mask, device, scale, min_val),
+        scale,
+    )
 
 
 def _loaders(train_ds, val_ds, test_ds, batch_size: int):
@@ -171,11 +211,14 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     device = torch.device(device_name if torch.cuda.is_available() or device_name == "cpu" else "cpu")
 
-    prepared = prepare_city_windows(
-        city,
-        paths.get("processed_dir", "data/processed"),
-        few_shot_days=few_shot_days,
-        concatenate_all_for_train=concatenate,
+    prepared = with_calendar(
+        prepare_city_windows(
+            city,
+            paths.get("processed_dir", "data/processed"),
+            few_shot_days=few_shot_days,
+            concatenate_all_for_train=concatenate,
+        ),
+        cfg,
     )
     mask = torch.as_tensor(prepared["mask"], device=device)
     logger.info(
@@ -191,6 +234,13 @@ def main(argv: list[str] | None = None) -> int:
         few_shot_days,
         concatenate,
     )
+    if prepared.get("calendar"):
+        logger.info(
+            "calendar=%s train_windows=%d early_stop_windows=%d",
+            prepared["calendar"],
+            len(prepared["train"]),
+            len(early_stop_dataset(prepared)),
+        )
 
     net = STNet(
         in_channels=1,
@@ -202,8 +252,9 @@ def main(argv: list[str] | None = None) -> int:
     ).to(device)
     opt = torch.optim.Adam(net.parameters(), lr=lr, weight_decay=weight_decay)
     train_loader, val_loader, test_loader = _loaders(
-        prepared["train"], prepared["val"], prepared["test"], batch_size
+        prepared["train"], early_stop_dataset(prepared), prepared["test"], batch_size
     )
+    full_val_loader = DataLoader(prepared["val"], batch_size=batch_size, shuffle=False)
 
     ckpt_dir = Path(paths.get("checkpoint_dir", "checkpoints"))
     ckpt_dir.mkdir(parents=True, exist_ok=True)
@@ -344,7 +395,7 @@ def main(argv: list[str] | None = None) -> int:
     state = torch.load(ckpt_path, map_location=device, weights_only=False)
     net.load_state_dict(state["model"])
     val_rmse_n, val_rmse, val_mae, val_mape = evaluate(
-        net, val_loader, mask, device, scale, min_val
+        net, full_val_loader, mask, device, scale, min_val
     )
     _, test_rmse, test_mae, test_mape = evaluate(
         net, test_loader, mask, device, scale, min_val
@@ -373,6 +424,7 @@ def main(argv: list[str] | None = None) -> int:
         "val": {"rmse": val_rmse, "mae": val_mae, "mape": val_mape},
         "test": {"rmse": test_rmse, "mae": test_mae, "mape": test_mape},
     }
+    append_slices(result, net, prepared, mask, device, scale, min_val, batch_size)
     result_path = log_dir / f"{run_id}.json"
     result_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
     logger.info("wrote %s", result_path)
