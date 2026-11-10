@@ -13,6 +13,7 @@ from pathlib import Path
 
 import numpy as np
 import torch
+from torch.utils.data import DataLoader
 
 _ROOT = Path(__file__).resolve().parents[2]
 if str(_ROOT) not in sys.path:
@@ -20,6 +21,7 @@ if str(_ROOT) not in sys.path:
 
 from src.data.dataset import prepare_city_windows
 from src.models.st_net import STNet
+from src.train.calendar_hooks import append_slices, early_stop_dataset, with_calendar
 from src.train.train_teacher import _loaders, evaluate, masked_mse
 from src.utils.config import load_config
 from src.utils.logging_utils import get_logger
@@ -101,11 +103,14 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     device = torch.device(device_name if torch.cuda.is_available() or device_name == "cpu" else "cpu")
 
-    prepared = prepare_city_windows(
-        target,
-        paths.get("processed_dir", "data/processed"),
-        few_shot_days=few_shot_days,
-        concatenate_all_for_train=False,
+    prepared = with_calendar(
+        prepare_city_windows(
+            target,
+            paths.get("processed_dir", "data/processed"),
+            few_shot_days=few_shot_days,
+            concatenate_all_for_train=False,
+        ),
+        cfg,
     )
     mask = torch.as_tensor(prepared["mask"], device=device)
     scale = float(prepared["max_val"] - prepared["min_val"])
@@ -122,6 +127,13 @@ def main(argv: list[str] | None = None) -> int:
         prepared["max_val"],
         few_shot_days,
     )
+    if prepared.get("calendar"):
+        logger.info(
+            "calendar=%s train_windows=%d early_stop_windows=%d",
+            prepared["calendar"],
+            len(prepared["train"]),
+            len(early_stop_dataset(prepared)),
+        )
 
     net = STNet(
         in_channels=1,
@@ -139,8 +151,9 @@ def main(argv: list[str] | None = None) -> int:
 
     opt = torch.optim.Adam(net.parameters(), lr=lr, weight_decay=weight_decay)
     train_loader, val_loader, test_loader = _loaders(
-        prepared["train"], prepared["val"], prepared["test"], batch_size
+        prepared["train"], early_stop_dataset(prepared), prepared["test"], batch_size
     )
+    full_val_loader = DataLoader(prepared["val"], batch_size=batch_size, shuffle=False)
 
     ckpt_dir = Path(paths.get("checkpoint_dir", "checkpoints"))
     ckpt_dir.mkdir(parents=True, exist_ok=True)
@@ -259,7 +272,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     state = torch.load(ckpt_path, map_location=device, weights_only=False)
     net.load_state_dict(state["model"])
-    _, val_rmse, val_mae, val_mape = evaluate(net, val_loader, mask, device, scale, min_val)
+    _, val_rmse, val_mae, val_mape = evaluate(net, full_val_loader, mask, device, scale, min_val)
     _, test_rmse, test_mae, test_mape = evaluate(net, test_loader, mask, device, scale, min_val)
     logger.info(
         "best epoch %d val rmse %.4f mae %.4f mape %.4f | test rmse %.4f mae %.4f mape %.4f",
@@ -286,6 +299,7 @@ def main(argv: list[str] | None = None) -> int:
         "val": {"rmse": val_rmse, "mae": val_mae, "mape": val_mape},
         "test": {"rmse": test_rmse, "mae": test_mae, "mape": test_mape},
     }
+    append_slices(result, net, prepared, mask, device, scale, min_val, batch_size)
     result_path = log_dir / f"{run_id}.json"
     result_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
     logger.info("wrote %s", result_path)

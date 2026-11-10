@@ -1,0 +1,34 @@
+# Washington from scratch on 3 weekdays plus 2 weekend days. Early stop uses every validation hour.
+_base: ../default.yaml
+
+experiment:
+  group: calendar
+  id: cal-dc-scratch
+  role: target_only
+
+cities:
+  source: null
+  target: dc
+
+splits:
+  few_shot_days: 0
+
+calendar:
+  train_labels: dc_wd3_we2
+  early_stop: all
+
+kd:
+  enabled: false
+  pearson_multiplier: false
+
+paths:
+  checkpoint_dir: checkpoints/calendar
+  log_dir: logs/calendar
+  checkpoint_name: dc_scratch_wd3we2.pt
+
+train:
+  epochs: 50
+  batch_size: 8
+  weight_decay: 5.0e-5
+
+seed: 42

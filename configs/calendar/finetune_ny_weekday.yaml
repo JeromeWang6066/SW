@@ -1,0 +1,35 @@
+# Weekday Washington labels, initialized from the new New York weekday teacher.
+_base: ../default.yaml
+
+experiment:
+  group: calendar
+  id: cal-finetune-ny-weekday
+  role: finetune
+
+cities:
+  source: ny
+  target: dc
+
+splits:
+  few_shot_days: 0
+
+calendar:
+  train_labels: dc_wd3
+  early_stop: weekday
+
+kd:
+  enabled: false
+  pearson_multiplier: false
+  teacher_checkpoint: checkpoints/calendar/teacher_ny_weekday.pt
+
+paths:
+  checkpoint_dir: checkpoints/calendar
+  log_dir: logs/calendar
+  checkpoint_name: finetune_ny_weekday.pt
+
+train:
+  epochs: 50
+  batch_size: 8
+  weight_decay: 5.0e-5
+
+seed: 42

@@ -1,0 +1,35 @@
+# Weekend Washington labels, initialized from the new Chicago weekend teacher.
+_base: ../default.yaml
+
+experiment:
+  group: calendar
+  id: cal-finetune-chi-weekend
+  role: finetune
+
+cities:
+  source: chi
+  target: dc
+
+splits:
+  few_shot_days: 0
+
+calendar:
+  train_labels: dc_we2
+  early_stop: weekend
+
+kd:
+  enabled: false
+  pearson_multiplier: false
+  teacher_checkpoint: checkpoints/calendar/teacher_chi_weekend.pt
+
+paths:
+  checkpoint_dir: checkpoints/calendar
+  log_dir: logs/calendar
+  checkpoint_name: finetune_chi_weekend.pt
+
+train:
+  epochs: 50
+  batch_size: 8
+  weight_decay: 5.0e-5
+
+seed: 42

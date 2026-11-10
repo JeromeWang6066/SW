@@ -1,0 +1,31 @@
+# Source teacher: Chicago weekends and US federal holidays. Seed 42.
+_base: ../default.yaml
+
+experiment:
+  group: calendar
+  id: cal-teacher-chi-weekend
+  role: teacher
+
+cities:
+  source: chi
+  target: null
+
+calendar:
+  train_labels: weekend
+  early_stop: weekend
+
+kd:
+  enabled: false
+  pearson_multiplier: false
+
+paths:
+  checkpoint_dir: checkpoints/calendar
+  log_dir: logs/calendar
+  checkpoint_name: teacher_chi_weekend.pt
+
+train:
+  epochs: 50
+  batch_size: 8
+  weight_decay: 5.0e-5
+
+seed: 42
