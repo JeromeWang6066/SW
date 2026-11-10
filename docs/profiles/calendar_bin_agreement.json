@@ -1,0 +1,181 @@
+{
+  "channel": "taxi_pickup",
+  "trained": false,
+  "bin_low": 0.5,
+  "bin_high": 0.8,
+  "gate": 0.7,
+  "windows": {
+    "weekend_start": 5736,
+    "weekend_end": 5784,
+    "weekday_start": 5832,
+    "weekday_end": 5904,
+    "weekend_first_date": "2016-08-27",
+    "weekend_last_date": "2016-08-28",
+    "weekday_first_date": "2016-08-31",
+    "weekday_last_date": "2016-09-02"
+  },
+  "weekend_hour_counts": [
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2
+  ],
+  "weekday_hour_counts": [
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3
+  ],
+  "weekday_pairs": [
+    {
+      "agreement": 0.4656084656084656,
+      "passes_gate": false,
+      "gate": 0.7,
+      "n_both_defined": 189,
+      "n_same": 88,
+      "n_only_protocol": 0,
+      "n_only_control": 18,
+      "protocol_counts": {
+        "n_defined": 189,
+        "n_undefined": 18,
+        "le_0.5": 3,
+        "gt_0.5_le_0.8": 111,
+        "gt_0.8": 75
+      },
+      "control_counts": {
+        "n_defined": 207,
+        "n_undefined": 0,
+        "le_0.5": 0,
+        "gt_0.5_le_0.8": 41,
+        "gt_0.8": 166
+      },
+      "source": "ny",
+      "target": "dc",
+      "kind": "weekday",
+      "n_target_valid": 207
+    },
+    {
+      "agreement": 0.5026455026455027,
+      "passes_gate": false,
+      "gate": 0.7,
+      "n_both_defined": 189,
+      "n_same": 95,
+      "n_only_protocol": 0,
+      "n_only_control": 18,
+      "protocol_counts": {
+        "n_defined": 189,
+        "n_undefined": 18,
+        "le_0.5": 3,
+        "gt_0.5_le_0.8": 100,
+        "gt_0.8": 86
+      },
+      "control_counts": {
+        "n_defined": 207,
+        "n_undefined": 0,
+        "le_0.5": 1,
+        "gt_0.5_le_0.8": 28,
+        "gt_0.8": 178
+      },
+      "source": "chi",
+      "target": "dc",
+      "kind": "weekday",
+      "n_target_valid": 207
+    }
+  ],
+  "weekend_pairs": [
+    {
+      "agreement": 0.5722543352601156,
+      "passes_gate": false,
+      "gate": 0.7,
+      "n_both_defined": 173,
+      "n_same": 99,
+      "n_only_protocol": 0,
+      "n_only_control": 30,
+      "protocol_counts": {
+        "n_defined": 173,
+        "n_undefined": 34,
+        "le_0.5": 11,
+        "gt_0.5_le_0.8": 120,
+        "gt_0.8": 42
+      },
+      "control_counts": {
+        "n_defined": 203,
+        "n_undefined": 4,
+        "le_0.5": 6,
+        "gt_0.5_le_0.8": 111,
+        "gt_0.8": 86
+      },
+      "source": "ny",
+      "target": "dc",
+      "kind": "weekend",
+      "n_target_valid": 207
+    },
+    {
+      "agreement": 0.49710982658959535,
+      "passes_gate": false,
+      "gate": 0.7,
+      "n_both_defined": 173,
+      "n_same": 86,
+      "n_only_protocol": 0,
+      "n_only_control": 30,
+      "protocol_counts": {
+        "n_defined": 173,
+        "n_undefined": 34,
+        "le_0.5": 13,
+        "gt_0.5_le_0.8": 112,
+        "gt_0.8": 48
+      },
+      "control_counts": {
+        "n_defined": 203,
+        "n_undefined": 4,
+        "le_0.5": 6,
+        "gt_0.5_le_0.8": 83,
+        "gt_0.8": 114
+      },
+      "source": "chi",
+      "target": "dc",
+      "kind": "weekend",
+      "n_target_valid": 207
+    }
+  ]
+}
