@@ -1,0 +1,40 @@
+{
+  "channel": "taxi_pickup",
+  "seed": null,
+  "trained_stnet": false,
+  "gate": 150,
+  "high": 0.8,
+  "alpha": 1.0,
+  "lag": 6,
+  "cities": [
+    {
+      "source": "ny",
+      "n_cells": 46,
+      "n_donors": 25,
+      "scale_median": 0.2621082565477353,
+      "finetune_val_mae": 6.898090329159564,
+      "transferred_val_mae": 6.436229540758926,
+      "local_val_mae": 6.433353000992345,
+      "n_better_than_finetune": 29,
+      "opens_test": true,
+      "test": {
+        "transferred_mae": 5.958614423887605,
+        "local_mae": 6.006356405582857,
+        "finetune_mae": 5.747600054257698,
+        "hours": 1440.0
+      }
+    },
+    {
+      "source": "chi",
+      "n_cells": 46,
+      "n_donors": 26,
+      "scale_median": 0.6297771795355853,
+      "finetune_val_mae": 6.262560492470494,
+      "transferred_val_mae": 6.597289656868752,
+      "local_val_mae": 6.444221776297646,
+      "n_better_than_finetune": 20,
+      "opens_test": false,
+      "test": null
+    }
+  ]
+}
