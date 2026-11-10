@@ -28,6 +28,9 @@ CALENDAR_START = date(2016, 1, 1)
 EXPECTED_SERIES_HOURS = 8784
 VAL_OR_TEST_HOURS = 60 * 24
 TRAIN_PREFIX_HOURS = EXPECTED_SERIES_HOURS - 2 * VAL_OR_TEST_HOURS
+LABEL_LAG_HOURS = 6
+FEW_SHOT_LABEL_HOURS = 3 * 24
+PROFILE_STD_EPS = 1e-8
 
 
 def weekday_24h_profile(
@@ -162,6 +165,92 @@ def grid_hour_profile(
     hours = np.arange(t) % 24
     counts = np.bincount(hours[mask], minlength=24).astype(np.int64)
     return flat.reshape(h, w, 24), counts
+
+
+def few_shot_label_bounds(
+    num_timesteps: int = EXPECTED_SERIES_HOURS,
+    few_shot_hours: int = FEW_SHOT_LABEL_HOURS,
+    val_hours: int = VAL_OR_TEST_HOURS,
+    test_hours: int = VAL_OR_TEST_HOURS,
+    lag_hours: int = LABEL_LAG_HOURS,
+) -> Tuple[int, int]:
+    """Raw ``[start, end)`` hours of the last few-shot training labels.
+
+    ``split_x_y`` emits a label at index ``i`` for ``i`` from ``lag_hours`` up to,
+    but not including, ``num_timesteps - val_hours - test_hours``. The target
+    protocol keeps the last ``few_shot_hours`` of those labels. The returned
+    slice starts at midnight for the default 8784-hour series.
+    """
+    train_end = num_timesteps - val_hours - test_hours
+    if train_end - lag_hours < few_shot_hours:
+        raise ValueError(
+            f"train labels {train_end - lag_hours} < few-shot {few_shot_hours}"
+        )
+    start = train_end - few_shot_hours
+    if start % 24 != 0 or few_shot_hours % 24 != 0:
+        raise ValueError(
+            f"few-shot slice [{start}, {train_end}) does not start at midnight"
+        )
+    return start, train_end
+
+
+def _centered_norm(profiles: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """Return centered ``(N, 24)`` profiles and their L2 norms."""
+    x = np.asarray(profiles, dtype=np.float64)
+    if x.ndim != 2 or x.shape[1] != 24:
+        raise ValueError(f"expected (N, 24), got {x.shape}")
+    centered = x - x.mean(axis=1, keepdims=True)
+    norm = np.sqrt((centered ** 2).sum(axis=1))
+    return centered, norm
+
+
+def paired_profile_pearson(
+    left: np.ndarray,
+    right: np.ndarray,
+    std_eps: float = PROFILE_STD_EPS,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """Pearson for each pair of rows. Flat rows are undefined, not zero.
+
+    Returns
+    -------
+    rho : float64 ndarray, shape ``(N,)``
+        ``nan`` where either row is constant within ``std_eps``.
+    defined : bool ndarray, shape ``(N,)``
+    """
+    left_c, left_n = _centered_norm(left)
+    right_c, right_n = _centered_norm(right)
+    if left_c.shape[0] != right_c.shape[0]:
+        raise ValueError(f"row count {left_c.shape[0]} != {right_c.shape[0]}")
+    defined = (left_n >= std_eps) & (right_n >= std_eps)
+    rho = np.full(left_c.shape[0], np.nan, dtype=np.float64)
+    if np.any(defined):
+        rho[defined] = (left_c[defined] * right_c[defined]).sum(axis=1) / (
+            left_n[defined] * right_n[defined]
+        )
+    return rho, defined
+
+
+def max_source_pearson(
+    source: np.ndarray,
+    target: np.ndarray,
+    std_eps: float = PROFILE_STD_EPS,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """Max Pearson from each target row to any non-constant source row.
+
+    Flat target rows, and targets with no usable source row, are undefined.
+    """
+    source_c, source_n = _centered_norm(source)
+    target_c, target_n = _centered_norm(target)
+    defined = target_n >= std_eps
+    usable_source = source_n >= std_eps
+    rho = np.full(target_c.shape[0], np.nan, dtype=np.float64)
+    if not np.any(defined) or not np.any(usable_source):
+        return rho, np.zeros(target_c.shape[0], dtype=bool)
+    corr = (target_c[defined] / target_n[defined, None]) @ (
+        source_c[usable_source] / source_n[usable_source, None]
+    ).T
+    rho[defined] = corr.max(axis=1)
+    return rho, defined
 
 
 def pearson_corr_rows(a: np.ndarray, b: np.ndarray, eps: float = 1e-8) -> np.ndarray:
