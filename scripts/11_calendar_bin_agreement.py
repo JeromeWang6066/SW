@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Bin agreement for the 3-weekday plus 2-weekend Washington labels.
 
-Weekday labels repeat the old 72-hour window and must match its published
-agreement. Weekend labels are Saturday and Sunday only. No training.
+Weekday means Monday–Friday excluding the 2016 federal holidays used in
+training. Weekend means Saturday, Sunday, and those holidays. The two short
+Washington windows contain no holiday, so their hours stay the same. The
+5904-hour profiles move the holiday hours. No training.
 """
 
 from __future__ import annotations
@@ -20,6 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from src.data.calendar_mask import is_weekend_or_holiday
 from src.data.dataset import load_city_array, valid_region_mask
 from src.utils.pearson_weekday_profile import (
     BIN_AGREEMENT_GATE,
@@ -38,22 +41,14 @@ from src.utils.pearson_weekday_profile import (
 
 PAIRS = (("ny", "dc"), ("chi", "dc"))
 WEEKEND_LABELS = (5736, 5784)
-PUBLISHED_WEEKDAY = {
-    ("ny", "dc"): (0.4656, 88, 189),
-    ("chi", "dc"): (0.5026, 95, 189),
-}
-PUBLISHED_ATOL = 1e-4
+HOLIDAY_HOURS_IN_PREFIX = 5 * 24
 BIN_NAMES = {0: "le_0.5", 1: "gt_0.5_le_0.8", 2: "gt_0.8"}
 
 
-def weekday_mask(num_timesteps: int = EXPECTED_SERIES_HOURS) -> np.ndarray:
-    _, weekday = hourly_calendar(num_timesteps)
-    return weekday
-
-
-def weekend_mask(num_timesteps: int = EXPECTED_SERIES_HOURS) -> np.ndarray:
-    """Saturday and Sunday. Federal holidays that fall on weekdays stay out."""
-    return ~weekday_mask(num_timesteps)
+def class_masks(num_timesteps: int = EXPECTED_SERIES_HOURS) -> tuple[np.ndarray, np.ndarray]:
+    """Weekday and weekend-plus-holiday masks, matching the calendar training split."""
+    weekend = is_weekend_or_holiday(np.arange(num_timesteps, dtype=np.int64))
+    return ~weekend, weekend
 
 
 def _hour_counts(select: np.ndarray) -> np.ndarray:
@@ -67,15 +62,21 @@ def window_report() -> dict[str, Any]:
     weekend_start, weekend_end = WEEKEND_LABELS
     if (weekday_start, weekday_end) != (5832, 5904):
         raise ValueError(f"weekday labels {(weekday_start, weekday_end)} != (5832, 5904)")
-    mask = weekend_mask()
-    weekend_slice = mask[weekend_start:weekend_end]
-    weekday_slice = weekday_mask()[weekday_start:weekday_end]
+    weekday, weekend = class_masks()
+    _, monday_friday = hourly_calendar(EXPECTED_SERIES_HOURS)
+    holiday_hours = monday_friday[:TRAIN_PREFIX_HOURS] & weekend[:TRAIN_PREFIX_HOURS]
+    if int(holiday_hours.sum()) != HOLIDAY_HOURS_IN_PREFIX:
+        raise ValueError(f"holiday hours in the train prefix: {int(holiday_hours.sum())}")
+    weekend_slice = weekend[weekend_start:weekend_end]
+    weekday_slice = weekday[weekday_start:weekday_end]
     if weekend_start % 24 != 0 or weekday_start % 24 != 0:
         raise ValueError("a short window does not start at midnight")
     if not bool(weekend_slice.all()):
-        raise ValueError("weekend labels include a Monday-Friday hour")
+        raise ValueError("weekend labels are not entirely weekend class")
     if not bool(weekday_slice.all()):
-        raise ValueError("weekday labels include a Saturday or Sunday")
+        raise ValueError("weekday labels are not entirely weekday class")
+    if int(holiday_hours[weekend_start:weekend_end].sum()) or int(holiday_hours[weekday_start:weekday_end].sum()):
+        raise ValueError("a short Washington window contains a federal holiday")
     if weekend_end > weekday_start:
         raise ValueError("weekend and weekday labels overlap")
     weekend_counts = _hour_counts(np.ones(weekend_end - weekend_start, dtype=bool))
@@ -91,6 +92,7 @@ def window_report() -> dict[str, Any]:
         "weekday_last_date": (CALENDAR_START + timedelta(days=(weekday_end - 1) // 24)).isoformat(),
         "weekend_hour_counts": weekend_counts,
         "weekday_hour_counts": weekday_counts,
+        "holiday_hours_in_prefix": int(holiday_hours.sum()),
     }
 
 
@@ -122,29 +124,13 @@ def _pair(source_rows: np.ndarray, target_short: np.ndarray, target_long: np.nda
     }
 
 
-def _check_published(pairs: list[dict[str, Any]]) -> None:
-    mismatches = []
-    for item in pairs:
-        expected = PUBLISHED_WEEKDAY[(item["source"], item["target"])]
-        agreement, n_same, n_both = expected
-        got = item["agreement"]
-        if got is None or abs(got - agreement) > PUBLISHED_ATOL or item["n_same"] != n_same or item["n_both_defined"] != n_both:
-            mismatches.append(
-                f"{item['source']}->{item['target']} got {got} ({item['n_same']}/{item['n_both_defined']}) "
-                f"expected {agreement} ({n_same}/{n_both})"
-            )
-    if mismatches:
-        raise ValueError("weekday agreement does not match the published 72-hour result:\n" + "\n".join(mismatches))
-
-
 def build_report(processed_dir: Path) -> dict[str, Any]:
     windows = window_report()
     if not np.array_equal(windows["weekend_hour_counts"], np.full(24, 2)):
         raise ValueError("weekend short window is not 2 samples per hour")
     if not np.array_equal(windows["weekday_hour_counts"], np.full(24, 3)):
         raise ValueError("weekday short window is not 3 samples per hour")
-    weekday = weekday_mask()
-    weekend = weekend_mask()
+    weekday, weekend = class_masks()
     flows = {}
     for city in ("ny", "chi", "dc"):
         flow = load_city_array(city, processed_dir)
@@ -185,7 +171,6 @@ def build_report(processed_dir: Path) -> dict[str, Any]:
             item["kind"] = name
             item["n_target_valid"] = flows[target]["n_valid"]
             bucket.append(item)
-    _check_published(weekday_pairs)
     return {
         "channel": "taxi_pickup",
         "trained": False,
@@ -257,12 +242,13 @@ def _markdown(report: dict[str, Any]) -> str:
         "工作日短窗口是 "
         f"[{windows['weekday_start']}, {windows['weekday_end']})，"
         f"{windows['weekday_first_date']} 至 {windows['weekday_last_date']}，每个钟点 3 个样本。",
-        "它和原来的 72 小时是同一段，所以工作日一致比例必须和已发表的结果一致。",
+        "这段里没有联邦假日。工作日分类仍去掉前 5904 小时里的 5 个假日，共 "
+        f"{windows['holiday_hours_in_prefix']} 小时：1 月 1 日、1 月 18 日、2 月 15 日、5 月 30 日、7 月 4 日。",
         "周末短窗口是 "
         f"[{windows['weekend_start']}, {windows['weekend_end']})，"
         f"{windows['weekend_first_date']} 至 {windows['weekend_last_date']}，每个钟点 2 个样本。",
-        "周末只含周六和周日，不含落到周一到周五的联邦假日。",
-        "源城和华盛顿的长窗口都用前 5904 小时里的同一种日期。",
+        "周末分类是周六、周日，加上上面这些假日。劳动节不在前 5904 小时里。",
+        "源城和华盛顿的长窗口都用前 5904 小时里的同一种分类。",
         f"分档是不超过 {report['bin_low']}、大于 {report['bin_low']} 且不超过 {report['bin_high']}、大于 {report['bin_high']}。",
         "一致比例的分母是两次都有定义的格子。",
         f"门槛是 {report['gate']}。这一步即使达到门槛也不训练。",

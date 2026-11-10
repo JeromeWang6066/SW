@@ -32,3 +32,4 @@ def test_weekend_and_weekday_windows_do_not_overlap() -> None:
     assert report["weekday_last_date"] == "2016-09-02"
     assert np.array_equal(report["weekend_hour_counts"], np.full(24, 2))
     assert np.array_equal(report["weekday_hour_counts"], np.full(24, 3))
+    assert report["holiday_hours_in_prefix"] == 120

@@ -59,3 +59,4 @@ python scripts/04_grid_profiles.py
 协议内的城市级和格子级相关见 [similarity.md](similarity.md)。
 跨通道的城市级相关见 [modality_similarity.md](modality_similarity.md)。
 五日训练窗口的格子分档见 [calendar_bin_agreement.md](calendar_bin_agreement.md)。
+档位不同的原因见 [bin_disagreement.md](bin_disagreement.md)。
