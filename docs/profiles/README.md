@@ -62,4 +62,5 @@ python scripts/04_grid_profiles.py
 档位不同的原因见 [bin_disagreement.md](bin_disagreement.md)。
 三天窗口按档选用已有模型见 [bin_route.md](bin_route.md)。
 上车量门和 3×3 轮廓的重放见 [grid_route.md](grid_route.md)。
+过门格子的水平和位移见 [cell_affine.md](cell_affine.md)。
 1km 格子的日上车量和三天轮廓见 [cell_volume.md](cell_volume.md)。
