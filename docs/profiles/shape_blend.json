@@ -1,0 +1,93 @@
+{
+  "channel": "taxi_pickup",
+  "seed": 42,
+  "trained": false,
+  "gate": 150,
+  "margin": 0.02,
+  "min_rho": 0.8,
+  "device": "cuda",
+  "cities": [
+    {
+      "source": "ny",
+      "n_with_shape": 46,
+      "donor_median": 2.0,
+      "weight": 0.1,
+      "validation_improved": true,
+      "splits": {
+        "val": {
+          "finetune": {
+            "mae": 2.054808802241137,
+            "rmse": 6.1935804786131055,
+            "mape": 75.63837603870056,
+            "hours": 1440.0,
+            "n_cells": 207
+          },
+          "blend": {
+            "mae": 2.039174346521594,
+            "rmse": 6.2383675416833215,
+            "mape": 74.38507724533515,
+            "hours": 1440.0,
+            "n_cells": 207
+          }
+        },
+        "test": {
+          "finetune": {
+            "mae": 1.7152932872454838,
+            "rmse": 5.27853592006352,
+            "mape": 72.39294952820704,
+            "hours": 1440.0,
+            "n_cells": 207
+          },
+          "blend": {
+            "mae": 1.7152727860889194,
+            "rmse": 5.294333044175764,
+            "mape": 72.69505494170313,
+            "hours": 1440.0,
+            "n_cells": 207
+          }
+        }
+      }
+    },
+    {
+      "source": "chi",
+      "n_with_shape": 46,
+      "donor_median": 2.0,
+      "weight": 0.15,
+      "validation_improved": true,
+      "splits": {
+        "val": {
+          "finetune": {
+            "mae": 1.7130375992425788,
+            "rmse": 5.580925726962562,
+            "mape": 72.98017470441498,
+            "hours": 1440.0,
+            "n_cells": 207
+          },
+          "blend": {
+            "mae": 1.6746067018456257,
+            "rmse": 5.494691326784367,
+            "mape": 70.95215841991686,
+            "hours": 1440.0,
+            "n_cells": 207
+          }
+        },
+        "test": {
+          "finetune": {
+            "mae": 1.4773075183173043,
+            "rmse": 5.0577626792058075,
+            "mape": 73.31647206018066,
+            "hours": 1440.0,
+            "n_cells": 207
+          },
+          "blend": {
+            "mae": 1.4645232680630957,
+            "rmse": 5.0174589589545215,
+            "mape": 72.38110682595983,
+            "hours": 1440.0,
+            "n_cells": 207
+          }
+        }
+      }
+    }
+  ]
+}
