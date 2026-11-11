@@ -61,5 +61,6 @@ python scripts/04_grid_profiles.py
 五日训练窗口的格子分档见 [calendar_bin_agreement.md](calendar_bin_agreement.md)。
 档位不同的原因见 [bin_disagreement.md](bin_disagreement.md)。
 三天窗口按档选用已有模型见 [bin_route.md](bin_route.md)。
+上车量门和 3×3 轮廓的重放见 [grid_route.md](grid_route.md)。
 匹配源城格子的单格模型见 [matched_cell.md](matched_cell.md)。
 1km 格子的日上车量和三天轮廓见 [cell_volume.md](cell_volume.md)。

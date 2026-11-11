@@ -893,6 +893,54 @@ python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dr
 
 ---
 
+## 2026-11-10 — 上车量门和 3×3 轮廓重放
+
+**目标：** 预测仍用种子 42 的 1km 输出。看两种分流是否改变华盛顿的误差：三天上车不少于 150 才按 1km 轮廓分档，以及每个格子按华盛顿 3×3 短轮廓分档。  
+**配置：** 不训练。切点 0.5、0.8、150 不改。没过门的格子用该源城微调。3×3 只平滑华盛顿轮廓，不和上车量门叠加。  
+**Git commit：** 本 PR  
+**机器 / GPU：** Windows 本机。不使用 GPU。缓存来自 logs/bin_route_cache。
+
+### 做了什么
+
+- scripts/16_grid_route.py 读五个已有模型的验证集和测试集逐格误差，按三条规则拼接。
+- 写报告前核对纯模型 MAE/RMSE、不做门的 1km 拼接、50 个过门格子、3×3 同档 150/207 和 169/207，以及芝加哥测试集上车量门 MAE 1.4737。
+- 	ests/test_grid_route.py 3 项通过。
+
+### 数据
+
+- 沿用已核对的出租车上车量。没有改 
+py，没有改权重。
+
+### 运行命令
+
+`ash
+.\.venv\Scripts\python.exe -m pytest tests/test_grid_route.py -q
+.\.venv\Scripts\python.exe scripts/16_grid_route.py
+`
+
+### 真实结果（仅实跑后填写）
+
+过门的格子是 50 个。两条源城的上车量门都只把 4 个格子送到蒸馏，没有格子送到从零。3×3 把纽约 67 格、芝加哥 43 格送到蒸馏，从零仍是 0。
+
+验证集 MAE：纽约一律微调 2.0548，上车量门 2.0509，3×3 2.0740。芝加哥一律微调 1.7130，上车量门 1.7079，3×3 1.7635。
+
+测试集 MAE：纽约一律微调 1.7153，上车量门 1.7132，3×3 1.7389。芝加哥一律微调 1.4773，上车量门 1.4737，3×3 1.5283。
+
+没过门的 157 格在上车量门下和一律微调相同。3×3 把误差加在这 157 格上。芝加哥测试集这 157 格的 MAE 是 0.3615，一律微调是 0.2942。过门的 50 格在 3×3 下仍全部用微调。
+
+| split | MAE | RMSE | MAPE | notes |
+|---|---|---|---|---|
+| val | 1.7130 | 5.5809 | 72.9802 | 芝加哥一律微调。上车量门 1.7079。3×3 1.7635 |
+| test | 1.4773 | 5.0578 | 73.3165 | 芝加哥一律微调。上车量门 1.4737。3×3 1.5283 |
+
+### 问题 / 下一步
+
+- 没有按这些表改 150、0.5 或 0.8
+- 没有重训，也没有做 2km 或 3km 预测
+- 种子 43 和 44 没有重放
+
+---
+
 ## 2026-11-10 — 用最相似的源城格子做单格预报
 
 **目标：** 相关高于 0.8 且三天上车不少于 150 的华盛顿格子，只用匹配到的那一个源城格子学 6 小时滞后形状，再用这 72 小时校正水平。验证集和整城微调比。  
@@ -902,16 +950,16 @@ python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dr
 
 ### 做了什么
 
-- `scripts/17_matched_cell.py` 对纽约、芝加哥各 46 个格子分别拟合。
+- scripts/17_matched_cell.py 对纽约、芝加哥各 46 个格子分别拟合。
 - 对照是同一批格子的整城微调缓存，以及只用 72 小时的岭回归。
-- `tests/test_matched_cell.py` 5 项通过。
+- 	ests/test_matched_cell.py 5 项通过。
 
 ### 运行命令
 
-```bash
+`ash
 .\.venv\Scripts\python.exe -m pytest tests/test_matched_cell.py -q
-.\.venv\Scripts\python.exe scripts\17_matched_cell.py
-```
+.\.venv\Scripts\python.exe scripts/17_matched_cell.py
+`
 
 ### 真实结果（仅实跑后填写）
 
@@ -930,6 +978,7 @@ python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dr
 
 - 没有因为纽约验证集更低去改 0.8 或 150
 - 芝加哥测试集按规则没有计算
+
 
 ---
 
