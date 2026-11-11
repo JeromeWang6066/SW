@@ -898,24 +898,25 @@ python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dr
 **目标：** 预测仍用种子 42 的 1km 输出。看两种分流是否改变华盛顿的误差：三天上车不少于 150 才按 1km 轮廓分档，以及每个格子按华盛顿 3×3 短轮廓分档。  
 **配置：** 不训练。切点 0.5、0.8、150 不改。没过门的格子用该源城微调。3×3 只平滑华盛顿轮廓，不和上车量门叠加。  
 **Git commit：** 本 PR  
-**机器 / GPU：** Windows 本机。不使用 GPU。缓存来自 `logs/bin_route_cache`。
+**机器 / GPU：** Windows 本机。不使用 GPU。缓存来自 logs/bin_route_cache。
 
 ### 做了什么
 
-- `scripts/16_grid_route.py` 读五个已有模型的验证集和测试集逐格误差，按三条规则拼接。
+- scripts/16_grid_route.py 读五个已有模型的验证集和测试集逐格误差，按三条规则拼接。
 - 写报告前核对纯模型 MAE/RMSE、不做门的 1km 拼接、50 个过门格子、3×3 同档 150/207 和 169/207，以及芝加哥测试集上车量门 MAE 1.4737。
-- `tests/test_grid_route.py` 3 项通过。
+- 	ests/test_grid_route.py 3 项通过。
 
 ### 数据
 
-- 沿用已核对的出租车上车量。没有改 `npy`，没有改权重。
+- 沿用已核对的出租车上车量。没有改 
+py，没有改权重。
 
 ### 运行命令
 
-```bash
+`ash
 .\.venv\Scripts\python.exe -m pytest tests/test_grid_route.py -q
-.\.venv\Scripts\python.exe scripts\16_grid_route.py
-```
+.\.venv\Scripts\python.exe scripts/16_grid_route.py
+`
 
 ### 真实结果（仅实跑后填写）
 
@@ -937,6 +938,46 @@ python -m src.train.train_student_kd --config configs/student_kd_ny2dc.yaml --dr
 - 没有按这些表改 150、0.5 或 0.8
 - 没有重训，也没有做 2km 或 3km 预测
 - 种子 43 和 44 没有重放
+
+---
+
+## 2026-11-10 — 用最相似的源城格子做单格预报
+
+**目标：** 相关高于 0.8 且三天上车不少于 150 的华盛顿格子，只用匹配到的那一个源城格子学 6 小时滞后形状，再用这 72 小时校正水平。验证集和整城微调比。  
+**配置：** 不看邻域，不改 ST-Net。岭回归惩罚 1。源城小时是 [0, 5832)，按华盛顿三天均值缩放。验证集不严格更低就不算测试集。  
+**Git commit：** 本 PR  
+**机器 / GPU：** Windows 本机。不使用 GPU。
+
+### 做了什么
+
+- `scripts/17_matched_cell.py` 对纽约、芝加哥各 46 个格子分别拟合。
+- 对照是同一批格子的整城微调缓存，以及只用 72 小时的岭回归。
+- `tests/test_matched_cell.py` 5 项通过。
+
+### 运行命令
+
+```bash
+.\.venv\Scripts\python.exe -m pytest tests/test_matched_cell.py -q
+.\.venv\Scripts\python.exe scripts/17_matched_cell.py
+```
+
+### 真实结果（仅实跑后填写）
+
+验证集，46 格平均 MAE。纽约：匹配格子 6.4362，整城微调 6.8981，只用三天 6.4334。29 格低于微调。芝加哥：匹配格子 6.5973，整城微调 6.2626，只用三天 6.4442。20 格低于微调。
+
+纽约验证集打开了测试集。测试集这 46 格：匹配格子 5.9586，整城微调 5.7476，只用三天 6.0064。芝加哥测试集未计算。
+
+缩放倍数中位数：纽约 0.2621，芝加哥 0.6298。
+
+| split | MAE | RMSE | MAPE | notes |
+|---|---|---|---|---|
+| val | 6.4362 | — | — | 纽约匹配格子，46 格。整城微调 6.8981。只用三天 6.4334 |
+| test | 5.9586 | — | — | 纽约匹配格子。整城微调 5.7476。芝加哥未计算 |
+
+### 问题 / 下一步
+
+- 没有因为纽约验证集更低去改 0.8 或 150
+- 芝加哥测试集按规则没有计算
 
 ---
 
