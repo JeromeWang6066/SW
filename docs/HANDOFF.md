@@ -2,12 +2,22 @@
 
 > **给下一位 coding agent 或本机同学的冷启动说明。**  
 > 中文为主；论文 / 代码专名保留英文。  
-> **请先读本文，再改代码。** 事实均摘自当前 `main` 上已合并文档（PR #1 / #2），勿凭记忆编造 URL、SHA、形状或指标。
+> **请先读本文，再改代码。** 下文第 2 节起保留 PR #1 / #2 的历史记录。2026-11-16 的方法说明不要从这一节的旧进度推断。
+
+**2026-11-16 起先读：**
+
+- [METHODOLOGY.md](METHODOLOGY.md) — 当前数据流、训练支路、后处理，以及哪些文件在 git、哪些只在本机
+- [PAPER_COMPARISON.md](PAPER_COMPARISON.md) — 我们的方法和论文方法，相对各自「直接训练」的下降比例
+- [profiles/matched_cell_normalization.md](profiles/matched_cell_normalization.md) — 匹配源格的归一化与纽约 / 芝加哥差异
+- [profiles/cell_affine_explain.md](profiles/cell_affine_explain.md) — 按格 \(a,b\) 与 λ=72
+- [RESULTS.md](RESULTS.md) — 已实跑指标
+
+Group 3 的 Pearson 乘子仍未实现。下文写的 HEAD `056f5c9` 是 2026-11-04 的交接快照，不是现在的 `main`。
 
 **仓库 HEAD（2026-11-04 与 `origin/main` 对齐）：** `056f5c9` — `Record the Chicago-to-DC lambda sweep.`  
 **公开仓：** https://github.com/JeromeWang6066/SW
 
-**进度：** Group 1、G1-C、标准 KD、教师初始化后再蒸馏、种子 43/44、芝加哥 λ 扫描都已写入 [RESULTS.md](RESULTS.md)。2026-11-05 导师会后的计划见 [advisor/2026-11-05-meeting.md](advisor/2026-11-05-meeting.md)：先按 Pearson 相关选择微调或蒸馏（Group 5），并用兴趣点 / 路网 / 上下车做格子功能标定（Group 6）。Pearson 乘子仍未实现，排在 Group 5 之后。比较用的 MAPE 只统计真实流量大于 0 的格子；`logs/` 里种子 42 主实验 JSON 的 MAPE 仍是旧分母。下文 §2 保留 PR #1 / #2 的历史记录，分组是否已跑完以本节和 RESULTS.md 为准。
+**进度：** Group 1、G1-C、标准 KD、教师初始化后再蒸馏、种子 43/44、芝加哥 λ 扫描都已写入 [RESULTS.md](RESULTS.md)。2026-11-05 导师会后的计划见 [advisor/2026-11-05-meeting.md](advisor/2026-11-05-meeting.md)：先按 Pearson 相关选择微调或蒸馏（Group 5），并用兴趣点 / 路网 / 上下车做格子功能标定（Group 6）。Pearson 乘子仍未实现，排在 Group 5 之后。比较用的 MAPE 只统计真实流量大于 0 的格子；`logs/` 里种子 42 主实验 JSON 的 MAPE 仍是旧分母。下文 §2 保留 PR #1 / #2 的历史记录。2026-11-05 之后的分档、匹配源格、按格仿射和形状混合以文首列出的 METHODOLOGY 与 `docs/profiles/` 为准。
 
 ---
 
