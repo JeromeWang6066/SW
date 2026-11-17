@@ -67,3 +67,4 @@ python scripts/04_grid_profiles.py
 过门格子的水平和位移见 [cell_affine.md](cell_affine.md)。
 相似格子的形状混合见 [shape_blend.md](shape_blend.md)。
 1km 格子的日上车量和三天轮廓见 [cell_volume.md](cell_volume.md)。
+中心化按格仿射和旧公式 λ=72 的对照见 [cell_affine_v2.md](cell_affine_v2.md)。

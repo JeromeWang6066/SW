@@ -882,7 +882,7 @@ def _markdown(report: dict[str, Any], fit: dict[str, Any], slices: dict[str, np.
         "m 和 κ 的网格是 0、0.125、0.25、0.5、1、2、4、8、16、∞。留一天交叉验证只用 8 月 31 日、9 月 1 日、9 月 2 日，平局取更大的强度。",
         "验证集和测试集不参与选择。主比较是种子 42 上新公式 κ=1 对旧公式 λ=72。",
         "",
-        f"主比较结论：{report['verdict']['primary']}。方向{'稳定' if report['verdict']['stable'] else '不稳定'}。",
+        f"主比较结论：{report['verdict']['primary']}。这个词比较的是测试 MAE，更高表示 κ=1 比 λ=72 更大，更低表示更小。方向{'稳定' if report['verdict']['stable'] else '不稳定'}。",
         "",
         "## 核对",
         "",
