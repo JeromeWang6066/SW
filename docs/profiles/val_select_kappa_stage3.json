@@ -1,0 +1,1213 @@
+{
+  "protocol_id": "val-select-kappa-v3",
+  "input_protocol_id": "val-select-input-bundle-v1",
+  "provenance_kind": "documented_from_bundle",
+  "exploratory": true,
+  "independent_test_recalculation": "matched",
+  "do_not_treat_as_verified_research_conclusion": false,
+  "pr20_protocol_unchanged": true,
+  "pr20_head": "a0a055f9bcb2cd9ffff7ceb04d9c68a0c4371a2c",
+  "implementation_fingerprint": "a489c31db161409dd31b1c2ba06d393d37fbd5a3f395ba71eee629a659c05f0e",
+  "plan_sha256": "0703c510c80fceaa7d950c644cba5f57afa70f1c67608a34d2a1d7de198e2a8f",
+  "tests_sha256": "11450e23ae7d9ba302f3a016f2716982867116b59c4d93d36edf21d604067804",
+  "zip_sha256": "99594eaa2b200fe4b8be51823e5716d6152de3186ccf05afb21b4bba81ef6845",
+  "lock_protocol_hash": "2ebe6361ea1b24395ecc3762424bb5740d3f827dd61756dac421f7d2e5fc9bc5",
+  "lock_file_sha256": "5de8dcbadf94ea4394da8c75a314d79bb82010a1a26bcfce0c64c0e0bbe58314",
+  "evidence_hash": "2cd9fced0eae73e50ac37802a247de1112c76b0dbc76793e32552df2d7bf4047",
+  "config_hash": "e59e49f539426851b56b2fd43663e76c54646c79d82aa421ba858009d3aa45a0",
+  "test_report_sha256": "82e0cfac77ae77c5d85ca0a5635c7f561587361cad984a7c14c6eaa3e617f819",
+  "label_budget": "3-day target training (72h) is used only to fit per-cell parameters; this protocol also uses the official ~60-day DC validation labels to select strength. This is not a 72h-only pipeline. Existing test labels have already been seen in prior work; test scores are exploratory and must not change selections or protocol.",
+  "provenance_limits": {
+    "fine_tune_commit": "unknown",
+    "documented_short_revision": "7a04ca4",
+    "checkpoint_hashes": "claimed_not_rehashed",
+    "time_index_origin": "documented_range_from_bundle",
+    "val_test_start_independently_proved_by_bundled_script": false,
+    "historical_test_interval_already_seen": true,
+    "unit": "dc_clipped_count",
+    "documented_value_scale": 234.0
+  },
+  "local_audit_not_in_git": [
+    "val-select-lock-20261117-1646",
+    "val-select-score-20261117-1657"
+  ],
+  "excluded_from_git": [
+    "hourly prediction NPZ/ZIP",
+    "weights/checkpoints",
+    "full selection.lock.json (contains cell geometry and train raw-count lists)",
+    "cache manifests and sidecars"
+  ],
+  "stage": 3,
+  "title": "Shared vs independent strength (Idea 1 + Idea 2 + Idea 3)",
+  "note": "Independent NumPy recalculation of the official test report matched (max abs summary error 2.842170943040401e-14). The test interval was already seen in prior work; results remain exploratory for this locked documented_from_bundle evaluation and must not revise selections.",
+  "do_not_pick_deployed_route_from_test_paired_differences": true,
+  "prelocked_seeds": [
+    42,
+    43,
+    44
+  ],
+  "seeds_dropped_after_seeing_scores": false,
+  "sources": {
+    "ny": {
+      "val_shared_selection": {
+        "OLD_VAL": {
+          "shared_chosen": "1",
+          "shared_mean_val_mae": 1.9734495992104415,
+          "curve_mean_val_mae": [
+            {
+              "strength": "0",
+              "status": "ok",
+              "mae": 1.986163475457695,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "0.125",
+              "status": "ok",
+              "mae": 1.978377885138946,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "0.25",
+              "status": "ok",
+              "mae": 1.9755107400974066,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "0.5",
+              "status": "ok",
+              "mae": 1.9736579717752953,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "1",
+              "status": "ok",
+              "mae": 1.9734495992104415,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "2",
+              "status": "ok",
+              "mae": 1.9739689713194615,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "4",
+              "status": "ok",
+              "mae": 1.9745152651651863,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "8",
+              "status": "ok",
+              "mae": 1.9750274344540195,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "16",
+              "status": "ok",
+              "mae": 1.975887418455257,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "identity",
+              "status": "ok",
+              "mae": 1.98709812832129,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            }
+          ],
+          "per_seed": [
+            {
+              "seed": 42,
+              "independent_chosen": "1",
+              "independent_val_mae": 2.036014593704619,
+              "shared_chosen": "1",
+              "seed_val_mae_under_shared": 2.036014593704619,
+              "delta_mae_shared_minus_independent": 0.0
+            },
+            {
+              "seed": 43,
+              "independent_chosen": "1",
+              "independent_val_mae": 1.9406103291816612,
+              "shared_chosen": "1",
+              "seed_val_mae_under_shared": 1.9406103291816612,
+              "delta_mae_shared_minus_independent": 0.0
+            },
+            {
+              "seed": 44,
+              "independent_chosen": "0.5",
+              "independent_val_mae": 1.9434259998127597,
+              "shared_chosen": "1",
+              "seed_val_mae_under_shared": 1.9437238747450438,
+              "delta_mae_shared_minus_independent": 0.00029787493228417006
+            }
+          ],
+          "independent_mean_val_mae": 1.9733503075663466,
+          "delta_mean_val_mae_shared_minus_independent": 9.92916440949454e-05
+        },
+        "NEW_VAL": {
+          "shared_chosen": "1",
+          "shared_mean_val_mae": 1.9738090187519244,
+          "curve_mean_val_mae": [
+            {
+              "strength": "0",
+              "status": "ok",
+              "mae": 1.986163475457695,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "0.125",
+              "status": "ok",
+              "mae": 1.9800332520086166,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "0.25",
+              "status": "ok",
+              "mae": 1.9769438644960768,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "0.5",
+              "status": "ok",
+              "mae": 1.9743427408981649,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "1",
+              "status": "ok",
+              "mae": 1.9738090187519244,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "2",
+              "status": "ok",
+              "mae": 1.9759731912037666,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "4",
+              "status": "ok",
+              "mae": 1.9793898404217913,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "8",
+              "status": "ok",
+              "mae": 1.9824752783392723,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "16",
+              "status": "ok",
+              "mae": 1.9845462933175801,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "identity",
+              "status": "ok",
+              "mae": 1.98709812832129,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            }
+          ],
+          "per_seed": [
+            {
+              "seed": 42,
+              "independent_chosen": "0.5",
+              "independent_val_mae": 2.0393222444298043,
+              "shared_chosen": "1",
+              "seed_val_mae_under_shared": 2.040144948326959,
+              "delta_mae_shared_minus_independent": 0.0008227038971546641
+            },
+            {
+              "seed": 43,
+              "independent_chosen": "1",
+              "independent_val_mae": 1.9383291567467418,
+              "shared_chosen": "1",
+              "seed_val_mae_under_shared": 1.9383291567467418,
+              "delta_mae_shared_minus_independent": 0.0
+            },
+            {
+              "seed": 44,
+              "independent_chosen": "1",
+              "independent_val_mae": 1.9429529511820727,
+              "shared_chosen": "1",
+              "seed_val_mae_under_shared": 1.9429529511820727,
+              "delta_mae_shared_minus_independent": 0.0
+            }
+          ],
+          "independent_mean_val_mae": 1.9735347841195396,
+          "delta_mean_val_mae_shared_minus_independent": 0.00027423463238474
+        },
+        "SHIFT_VAL": {
+          "shared_chosen": "1",
+          "shared_mean_val_mae": 1.9803506052378026,
+          "curve_mean_val_mae": [
+            {
+              "strength": "0",
+              "status": "ok",
+              "mae": 1.9905723797984292,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "0.125",
+              "status": "ok",
+              "mae": 1.9870100800100563,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "0.25",
+              "status": "ok",
+              "mae": 1.9846704810988116,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "0.5",
+              "status": "ok",
+              "mae": 1.9820498718341415,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "1",
+              "status": "ok",
+              "mae": 1.9803506052378026,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "2",
+              "status": "ok",
+              "mae": 1.9805858968585823,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "4",
+              "status": "ok",
+              "mae": 1.9822971864779884,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "8",
+              "status": "ok",
+              "mae": 1.9841246701795467,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "16",
+              "status": "ok",
+              "mae": 1.9854321994405453,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "identity",
+              "status": "ok",
+              "mae": 1.98709812832129,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            }
+          ],
+          "per_seed": [
+            {
+              "seed": 42,
+              "independent_chosen": "1",
+              "independent_val_mae": 2.047140294945349,
+              "shared_chosen": "1",
+              "seed_val_mae_under_shared": 2.047140294945349,
+              "delta_mae_shared_minus_independent": 0.0
+            },
+            {
+              "seed": 43,
+              "independent_chosen": "1",
+              "independent_val_mae": 1.9429828295038527,
+              "shared_chosen": "1",
+              "seed_val_mae_under_shared": 1.9429828295038527,
+              "delta_mae_shared_minus_independent": 0.0
+            },
+            {
+              "seed": 44,
+              "independent_chosen": "2",
+              "independent_val_mae": 1.9508999800798719,
+              "shared_chosen": "1",
+              "seed_val_mae_under_shared": 1.9509286912642063,
+              "delta_mae_shared_minus_independent": 2.871118433445119e-05
+            }
+          ],
+          "independent_mean_val_mae": 1.9803410348430246,
+          "delta_mean_val_mae_shared_minus_independent": 9.570394778002367e-06
+        }
+      },
+      "test_exploratory_pending_verification": {
+        "OLD_VAL": {
+          "shared_chosen": "1",
+          "per_seed": [
+            {
+              "seed": 42,
+              "independent_chosen": "1",
+              "shared_chosen": "1",
+              "independent_test_mae": 1.7054192513504478,
+              "shared_test_mae": 1.7054192513504478,
+              "paired_mae_delta_shared_minus_independent": 0.0,
+              "shared_test": {
+                "mae": 1.7054192513504478,
+                "rmse": 5.22624649469633,
+                "gated_mae": 5.373979193419971,
+                "mape": 72.05027273458145,
+                "n_points": 298080,
+                "n_mape_points": 91001,
+                "hours": 1440,
+                "n_cells": 207
+              }
+            },
+            {
+              "seed": 43,
+              "independent_chosen": "1",
+              "shared_chosen": "1",
+              "independent_test_mae": 1.6272443785022825,
+              "shared_test_mae": 1.6272443785022825,
+              "paired_mae_delta_shared_minus_independent": 0.0,
+              "shared_test": {
+                "mae": 1.6272443785022825,
+                "rmse": 5.1579362365811114,
+                "gated_mae": 5.278546771877237,
+                "mape": 71.09914006280341,
+                "n_points": 298080,
+                "n_mape_points": 91001,
+                "hours": 1440,
+                "n_cells": 207
+              }
+            },
+            {
+              "seed": 44,
+              "independent_chosen": "0.5",
+              "shared_chosen": "1",
+              "independent_test_mae": 1.6189892426483607,
+              "shared_test_mae": 1.6175237957134114,
+              "paired_mae_delta_shared_minus_independent": -0.0014654469349493215,
+              "shared_test": {
+                "mae": 1.6175237957134114,
+                "rmse": 5.176295497026161,
+                "gated_mae": 5.301507310639664,
+                "mape": 72.1020298462936,
+                "n_points": 298080,
+                "n_mape_points": 91001,
+                "hours": 1440,
+                "n_cells": 207
+              }
+            }
+          ],
+          "shared_test_mae_mean": 1.6500624751887139,
+          "independent_test_mae_mean": 1.6505509575003636,
+          "delta_mean": -0.0004884823116497738,
+          "delta_min": -0.0014654469349493215,
+          "delta_max": 0.0
+        },
+        "NEW_VAL": {
+          "shared_chosen": "1",
+          "per_seed": [
+            {
+              "seed": 42,
+              "independent_chosen": "0.5",
+              "shared_chosen": "1",
+              "independent_test_mae": 1.7105077290076103,
+              "shared_test_mae": 1.7077793334619,
+              "paired_mae_delta_shared_minus_independent": -0.0027283955457102493,
+              "shared_test": {
+                "mae": 1.7077793334619,
+                "rmse": 5.236470966523146,
+                "gated_mae": 5.383749933361383,
+                "mape": 72.16577075288414,
+                "n_points": 298080,
+                "n_mape_points": 91001,
+                "hours": 1440,
+                "n_cells": 207
+              }
+            },
+            {
+              "seed": 43,
+              "independent_chosen": "1",
+              "shared_chosen": "1",
+              "independent_test_mae": 1.6293135009470272,
+              "shared_test_mae": 1.6293135009470272,
+              "paired_mae_delta_shared_minus_independent": 0.0,
+              "shared_test": {
+                "mae": 1.6293135009470272,
+                "rmse": 5.118094002374867,
+                "gated_mae": 5.28711293879848,
+                "mape": 71.70003164611094,
+                "n_points": 298080,
+                "n_mape_points": 91001,
+                "hours": 1440,
+                "n_cells": 207
+              }
+            },
+            {
+              "seed": 44,
+              "independent_chosen": "1",
+              "shared_chosen": "1",
+              "independent_test_mae": 1.6178964144339414,
+              "shared_test_mae": 1.6178964144339414,
+              "paired_mae_delta_shared_minus_independent": 0.0,
+              "shared_test": {
+                "mae": 1.6178964144339414,
+                "rmse": 5.154486936181821,
+                "gated_mae": 5.303049952142659,
+                "mape": 72.23942791493539,
+                "n_points": 298080,
+                "n_mape_points": 91001,
+                "hours": 1440,
+                "n_cells": 207
+              }
+            }
+          ],
+          "shared_test_mae_mean": 1.6516630829476229,
+          "independent_test_mae_mean": 1.6525725481295264,
+          "delta_mean": -0.0009094651819034164,
+          "delta_min": -0.0027283955457102493,
+          "delta_max": 0.0
+        },
+        "SHIFT_VAL": {
+          "shared_chosen": "1",
+          "per_seed": [
+            {
+              "seed": 42,
+              "independent_chosen": "1",
+              "shared_chosen": "1",
+              "independent_test_mae": 1.7144171976325826,
+              "shared_test_mae": 1.7144171976325826,
+              "paired_mae_delta_shared_minus_independent": 0.0,
+              "shared_test": {
+                "mae": 1.7144171976325826,
+                "rmse": 5.241518765929728,
+                "gated_mae": 5.411230691028009,
+                "mape": 73.05767454703147,
+                "n_points": 298080,
+                "n_mape_points": 91001,
+                "hours": 1440,
+                "n_cells": 207
+              }
+            },
+            {
+              "seed": 43,
+              "independent_chosen": "1",
+              "shared_chosen": "1",
+              "independent_test_mae": 1.6318865882541012,
+              "shared_test_mae": 1.6318865882541012,
+              "paired_mae_delta_shared_minus_independent": 0.0,
+              "shared_test": {
+                "mae": 1.6318865882541012,
+                "rmse": 5.116143673828703,
+                "gated_mae": 5.297765520249767,
+                "mape": 72.41553124679947,
+                "n_points": 298080,
+                "n_mape_points": 91001,
+                "hours": 1440,
+                "n_cells": 207
+              }
+            },
+            {
+              "seed": 44,
+              "independent_chosen": "2",
+              "shared_chosen": "1",
+              "independent_test_mae": 1.6216667622502472,
+              "shared_test_mae": 1.6235614341970437,
+              "paired_mae_delta_shared_minus_independent": 0.001894671946796489,
+              "shared_test": {
+                "mae": 1.6235614341970437,
+                "rmse": 5.157847222396597,
+                "gated_mae": 5.326503133961902,
+                "mape": 73.1087197431085,
+                "n_points": 298080,
+                "n_mape_points": 91001,
+                "hours": 1440,
+                "n_cells": 207
+              }
+            }
+          ],
+          "shared_test_mae_mean": 1.656621740027909,
+          "independent_test_mae_mean": 1.6559901827123102,
+          "delta_mean": 0.0006315573155988297,
+          "delta_min": 0.0,
+          "delta_max": 0.001894671946796489
+        }
+      }
+    },
+    "chi": {
+      "val_shared_selection": {
+        "OLD_VAL": {
+          "shared_chosen": "0.5",
+          "shared_mean_val_mae": 1.72949301782445,
+          "curve_mean_val_mae": [
+            {
+              "strength": "0",
+              "status": "ok",
+              "mae": 1.7476459456504287,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "0.125",
+              "status": "ok",
+              "mae": 1.735807407373718,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "0.25",
+              "status": "ok",
+              "mae": 1.7315679739749272,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "0.5",
+              "status": "ok",
+              "mae": 1.72949301782445,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "1",
+              "status": "ok",
+              "mae": 1.731124294980441,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "2",
+              "status": "ok",
+              "mae": 1.734772021843016,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "4",
+              "status": "ok",
+              "mae": 1.7384913159106734,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "8",
+              "status": "ok",
+              "mae": 1.7417094508379867,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "16",
+              "status": "ok",
+              "mae": 1.7447189745759981,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "identity",
+              "status": "ok",
+              "mae": 1.7617474750511082,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            }
+          ],
+          "per_seed": [
+            {
+              "seed": 42,
+              "independent_chosen": "0.5",
+              "independent_val_mae": 1.6844461342996944,
+              "shared_chosen": "0.5",
+              "seed_val_mae_under_shared": 1.6844461342996944,
+              "delta_mae_shared_minus_independent": 0.0
+            },
+            {
+              "seed": 43,
+              "independent_chosen": "0.5",
+              "independent_val_mae": 1.7483041493851599,
+              "shared_chosen": "0.5",
+              "seed_val_mae_under_shared": 1.7483041493851599,
+              "delta_mae_shared_minus_independent": 0.0
+            },
+            {
+              "seed": 44,
+              "independent_chosen": "0.5",
+              "independent_val_mae": 1.755728769788496,
+              "shared_chosen": "0.5",
+              "seed_val_mae_under_shared": 1.755728769788496,
+              "delta_mae_shared_minus_independent": 0.0
+            }
+          ],
+          "independent_mean_val_mae": 1.72949301782445,
+          "delta_mean_val_mae_shared_minus_independent": 0.0
+        },
+        "NEW_VAL": {
+          "shared_chosen": "0.5",
+          "shared_mean_val_mae": 1.731581233723323,
+          "curve_mean_val_mae": [
+            {
+              "strength": "0",
+              "status": "ok",
+              "mae": 1.7476459456504287,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "0.125",
+              "status": "ok",
+              "mae": 1.7385203206971482,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "0.25",
+              "status": "ok",
+              "mae": 1.7343295430701648,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "0.5",
+              "status": "ok",
+              "mae": 1.731581233723323,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "1",
+              "status": "ok",
+              "mae": 1.7328167940599462,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "2",
+              "status": "ok",
+              "mae": 1.7386663975853232,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "4",
+              "status": "ok",
+              "mae": 1.746460358774658,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "8",
+              "status": "ok",
+              "mae": 1.752763584628765,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "16",
+              "status": "ok",
+              "mae": 1.756838194077238,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "identity",
+              "status": "ok",
+              "mae": 1.7617474750511082,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            }
+          ],
+          "per_seed": [
+            {
+              "seed": 42,
+              "independent_chosen": "1",
+              "independent_val_mae": 1.6783687230951216,
+              "shared_chosen": "0.5",
+              "seed_val_mae_under_shared": 1.6795696349550644,
+              "delta_mae_shared_minus_independent": 0.0012009118599427548
+            },
+            {
+              "seed": 43,
+              "independent_chosen": "0.25",
+              "independent_val_mae": 1.756635346245982,
+              "shared_chosen": "0.5",
+              "seed_val_mae_under_shared": 1.7569215482262786,
+              "delta_mae_shared_minus_independent": 0.00028620198029649657
+            },
+            {
+              "seed": 44,
+              "independent_chosen": "0.5",
+              "independent_val_mae": 1.7582525179886264,
+              "shared_chosen": "0.5",
+              "seed_val_mae_under_shared": 1.7582525179886264,
+              "delta_mae_shared_minus_independent": 0.0
+            }
+          ],
+          "independent_mean_val_mae": 1.73108552910991,
+          "delta_mean_val_mae_shared_minus_independent": 0.0004957046134128618
+        },
+        "SHIFT_VAL": {
+          "shared_chosen": "1",
+          "shared_mean_val_mae": 1.7485327038006855,
+          "curve_mean_val_mae": [
+            {
+              "strength": "0",
+              "status": "ok",
+              "mae": 1.7604415933821616,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "0.125",
+              "status": "ok",
+              "mae": 1.755937874365466,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "0.25",
+              "status": "ok",
+              "mae": 1.7530440890424928,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "0.5",
+              "status": "ok",
+              "mae": 1.7499569656847243,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "1",
+              "status": "ok",
+              "mae": 1.7485327038006855,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "2",
+              "status": "ok",
+              "mae": 1.7499098900944603,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "4",
+              "status": "ok",
+              "mae": 1.7531890127417402,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "8",
+              "status": "ok",
+              "mae": 1.75644040524098,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "16",
+              "status": "ok",
+              "mae": 1.7587511018369597,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            },
+            {
+              "strength": "identity",
+              "status": "ok",
+              "mae": 1.7617474750511082,
+              "rmse": null,
+              "gated_mae": null,
+              "mape": null,
+              "n_points": 3
+            }
+          ],
+          "per_seed": [
+            {
+              "seed": 42,
+              "independent_chosen": "2",
+              "independent_val_mae": 1.700715866990136,
+              "shared_chosen": "1",
+              "seed_val_mae_under_shared": 1.701047562623669,
+              "delta_mae_shared_minus_independent": 0.000331695633532858
+            },
+            {
+              "seed": 43,
+              "independent_chosen": "0.25",
+              "independent_val_mae": 1.7656223138826208,
+              "shared_chosen": "1",
+              "seed_val_mae_under_shared": 1.7673863974690325,
+              "delta_mae_shared_minus_independent": 0.0017640835864116688
+            },
+            {
+              "seed": 44,
+              "independent_chosen": "1",
+              "independent_val_mae": 1.7771641513093548,
+              "shared_chosen": "1",
+              "seed_val_mae_under_shared": 1.7771641513093548,
+              "delta_mae_shared_minus_independent": 0.0
+            }
+          ],
+          "independent_mean_val_mae": 1.7478341107273705,
+          "delta_mean_val_mae_shared_minus_independent": 0.0006985930733149903
+        }
+      },
+      "test_exploratory_pending_verification": {
+        "OLD_VAL": {
+          "shared_chosen": "0.5",
+          "per_seed": [
+            {
+              "seed": 42,
+              "independent_chosen": "0.5",
+              "shared_chosen": "0.5",
+              "independent_test_mae": 1.443879134298066,
+              "shared_test_mae": 1.443879134298066,
+              "paired_mae_delta_shared_minus_independent": 0.0,
+              "shared_test": {
+                "mae": 1.443879134298066,
+                "rmse": 4.964937855106795,
+                "gated_mae": 5.053781097714493,
+                "mape": 68.4479064649519,
+                "n_points": 298080,
+                "n_mape_points": 91001,
+                "hours": 1440,
+                "n_cells": 207
+              }
+            },
+            {
+              "seed": 43,
+              "independent_chosen": "0.5",
+              "shared_chosen": "0.5",
+              "independent_test_mae": 1.5057332311471878,
+              "shared_test_mae": 1.5057332311471878,
+              "paired_mae_delta_shared_minus_independent": 0.0,
+              "shared_test": {
+                "mae": 1.5057332311471878,
+                "rmse": 4.936493591872874,
+                "gated_mae": 5.002278668241851,
+                "mape": 64.27774468923101,
+                "n_points": 298080,
+                "n_mape_points": 91001,
+                "hours": 1440,
+                "n_cells": 207
+              }
+            },
+            {
+              "seed": 44,
+              "independent_chosen": "0.5",
+              "shared_chosen": "0.5",
+              "independent_test_mae": 1.5077440427344604,
+              "shared_test_mae": 1.5077440427344604,
+              "paired_mae_delta_shared_minus_independent": 0.0,
+              "shared_test": {
+                "mae": 1.5077440427344604,
+                "rmse": 5.064889615057041,
+                "gated_mae": 5.147592011669457,
+                "mape": 68.18638513245392,
+                "n_points": 298080,
+                "n_mape_points": 91001,
+                "hours": 1440,
+                "n_cells": 207
+              }
+            }
+          ],
+          "shared_test_mae_mean": 1.485785469393238,
+          "independent_test_mae_mean": 1.485785469393238,
+          "delta_mean": 0.0,
+          "delta_min": 0.0,
+          "delta_max": 0.0
+        },
+        "NEW_VAL": {
+          "shared_chosen": "0.5",
+          "per_seed": [
+            {
+              "seed": 42,
+              "independent_chosen": "1",
+              "shared_chosen": "0.5",
+              "independent_test_mae": 1.449489908722066,
+              "shared_test_mae": 1.4528034387382252,
+              "paired_mae_delta_shared_minus_independent": 0.003313530016159083,
+              "shared_test": {
+                "mae": 1.4528034387382252,
+                "rmse": 4.936782685784403,
+                "gated_mae": 5.090727718096753,
+                "mape": 70.46576658173275,
+                "n_points": 298080,
+                "n_mape_points": 91001,
+                "hours": 1440,
+                "n_cells": 207
+              }
+            },
+            {
+              "seed": 43,
+              "independent_chosen": "0.25",
+              "shared_chosen": "0.5",
+              "independent_test_mae": 1.5189931602554219,
+              "shared_test_mae": 1.5165676433361106,
+              "paired_mae_delta_shared_minus_independent": -0.0024255169193112547,
+              "shared_test": {
+                "mae": 1.5165676433361106,
+                "rmse": 4.949853875570172,
+                "gated_mae": 5.047133134703991,
+                "mape": 65.81591681693068,
+                "n_points": 298080,
+                "n_mape_points": 91001,
+                "hours": 1440,
+                "n_cells": 207
+              }
+            },
+            {
+              "seed": 44,
+              "independent_chosen": "0.5",
+              "shared_chosen": "0.5",
+              "independent_test_mae": 1.5199440567434908,
+              "shared_test_mae": 1.5199440567434908,
+              "paired_mae_delta_shared_minus_independent": 0.0,
+              "shared_test": {
+                "mae": 1.5199440567434908,
+                "rmse": 5.051146607063156,
+                "gated_mae": 5.198100069666841,
+                "mape": 70.6380926805107,
+                "n_points": 298080,
+                "n_mape_points": 91001,
+                "hours": 1440,
+                "n_cells": 207
+              }
+            }
+          ],
+          "shared_test_mae_mean": 1.4964383796059422,
+          "independent_test_mae_mean": 1.4961423752403262,
+          "delta_mean": 0.0002960043656159428,
+          "delta_min": -0.0024255169193112547,
+          "delta_max": 0.003313530016159083
+        },
+        "SHIFT_VAL": {
+          "shared_chosen": "1",
+          "per_seed": [
+            {
+              "seed": 42,
+              "independent_chosen": "2",
+              "shared_chosen": "1",
+              "independent_test_mae": 1.4677566943182998,
+              "shared_test_mae": 1.4700645254717963,
+              "paired_mae_delta_shared_minus_independent": 0.0023078311534965312,
+              "shared_test": {
+                "mae": 1.4700645254717963,
+                "rmse": 5.020901735887061,
+                "gated_mae": 5.1621886171737374,
+                "mape": 71.35197485264554,
+                "n_points": 298080,
+                "n_mape_points": 91001,
+                "hours": 1440,
+                "n_cells": 207
+              }
+            },
+            {
+              "seed": 43,
+              "independent_chosen": "0.25",
+              "shared_chosen": "1",
+              "independent_test_mae": 1.5230051026241744,
+              "shared_test_mae": 1.5210381522272876,
+              "paired_mae_delta_shared_minus_independent": -0.0019669503968868796,
+              "shared_test": {
+                "mae": 1.5210381522272876,
+                "rmse": 4.978696422557648,
+                "gated_mae": 5.065641041513463,
+                "mape": 66.92143485707905,
+                "n_points": 298080,
+                "n_mape_points": 91001,
+                "hours": 1440,
+                "n_cells": 207
+              }
+            },
+            {
+              "seed": 44,
+              "independent_chosen": "1",
+              "shared_chosen": "1",
+              "independent_test_mae": 1.5328345372659153,
+              "shared_test_mae": 1.5328345372659153,
+              "paired_mae_delta_shared_minus_independent": 0.0,
+              "shared_test": {
+                "mae": 1.5328345372659153,
+                "rmse": 5.088146100660367,
+                "gated_mae": 5.25146665902968,
+                "mape": 73.27369553851055,
+                "n_points": 298080,
+                "n_mape_points": 91001,
+                "hours": 1440,
+                "n_cells": 207
+              }
+            }
+          ],
+          "shared_test_mae_mean": 1.5079790716549997,
+          "independent_test_mae_mean": 1.50786544473613,
+          "delta_mean": 0.0001136269188698839,
+          "delta_min": -0.0019669503968868796,
+          "delta_max": 0.0023078311534965312
+        }
+      }
+    }
+  },
+  "independent_test_audit": {
+    "independent_test_audit_dir": "test-audit-20261117-170055-oyEk29",
+    "independent_test_audit_path": "/workspace/sw-validator/test-audit-20261117-170055-oyEk29",
+    "verification_json_sha256": "6aab1cd6552869eb7ba343aa3cb1c4e6391416fa8abcd1424e5ef2e9ac40763e",
+    "diagnostics_json_sha256": "4c4ef24c60073acc527df8ace1e8d72faacd5f8bb7f6430904d9646f1366c45b",
+    "audit_exit_code": 0,
+    "audit_errors": [],
+    "max_absolute_error_summary": 2.842170943040401e-14,
+    "max_absolute_error_mae": 4.440892098500626e-16,
+    "stage2_same_as_stage1_verified": true,
+    "status": "independently_recalculated_matched"
+  },
+  "historical_test_interval_already_seen": true,
+  "do_not_generalize_beyond_this_locked_evaluation": true,
+  "do_not_reselect_from_test": true,
+  "do_not_pick_test_winner_or_deployed_route": true,
+  "verified_findings": {
+    "shared_strength_is_not_universally_better_on_test": true,
+    "supported": true,
+    "note": "Shared vs independent test MAE deltas change sign across source, method, and seed (some zero when the shared strength equals the independent choice). Do not pick a deployed route from these test paired differences."
+  }
+}
