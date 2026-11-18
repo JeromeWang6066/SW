@@ -63,7 +63,7 @@ python scripts/04_grid_profiles.py
 三天窗口按档选用已有模型见 [bin_route.md](bin_route.md)。
 上车量门和 3×3 轮廓的重放见 [grid_route.md](grid_route.md)。
 上车量门和 3×3 轮廓的重放见 [grid_route.md](grid_route.md)。
-匹配源城格子的单格模型见 [matched_cell.md](matched_cell.md)。
-过门格子的水平和位移见 [cell_affine.md](cell_affine.md)。
+匹配源城格子的单格模型见 [matched_cell.md](matched_cell.md)。归一化做在哪一步、纽约和芝加哥为什么差开，见 [matched_cell_normalization.md](matched_cell_normalization.md)。
+过门格子的水平和位移见 [cell_affine.md](cell_affine.md)。\(a\)、\(b\) 和 λ=72 的公式见 [cell_affine_explain.md](cell_affine_explain.md)。
 相似格子的形状混合见 [shape_blend.md](shape_blend.md)。
 1km 格子的日上车量和三天轮廓见 [cell_volume.md](cell_volume.md)。
