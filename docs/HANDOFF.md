@@ -11,6 +11,7 @@
 - [profiles/matched_cell_normalization.md](profiles/matched_cell_normalization.md) — 匹配源格的归一化与纽约 / 芝加哥差异
 - [profiles/cell_affine_explain.md](profiles/cell_affine_explain.md) — 按格 \(a,b\) 与 λ=72
 - [RESULTS.md](RESULTS.md) — 已实跑指标
+- [advisor/2026-11-formula-meeting.md](advisor/2026-11-formula-meeting.md) — 录音 7。文首英文 Agent brief 是操作说明：先把按格公式写成能从目标函数推到 `ã`、`c` 的一页，再在 150 门之前加误差反馈。不新增实验数字。中文各节是会后整理，不是逐字稿
 
 Group 3 的 Pearson 乘子仍未实现。下文写的 HEAD `056f5c9` 是 2026-11-04 的交接快照，不是现在的 `main`。
 

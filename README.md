@@ -9,6 +9,7 @@
 - **[docs/METHODOLOGY.md](docs/METHODOLOGY.md)** — 当前方法与每一步的数据流
 - **[docs/PAPER_COMPARISON.md](docs/PAPER_COMPARISON.md)** — 相对目标城直接训练的下降比例，含论文摘录
 - **[docs/HANDOFF.md](docs/HANDOFF.md)** — 接手说明（文首指向 2026-11-16 的文档；后文有早期 PR 记录）
+- **[docs/advisor/2026-11-formula-meeting.md](docs/advisor/2026-11-formula-meeting.md)** — 录音 7 整理：公式要能当场解释，并在现有流程前加误差反馈
 - [docs/DATA.md](docs/DATA.md) — 已核实 zip 直链 / SHA256 / 网格形状
 - [docs/UPSTREAM_MAP.md](docs/UPSTREAM_MAP.md) — 上游 ↔ 本仓移植清单
 - [docs/REPRODUCTION.md](docs/REPRODUCTION.md) — Day 0–N 真实复现手册
@@ -99,6 +100,8 @@ SW/
 │   ├── EXPERIMENT_PLAN.md
 │   ├── PAPERS.md
 │   ├── DATA.md             # 已核实下载直链
+│   ├── advisor/2026-11-05-meeting.md
+│   ├── advisor/2026-11-formula-meeting.md
 │   └── advisor/选题汇报.html
 ├── notes/progress.md       # 实验笔记（逐步记录）
 ├── scripts/                # 环境 / 数据布局 / 导入 / 合成形状冒烟
@@ -125,6 +128,8 @@ SW/
 - **[docs/EXPERIMENT_PLAN.md](docs/EXPERIMENT_PLAN.md)** — Groups 1–4 与完成标准
 - **[docs/PAPERS.md](docs/PAPERS.md)** — 论文 / 代码链接
 - **[docs/advisor/选题汇报.html](docs/advisor/选题汇报.html)** — 选题汇报幻灯片
+- **[docs/advisor/2026-11-05-meeting.md](docs/advisor/2026-11-05-meeting.md)** — 11 月 5 日会议：按相关选择微调或蒸馏
+- **[docs/advisor/2026-11-formula-meeting.md](docs/advisor/2026-11-formula-meeting.md)** — 录音 7：按格公式与误差反馈。不新增实验数字
 
 ## 许可
 
