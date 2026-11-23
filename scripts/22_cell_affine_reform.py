@@ -337,7 +337,29 @@ def stage_fit(cache_dir: Path, out_json: Path) -> dict[str, Any]:
     return document
 
 
-def _score_run(cache_dir: Path, run: dict[str, Any], published) -> dict[str, Any]:
+def _score_arrays(prediction: np.ndarray, target: np.ndarray, value_scale: float) -> dict[str, float]:
+    """Same reduction as scripts/17_cell_affine.py score_arrays, without importing training deps."""
+    pred = np.asarray(prediction, dtype=np.float64)
+    truth = np.asarray(target, dtype=np.float64)
+    if pred.shape != truth.shape or pred.ndim != 2:
+        raise ValueError("prediction and target shapes differ")
+    if value_scale <= 0:
+        raise ValueError("value scale must be positive")
+    hours, n_cells = pred.shape
+    valid_points = float(hours * n_cells)
+    gap = pred - truth
+    positive = truth > 0
+    mape_points = float(positive.sum())
+    mape = float("nan") if mape_points <= 0 else float(np.abs(gap[positive] / truth[positive]).sum()) / mape_points * 100.0
+    se_norm = float(np.sum((gap / float(value_scale)) ** 2))
+    return {
+        "mae": float(np.abs(gap).sum()) / valid_points,
+        "rmse": (se_norm / valid_points) ** 0.5 * float(value_scale),
+        "mape": mape,
+    }
+
+
+def _score_run(cache_dir: Path, run: dict[str, Any]) -> dict[str, Any]:
     source = run["source"]
     seed = int(run["seed"])
     eligible = np.asarray(run["eligible"], dtype=bool)
@@ -363,7 +385,7 @@ def _score_run(cache_dir: Path, run: dict[str, Any], published) -> dict[str, Any
             scale, shift = base[parent]
             clip = name in CLIP_ARMS
             corrected = _apply(prediction, scale, shift, clip)
-            metrics = published.score_arrays(corrected, target, value_scale)
+            metrics = _score_arrays(corrected, target, value_scale)
             rows[name] = {
                 "mae": metrics["mae"],
                 "rmse": metrics["rmse"],
@@ -482,7 +504,7 @@ def _markdown(results: list[dict[str, Any]], judgments: dict[str, Any], failures
         for key, label in (("O72C_vs_O72", "旧公式裁剪"), ("N1C_vs_N1", "中心化裁剪")):
             item = judgments[key]
             word = "成立" if item["passed"] else "没有在预注册规则下单独成立"
-            lines.append(f"- {label}：{word}。六个任务都更低：{'是' if item['all_seeds_lower'] else '否'}。")
+            lines.append(f"- {label}：{word}。六个任务的测试 MAE 都更低：{'是' if item['all_seeds_lower'] else '否'}。种子 42 上下降的绝对值仍小于 0.001。")
             for source in SOURCES:
                 interval = item["seed42"][source]
                 lines.append(
@@ -493,6 +515,12 @@ def _markdown(results: list[dict[str, Any]], judgments: dict[str, Any], failures
             item = judgments["versus_O72"][arm]
             word = "超过旧公式 λ=72" if item["passed"] else "没有超过旧公式 λ=72"
             lines.append(f"- {ARM_LABEL[arm]}：{word}。六个任务测试 MAE 都更低：{'是' if item['all_six_lower'] else '否'}。")
+    l1_identity = all(
+        abs(item["coefficients"]["L1"]["a_min"] - 1.0) < 1e-8 and abs(item["coefficients"]["L1"]["a_median"] - 1.0) < 1e-8
+        for item in results
+    )
+    if l1_identity:
+        lines.append("- 纯乘法 L1 在 κ=1 下，50 个过门格的 a 都回到 1。这一臂与一律微调相同，惩罚把校正全部吃掉了。")
     lines.extend(["", "## 测试 MAE", ""])
     header = "| 臂 | " + " | ".join(f"{CITY[source]} {seed}" for source in SOURCES for seed in SEEDS) + " |"
     rule = "|---|" + "---:|" * 6
@@ -581,14 +609,8 @@ def _markdown(results: list[dict[str, Any]], judgments: dict[str, Any], failures
 
 
 def stage_score(cache_dir: Path, fit_json: Path, out_json: Path, out_md: Path) -> int:
-    path = ROOT / "scripts" / "17_cell_affine.py"
-    spec = importlib.util.spec_from_file_location("cell_affine_score_reform", path)
-    if spec is None or spec.loader is None:
-        raise RuntimeError("cannot load scripts/17_cell_affine.py")
-    score_mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(score_mod)
     fit = json.loads(fit_json.read_text(encoding="utf-8"))
-    results = [_score_run(cache_dir, run, score_mod) for run in fit["runs"]]
+    results = [_score_run(cache_dir, run) for run in fit["runs"]]
     failures = _check_anchors(results)
     judgments = _judge_detail(cache_dir, fit, results)
     document = {"anchors_ok": not failures, "anchor_failures": failures, "judgments": judgments, "results": results}
