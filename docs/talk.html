@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>按格收缩校正</title>
+<style>
+  :root {
+    --ink: #1c2128;
+    --muted: #59636e;
+    --line: #d0d7de;
+    --paper: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    color: var(--ink);
+    background: #1c2128;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 500;
+  }
+  .deck { height: 100vh; overflow: hidden; }
+  .slide {
+    display: none;
+    height: 100vh;
+    padding: 28px 40px 56px;
+    background: var(--paper);
+    flex-direction: column;
+  }
+  .slide.on { display: flex; }
+  h1 { font-size: 32px; font-weight: 700; margin: 0 0 6px; letter-spacing: 0; }
+  h2 { font-size: 15px; font-weight: 650; color: var(--muted); margin: 0 0 12px; }
+  .fig {
+    flex: 1;
+    min-height: 0;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    display: flex;
+  }
+  .fig svg { width: 100%; height: 100%; }
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 24px;
+    overflow: auto;
+    flex: none;
+  }
+  .sect {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: .06em;
+    margin: 0 0 8px;
+  }
+  .sym { margin: 0 0 6px; font-size: 13.5px; line-height: 1.5; color: #333b46; }
+  .sym b { font-weight: 700; color: var(--ink); }
+  .fblock {
+    border-top: 1px solid var(--line);
+    padding: 12px 0 4px;
+    margin-top: 8px;
+  }
+  .fblock:first-of-type { border-top: 0; margin-top: 2px; padding-top: 4px; }
+  .fbig {
+    font-size: 25px;
+    font-weight: 750;
+    text-align: center;
+    margin: 6px 0 10px;
+    line-height: 1.35;
+    letter-spacing: .01em;
+  }
+  .fnote {
+    font-size: 13px;
+    line-height: 1.55;
+    color: #3d4754;
+    text-align: center;
+    margin: 0 auto 6px;
+    max-width: 1080px;
+  }
+  .frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    margin: 0 .12em;
+    line-height: 1.16;
+  }
+  .frac > span { display: block; padding: 0 .32em; white-space: nowrap; }
+  .frac .num { border-bottom: 1.5px solid currentColor; padding-bottom: 1px; }
+  .frac .den { padding-top: 1px; }
+  .fbig .frac { margin: 0 .14em; }
+  .fbig .frac .num { border-bottom-width: 2.6px; padding-bottom: 2px; }
+  .fbig .frac .den { padding-top: 2px; }
+  .sym .frac { line-height: 1.12; }
+  ul { margin: 6px 0 0; padding-left: 1.15em; }
+  li { margin: 7px 0; font-size: 15px; line-height: 1.5; }
+  table { width: 100%; border-collapse: collapse; font-size: 16px; background: #fff; }
+  th, td { border-bottom: 1px solid var(--line); padding: 9px 10px; text-align: right; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-weight: 700; color: #3d4754; }
+  .tables { display: flex; flex-direction: column; gap: 18px; }
+  .note { margin: 12px 0 0; font-size: 16px; line-height: 1.55; }
+  .bar {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+    color: #fff;
+    background: #1c2128;
+    font-size: 14px;
+  }
+  .dots { display: flex; gap: 8px; }
+  .dots button {
+    width: 10px; height: 10px; border-radius: 50%;
+    border: 0; background: #8b949e; cursor: pointer; padding: 0;
+  }
+  .dots button.on { background: #fff; }
+  .hint { color: #c9d1d9; }
+</style>
+</head>
+<body>
+<div class="deck">
+  <section class="slide on" aria-label="系统结构">
+    <h1>系统结构</h1>
+    <h2>源城训练，华盛顿三天微调，再用一个 κ 按格子收一收预测</h2>
+    <div class="fig" role="img" aria-label="系统结构图">
+      <svg viewBox="0 0 1600 780" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L10 5 L0 10 Z" fill="#3d4754"/>
+          </marker>
+          <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L10 5 L0 10 Z" fill="#9a5b12"/>
+          </marker>
+        </defs>
+        <style>
+          .t { font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #1c2128; font-weight: 500; }
+          .h { font-size: 16px; font-weight: 700; }
+          .s { font-size: 13.5px; font-weight: 500; }
+          .lab { font-size: 12.5px; font-weight: 650; fill: #3d4754; }
+        </style>
+        <rect x="16" y="16" width="1568" height="428" rx="10" fill="#f4f8fb" stroke="#d5e2ee"/>
+        <text class="t h" x="32" y="46" fill="#1a4f7a">预测</text>
+        <rect x="40" y="64" width="420" height="118" rx="6" fill="#e8f2fa" stroke="#1a4f7a" stroke-width="1.6"/>
+        <text class="t h" x="56" y="90">三城上车网格</text>
+        <text class="t s" x="56" y="114">纽约、芝加哥、华盛顿</text>
+        <text class="t s" x="56" y="134">每小时一个格子的上车数</text>
+        <text class="t s" x="56" y="154">一年，8784 个小时</text>
+        <text class="t s" x="56" y="174">有效格：458 / 270 / 207</text>
+        <line x1="460" y1="123" x2="500" y2="123" stroke="#3d4754" stroke-width="1.7" marker-end="url(#a)"/>
+        <text class="t lab" x="462" y="113">原始计数</text>
+        <rect x="502" y="64" width="420" height="118" rx="6" fill="#e8f2fa" stroke="#1a4f7a" stroke-width="1.6"/>
+        <text class="t h" x="518" y="90">分城归一化</text>
+        <text class="t s" x="518" y="114">先按 99.9 分位截断</text>
+        <text class="t s" x="518" y="134">再做 min-max 到本城尺度</text>
+        <text class="t s" x="518" y="154">三座城各自算上下限</text>
+        <text class="t s" x="518" y="174">下限取 max(0, 最小值)</text>
+        <line x1="922" y1="123" x2="962" y2="123" stroke="#3d4754" stroke-width="1.7" marker-end="url(#a)"/>
+        <text class="t lab" x="924" y="113">归一化网格</text>
+        <rect x="964" y="64" width="592" height="118" rx="6" fill="#e8f2fa" stroke="#1a4f7a" stroke-width="1.6"/>
+        <text class="t h" x="980" y="90">做成样本</text>
+        <text class="t s" x="980" y="114">用过去 6 小时，预测下一小时</text>
+        <text class="t s" x="980" y="134">源城用前面整段训练小时</text>
+        <text class="t s" x="980" y="154">华盛顿只留最后 72 小时</text>
+        <text class="t s" x="980" y="174">2016-08-31 至 09-02</text>
+        <path d="M1100 182 V216 H320 V246" fill="none" stroke="#3d4754" stroke-width="1.7" marker-end="url(#a)"/>
+        <text class="t lab" x="742" y="210">源城训练小时</text>
+        <path d="M1400 182 V216 H1210 V246" fill="none" stroke="#3d4754" stroke-width="1.7" marker-end="url(#a)"/>
+        <text class="t lab" x="1242" y="210">华盛顿 72 小时</text>
+        <rect x="120" y="250" width="560" height="142" rx="6" fill="#fff6ec" stroke="#9a5b12" stroke-width="1.6"/>
+        <text class="t h" x="136" y="276">源城上训练 ST-Net</text>
+        <text class="t s" x="136" y="300">只在源城自己的训练小时上学习</text>
+        <text class="t s" x="136" y="319">损失是有效格的平方误差</text>
+        <text class="t s" x="136" y="338">先对一个 batch 取平均，再对格子求和</text>
+        <text class="t s" x="136" y="357">验证集用来决定何时停下</text>
+        <text class="t s" x="136" y="376">得到可迁移的网络权重</text>
+        <path d="M680 320 H752" fill="none" stroke="#9a5b12" stroke-width="1.7" stroke-dasharray="6 4" marker-end="url(#aw)"/>
+        <text class="t lab" x="688" y="310" fill="#9a5b12">复制权重</text>
+        <rect x="756" y="250" width="620" height="142" rx="6" fill="#fff6ec" stroke="#9a5b12" stroke-width="1.6"/>
+        <text class="t h" x="772" y="276">在华盛顿三天上微调</text>
+        <text class="t s" x="772" y="300">换上华盛顿的有效格掩码，参数全部解开</text>
+        <text class="t s" x="772" y="319">只用这 72 小时的任务损失，不再加别的项</text>
+        <text class="t s" x="772" y="338">网络输出经过 sigmoid，落在 0 到 1</text>
+        <text class="t s" x="772" y="357">再乘回华盛顿自己的截断区间</text>
+        <text class="t s" x="772" y="376">得到上车量预测 p</text>
+        <rect x="120" y="400" width="1256" height="34" rx="6" fill="#fff" stroke="#9a5b12" stroke-width="1.2"/>
+        <text class="t s" x="136" y="422">两个 ST-Net 是同一个结构：6 小时共用 3×3 卷积和 3 个残差块，按格子进 LSTM，sigmoid 后留有效格。</text>
+        <rect x="16" y="462" width="1568" height="302" rx="10" fill="#f8f5fb" stroke="#e0d4ee"/>
+        <text class="t h" x="32" y="492" fill="#5c3d82">按格收缩</text>
+        <path d="M1000 392 V510 H260 V524" fill="none" stroke="#3d4754" stroke-width="1.7" marker-end="url(#a)"/>
+        <text class="t lab" x="640" y="502">上车量预测 p</text>
+        <rect x="40" y="524" width="420" height="176" rx="6" fill="#fff" stroke="#5c3d82" stroke-width="1.6"/>
+        <text class="t h" x="56" y="550">先看这一格忙不忙</text>
+        <text class="t s" x="56" y="576">用三天的原始上车合计</text>
+        <text class="t s" x="56" y="596">满 150 的 50 个格子</text>
+        <text class="t s" x="56" y="616">进入右边的校正</text>
+        <text class="t s" x="56" y="646">不满的格子</text>
+        <text class="t s" x="56" y="666">预测 p 直接送出去</text>
+        <line x1="460" y1="612" x2="500" y2="612" stroke="#3d4754" stroke-width="1.7" marker-end="url(#a)"/>
+        <text class="t lab" x="462" y="602">高流量格的 p</text>
+        <rect x="502" y="516" width="620" height="196" rx="6" fill="#f3eaf8" stroke="#5c3d82" stroke-width="1.6"/>
+        <text class="t h" x="518" y="542">用 κ 把预测往「少改」的方向收</text>
+        <text class="t s" x="518" y="568">先用这 72 小时算出该格预测的平均值 p̄</text>
+        <text class="t s" x="518" y="588">校正拆成两截：偏离平均的部分乘 α，整体再加 c</text>
+        <text class="t" x="518" y="614" font-size="15.5" font-weight="700">p′ = p + α(p − p̄) + c</text>
+        <text class="t s" x="518" y="640">拟合时惩罚 α p̄ 和 c，力度由 κ 决定</text>
+        <text class="t s" x="518" y="660">κ 越大，校正越接近「原预测不动」</text>
+        <text class="t s" x="518" y="680">一个城市、一次训练只定一个 κ</text>
+        <text class="t s" x="518" y="700">在这三天里留一天轮流试，取误差最小的</text>
+        <line x1="1122" y1="614" x2="1162" y2="614" stroke="#3d4754" stroke-width="1.7" marker-end="url(#a)"/>
+        <text class="t lab" x="1126" y="604">p′</text>
+        <rect x="1164" y="536" width="380" height="156" rx="6" fill="#fff" stroke="#1e6b45" stroke-width="1.6"/>
+        <text class="t h" x="1180" y="562">下一小时上车量</text>
+        <text class="t s" x="1180" y="588">高流量格用 p′</text>
+        <text class="t s" x="1180" y="608">其余格用原来的 p</text>
+        <text class="t s" x="1180" y="634">拼回华盛顿</text>
+        <text class="t s" x="1180" y="654">207 个有效格</text>
+        <path d="M250 700 V734 H1354 V692" fill="none" stroke="#3d4754" stroke-width="1.6" marker-end="url(#a)"/>
+        <text class="t lab" x="700" y="728">不满 150 的格子，原预测直接送出</text>
+      </svg>
+    </div>
+  </section>
+
+  <section class="slide" aria-label="κ 的公式">
+    <h1>这一格上在解什么</h1>
+    <h2>只对三天上车合计不少于 150 的格子。p 是微调预测，y 是真实上车，单位都是每小时上车量。主比较把 κ 定成 1。</h2>
+    <div class="stack">
+      <div class="card">
+        <div class="sect">量的含义</div>
+        <p class="sym"><b>p̄</b>　这 n 个小时预测的平均值。最终拟合时 n = 72，留一天时 n = 48。</p>
+        <p class="sym"><b>p<sub>c,t</sub> = p<sub>t</sub> − p̄</b>　把预测减去自己的均值，只留下这一小时比平均偏高还是偏低。</p>
+        <p class="sym"><b>r<sub>t</sub> = y<sub>t</sub> − p<sub>t</sub></b>　微调还没补上的差。正数表示真实上车比预测多。</p>
+        <p class="sym"><b>S = Σ p<sub>c,t</sub>²</b>　起伏的总能量。S 越大，形状越容易被这几天的数据定住。</p>
+        <p class="sym"><b>CV² = <span class="frac"><span class="num">S</span><span class="den">n p̄²</span></span></b>　起伏相对于平均水平有多明显。CV² 小，说明这格的预测几乎是一条平线。</p>
+
+        <div class="fblock">
+          <div class="fbig">J(ã, c) = Σ (r<sub>t</sub> − ã p<sub>c,t</sub> − c)² + κ n p̄² ã² + κ n c²</div>
+          <div class="fnote">第一项让校正去补上残差。后两项把 ã 和 c 往 0 拉，也就是别离「原预测不动」太远。κ n p̄² 把形状那一项换成上车量的尺度，才能和 c 放在一起罚。</div>
+        </div>
+
+        <div class="fblock">
+          <div class="fnote">因为 Σ p<sub>c,t</sub> = 0，形状项和水平项互不牵扯，可以分开解。</div>
+          <div class="fbig">ã = <span class="frac"><span class="num">Σ p<sub>c</sub> r</span><span class="den">S + κ n p̄²</span></span> = ã<sub>OLS</sub> · <span class="frac"><span class="num">CV²</span><span class="den">CV² + κ</span></span></div>
+          <div class="fnote">ã<sub>OLS</sub> 是完全不惩罚时，用起伏去解释残差得到的倍率。后面那个分数是收缩：CV² 比 κ 大，就多留一点这个倍率；CV² 很小，ã 就被压回 0。κ = 1 且 CV² 也接近 1 时，大约留下一半。</div>
+        </div>
+
+        <div class="fblock">
+          <div class="fbig">c = <span class="frac"><span class="num">Σ r</span><span class="den">n (1 + κ)</span></span> = <span class="frac"><span class="num">r̄</span><span class="den">1 + κ</span></span></div>
+          <div class="fnote">r̄ 是这 n 小时残差的平均，也就是预测整段偏低或偏高多少。c 只取其中的 <span class="frac"><span class="num">1</span><span class="den">1 + κ</span></span>。κ = 1 时，整体只补上平均缺口的一半。</div>
+        </div>
+
+        <div class="fblock">
+          <div class="fbig">p′<sub>t</sub> = p<sub>t</sub> + ã p<sub>c,t</sub> + c</div>
+          <div class="fnote">ã 只改高低起伏，c 只改整段水平。一座城、一次微调共用一个 κ；它在这三天里留一天轮流试，验证集和测试集不参加选择。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" aria-label="实验结果">
+    <h1>微调、旧式子和 κ = 1</h1>
+    <h2>测试集全城 MAE，单位是每小时上车量。</h2>
+    <div class="stack">
+      <div class="card">
+        <div class="sect">实验内容（PR #20，无新训练）</div>
+        <ul>
+          <li>起点是种子 42 / 43 / 44 已经训好的整城微调。门槛不变：72 小时原始上车合计不少于 150 的 50 个格子做校正，其余 157 格保持原预测。</li>
+          <li>旧式子 p′ = a·p + b（λ = 72，PR #18 的按格仿射）；新式子换成中心化形式 p′ = p + ã(p − p̄) + c，形状项和水平项分开惩罚，主设定 κ = 1。</li>
+          <li>强度候选是 0、0.125、0.25、0.5、1、2、4、8、16、∞。只在训练的三天里留一天轮流选（8 月 31 日、9 月 1 日、9 月 2 日，平局取更大的强度）；验证集和测试集不参加选择。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="tables">
+          <table>
+            <thead>
+              <tr><th>种子 42</th><th>纽约</th><th>芝加哥</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>微调</td><td>1.7153</td><td>1.4773</td></tr>
+              <tr><td>旧式子，λ = 72</td><td>1.7078</td><td>1.4495</td></tr>
+              <tr><td>新式子，κ = 1</td><td>1.7054</td><td>1.4415</td></tr>
+            </tbody>
+          </table>
+          <table>
+            <thead>
+              <tr><th>三种子平均</th><th>纽约</th><th>芝加哥</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>微调</td><td>1.6579</td><td>1.5172</td></tr>
+              <tr><td>旧式子，λ = 72</td><td>1.6517</td><td>1.4951</td></tr>
+              <tr><td>新式子，κ = 1</td><td>1.6501</td><td>1.4843</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sect">直接结论</div>
+        <ul>
+          <li>主比较（测试 MAE，旧式子 λ = 72 减新式子 κ = 1）：种子 42 纽约 +0.0024 [0.0003, 0.0045]，芝加哥 +0.0080 [0.0023, 0.0133] —— 新式子在两城都更低；六个「源城 × 种子」的差值符号全部相同，方向稳定。</li>
+          <li>两种校正都好于不校正的微调；三种子平均同样是两种校正更低，且新式子 κ = 1 又略优于旧式子 λ = 72。</li>
+          <li>κ = 0（不惩罚）明显更差：种子 42 纽约 1.7292、芝加哥 1.4873。惩罚项是校正收益的主要来源。</li>
+          <li>留一天选出的 κ 取到 0.5 / 1 / 2（六个「源城 × 种子」依次是 1、1、2、0.5、1、0.5）；旧式子的倍数有时选到 ∞，等于不校正。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="bar">
+  <span class="hint">方向键或点击左右边缘翻页</span>
+  <div class="dots" id="dots"></div>
+  <span id="count">1 / 3</span>
+</div>
+<script>
+  const slides = [...document.querySelectorAll(".slide")];
+  const dots = document.getElementById("dots");
+  const count = document.getElementById("count");
+  let i = 0;
+  slides.forEach((_, k) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.addEventListener("click", () => show(k));
+    dots.appendChild(b);
+  });
+  function show(n) {
+    i = (n + slides.length) % slides.length;
+    slides.forEach((s, k) => s.classList.toggle("on", k === i));
+    [...dots.children].forEach((d, k) => d.classList.toggle("on", k === i));
+    count.textContent = (i + 1) + " / " + slides.length;
+  }
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") { e.preventDefault(); show(i + 1); }
+    if (e.key === "ArrowLeft" || e.key === "PageUp" || e.key === "Backspace") { e.preventDefault(); show(i - 1); }
+  });
+  document.addEventListener("click", (e) => {
+    if (e.target.closest(".bar")) return;
+    show(e.clientX > window.innerWidth / 2 ? i + 1 : i - 1);
+  });
+  show(0);
+</script>
+</body>
+</html>

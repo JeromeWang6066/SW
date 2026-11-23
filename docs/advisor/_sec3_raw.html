@@ -1,0 +1,20 @@
+<!-- ================= 03 分档一致性 ================= -->
+<section class="slide">
+  <header><span>分档检验</span><span>03</span></header>
+  <h1 class="title">3 天选出的档位，和长窗口对不上</h1>
+  <p class="lede">先检验前提：用 3 天工作日轮廓给格子选档，与用训练前缀 5904 小时选档，结果是否一致。仓库 PR #10，无训练。</p>
+  <div class="body">
+    <div class="lines" style="margin-bottom:18px">
+      <div class="line"><span class="k">做法</span><span class="v">源城取训练前缀 5904 小时的工作日轮廓；华盛顿分别用协议的 72 小时与同样的 5904 小时各算一次最大相关并分档，只统计两次都有定义的 189 格。</span></div>
+      <div class="line"><span class="k">门槛</span><span class="v">一致比例 0.7 在看结果之前定下；不过线就不做「按档部分蒸馏」。</span></div>
+    </div>
+    <table>
+      <tr><th>方向</th><th>两次都有定义</th><th>档位相同</th><th>一致比例</th><th>72h 判 &gt; 0.8</th><th>5904h 判 &gt; 0.8</th><th>过 0.7</th></tr>
+      <tr><td class="id">纽约 → 华盛顿</td><td class="num">189</td><td class="num">88</td><td class="num">0.4656</td><td class="num">75 格</td><td class="num">166 格</td><td><span class="tag todo">否</span></td></tr>
+      <tr><td class="id">芝加哥 → 华盛顿</td><td class="num">189</td><td class="num">95</td><td class="num">0.5026</td><td class="num">86 格</td><td class="num">178 格</td><td><span class="tag todo">否</span></td></tr>
+    </table>
+    <p class="note">短窗口里判为高相关的格子只有长窗口的一半上下：纽约 75 对 166，芝加哥 86 对 178。</p>
+    <div class="statement"><strong>意义：</strong>3 天轮廓给出的分档与长窗口分档对不上，不能直接拿它决定每个格子「像谁」。</div>
+  </div>
+  <footer><span class="nav"><button data-go="prev">‹</button><span>03 / 15</span><button data-go="next">›</button></span></footer>
+</section>

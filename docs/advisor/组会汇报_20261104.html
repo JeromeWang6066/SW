@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>组会汇报 · 跨城市网格交通流知识蒸馏复现进展 · 2026-11-04</title>
+<style>
+:root{--ink:#1d1d1f;--mut:#6e6e73;--hint:#86868b;--line:#e5e5e5;--rule:#d2d2d7;--dark:#0b0b0d;--light:#f5f5f7}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{background:#e8e8e8;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{width:1280px;height:720px;flex:none;position:relative;background:#fff;transform-origin:center center}
+.slide{--f:1;--u:calc(17px * var(--f));position:absolute;inset:0;padding:52px 76px 34px;display:flex;flex-direction:column;visibility:hidden;opacity:0;pointer-events:none;overflow:hidden;background:#fff}
+.slide.on{visibility:visible;opacity:1;pointer-events:auto}
+header{display:flex;justify-content:space-between;align-items:baseline;font-size:11.5px;letter-spacing:.12em;color:var(--hint);flex:none}
+h1{font-size:40px;font-weight:500;letter-spacing:-.015em;line-height:1.2;margin:30px 0 10px;flex:none}
+.lede{font-size:17px;font-weight:400;color:var(--mut);line-height:1.55;margin:0 0 32px;flex:none}
+.body{flex:1;min-height:0;overflow:hidden;font-size:var(--u);line-height:1.68}
+.body h2{font-size:calc(var(--u)*.86);font-weight:500;letter-spacing:.01em;margin:0 0 calc(var(--u)*.6)}
+.body h2.mt{margin-top:calc(var(--u)*1.3)}
+.body p{margin:0 0 calc(var(--u)*.7)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*3)}
+.cols.plan{grid-template-columns:1fr 1fr;gap:calc(var(--u)*2.4)}
+.cols.narrow{grid-template-columns:.9fr 1.1fr;gap:calc(var(--u)*3)}
+table{width:100%;border-collapse:collapse;font-size:calc(var(--u)*.86)}
+th,td{padding:calc(var(--u)*.46) calc(var(--u)*.5);border-bottom:1px solid var(--line);text-align:left;vertical-align:top;line-height:1.5}
+thead th{border-top:1px solid var(--rule);color:var(--hint);font-size:calc(var(--u)*.72);font-weight:400;letter-spacing:.04em;white-space:nowrap;padding-top:calc(var(--u)*.35)}
+tbody tr:last-child td{border-bottom:1px solid var(--rule)}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.best{font-weight:600}
+.lines{margin:0}
+.line{display:grid;grid-template-columns:calc(var(--u)*8.2) 1fr;gap:calc(var(--u)*1.4);padding:calc(var(--u)*.42) 0;border-bottom:1px solid var(--line);line-height:1.55}
+.line .k{color:var(--ink);font-weight:500}
+.line .v{color:var(--mut)}
+.line:first-child{border-top:1px solid var(--rule)}
+.plain{margin:0;padding:0;list-style:none}
+.plain li{padding:calc(var(--u)*.3) 0;color:var(--mut);line-height:1.6}
+.plain li b{font-weight:500;color:var(--ink)}
+.note{font-size:calc(var(--u)*.72);color:var(--hint);line-height:1.6;margin-top:calc(var(--u)*.8)}
+.ph{color:#96682a;border-bottom:1px dotted #c9a86f;white-space:nowrap}
+.fig svg{display:block;width:100%;height:auto}
+.figcap{font-size:calc(var(--u)*.7);color:var(--hint);margin-top:calc(var(--u)*.35);line-height:1.45}
+.eqbox{border-top:1px solid var(--rule);padding-top:calc(var(--u)*.9)}
+.eq{display:flex;align-items:baseline;gap:calc(var(--u)*.7);margin-bottom:calc(var(--u)*.85);font-family:Cambria,"Times New Roman",serif;font-size:calc(var(--u)*1.22);line-height:1.45}
+.eqn{margin-left:auto;font-size:calc(var(--u)*.72);color:var(--hint);font-family:inherit;white-space:nowrap}
+.eqbody{flex:1}
+sub,sup{font-size:.66em;line-height:0}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.86em;line-height:1.2;margin:0 3px}
+.frac>span:first-child{border-bottom:1px solid currentColor;padding:0 5px 1px}
+.frac>span:last-child{padding:1px 5px 0}
+.sym{font-size:calc(var(--u)*.74);color:var(--mut);line-height:1.65;margin-top:calc(var(--u)*.3)}
+.statement{border-left:2px solid var(--ink);padding-left:calc(var(--u)*1);color:var(--ink);line-height:1.6;margin-top:calc(var(--u)*.9)}
+.hero{font-size:calc(var(--u)*3.6);font-weight:500;letter-spacing:-.04em;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+.hero-sub{font-size:calc(var(--u)*.8);color:var(--mut);margin-top:calc(var(--u)*.5);line-height:1.55}
+.numbers{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--u)*2.4);margin-top:calc(var(--u)*1.2)}
+.numbers .n{font-size:calc(var(--u)*2.7);font-weight:500;letter-spacing:-.03em;line-height:1.1}
+.numbers .t{font-size:calc(var(--u)*.82);color:var(--hint);margin-top:calc(var(--u)*.5);line-height:1.5}
+.bigrow{display:grid;grid-template-columns:calc(var(--u)*3.4) 1fr;gap:calc(var(--u)*1.2);padding:calc(var(--u)*.7) 0;border-bottom:1px solid var(--line)}
+.bigrow:first-child{border-top:1px solid var(--rule)}
+.bigrow .idx{font-size:calc(var(--u)*1.5);font-weight:400;color:var(--hint);line-height:1.2;font-variant-numeric:tabular-nums}
+.bigrow .txt b{display:block;font-size:calc(var(--u)*1.02);font-weight:500;margin-bottom:calc(var(--u)*.2)}
+.bigrow .txt span{font-size:calc(var(--u)*.82);color:var(--mut);line-height:1.55}
+footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:12px;font-size:11.5px;color:var(--hint);flex:none;margin-top:10px}
+.nav{display:flex;align-items:center;gap:14px}
+.nav button{font:inherit;font-size:17px;line-height:1;color:var(--ink);background:none;border:0;padding:2px 6px;cursor:pointer}
+.nav button:hover{color:#000}
+.nav button:disabled{color:#c7c7cc;cursor:default}
+.pg{font-variant-numeric:tabular-nums;min-width:48px;text-align:center;letter-spacing:.08em}
+.cover{background:var(--dark);color:var(--light);padding-left:96px}
+.cover header,.cover footer{color:#86868b;border-color:#2a2a2c}
+.cover .nav button{color:#f5f5f7}
+.cover .nav button:disabled{color:#48484a}
+.cover .body{display:flex;flex-direction:column;justify-content:center}
+.cover .kicker{font-size:13px;letter-spacing:.22em;color:#86868b;margin-bottom:38px}
+.cover h1{font-size:62px;font-weight:500;letter-spacing:-.035em;line-height:1.16;margin:0 0 24px;color:#f5f5f7}
+.cover .sub{font-size:21px;font-weight:300;color:#a1a1a6;margin:0 0 56px;line-height:1.5}
+.cover .meta{font-size:15px;line-height:2;color:#d2d2d7}
+.cover .status{font-size:13px;color:#86868b;margin-top:42px;line-height:1.6;max-width:760px}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="stage">
+
+<!-- 01 封面 -->
+<section class="slide on cover">
+  <header><span>DUKE KUNSHAN UNIVERSITY · SIGNATURE WORK</span><span>组会汇报 / 2026-11-04</span></header>
+  <div class="body">
+    <div class="kicker">实验进展汇报</div>
+    <h1>跨城市网格交通流<br>知识蒸馏</h1>
+    <div class="sub">复现实验进展　·　基线与标准蒸馏</div>
+    <div class="meta">王天遥 Tianyao Wang<br>JeromeWang6066/SW　·　main 056f5c9</div>
+    <div class="status">本次汇报只涉及已实跑的对照实验与下一阶段的统计准备。结果数字取自 docs/RESULTS.md；未产出的量以 [待补充] 标出。</div>
+  </div>
+  <footer><span>方向键或右下角按钮翻页</span><span class="nav"><button data-go="prev">‹</button><span class="pg"><span class="pg-cur">1</span> / <span class="pg-total">15</span></span><button data-go="next">›</button></span></footer>
+</section>
+
+<!-- 02 阶段定位 -->
+<section class="slide">
+  <header><span>SIGNATURE WORK · 组会汇报</span><span>2026-11-04</span></header>
+  <h1>阶段定位</h1>
+  <p class="lede">从选题到第一组可比较的结果表；本次不展示任何未执行的实验。</p>
+  <div class="body">
+    <div class="numbers">
+      <div><div class="n">3 天</div><div class="t">目标城华盛顿的训练长度<br>STBaT 式 few-shot 协议</div></div>
+      <div><div class="n">3 种子</div><div class="t">42 / 43 / 44<br>华盛顿侧重跑，源城教师未重训</div></div>
+      <div><div class="n">0 组</div><div class="t">Pearson ρ̃ 乘子实验<br>Group 3 / 4 尚未实现</div></div>
+    </div>
+    <div class="statement" style="margin-top:calc(var(--u)*2.2)">已完成的是基线与标准蒸馏；选题中的区域乘子问题还没有被检验。</div>
+    <p class="note">口径：开题四组与实跑对照分开陈述；旧日志千万量级 MAPE 作废；源城与目标城绝对误差不横比。</p>
+  </div>
+  <footer><span>资料：docs/PPT_HANDOFF.md、docs/EXPERIMENT_PLAN.md</span><span class="nav"><button data-go="prev">‹</button><span class="pg"><span class="pg-cur">2</span> / <span class="pg-total">15</span></span><button data-go="next">›</button></span></footer>
+</section>
+
+<!-- 03 研究问题 -->
+<section class="slide">
+  <header><span>SIGNATURE WORK · 组会汇报</span><span>2026-11-04</span></header>
+  <h1>研究问题与开题四组</h1>
+  <p class="lede">源城教师冻结，目标城只有 3 天；检验按日周期轮廓相关加权的蒸馏能否减少负迁移。</p>
+  <div class="body">
+    <table>
+      <thead><tr><th style="width:15%">分组</th><th style="width:40%">设定</th><th>当前状态</th></tr></thead>
+      <tbody>
+        <tr><td>第 1 组</td><td>华盛顿 3 天，随机初始化，只做监督</td><td>已完成，ID 为 G1-tgt-3d</td></tr>
+        <tr><td>第 2 组</td><td>复制教师权重，λ = 0，只微调</td><td>已完成，ID 为 G1-C，不是「Group 2」</td></tr>
+        <tr><td>第 3 组</td><td>同一区域配对上均匀蒸馏，乘子恒为 1</td><td>未按选题执行。现有 Group 2 是输出 MSE 蒸馏，教师读华盛顿窗口，<b>无区域配对</b></td></tr>
+        <tr><td>第 4 组</td><td>同一配对，乘子为截断后的 Pearson ρ̃</td><td>未实现；pearson_weekday_profile.py 只有 hook，跨城匹配为 TBD</td></tr>
+      </tbody>
+    </table>
+    <div class="statement">汇报中的「Group 2」指实跑的标准 KD，不等于选题第 3 组。</div>
+    <p class="note">依据：选题汇报第 8、12、13 页；分组定义见 docs/EXPERIMENT_PLAN.md。</p>
+  </div>
+  <footer><span>资料：docs/advisor/选题汇报.html、docs/PPT_HANDOFF.md §1</span><span class="nav"><button data-go="prev">‹</button><span class="pg"><span class="pg-cur">3</span> / <span class="pg-total">15</span></span><button data-go="next">›</button></span></footer>
+</section>
+
+<!-- 04 复现流程 -->
+<section class="slide">
+  <header><span>SIGNATURE WORK · 组会汇报</span><span>2026-11-04</span></header>
+  <h1>复现执行链路</h1>
+  <p class="lede">五段依赖顺序，全部在本机 GPU 上完成。</p>
+  <div class="body">
+    <div class="fig">
+      <svg class="f1" viewBox="0 0 1128 108" role="img" aria-label="复现执行链路">
+        <title>复现执行链路</title>
+        <g font-family="-apple-system, Segoe UI, Microsoft YaHei, sans-serif" text-anchor="middle">
+          <text x="94" y="40" font-size="20" fill="#1d1d1f">数据与形状核验</text><text x="94" y="66" font-size="14" fill="#86868b">zip / SHA256 / 8784 h</text>
+          <text x="329" y="40" font-size="20" fill="#1d1d1f">代码移植</text><text x="329" y="66" font-size="14" fill="#86868b">ST-Net / 60×24 / 窗口</text>
+          <text x="564" y="40" font-size="20" fill="#1d1d1f">源城教师</text><text x="564" y="66" font-size="14" fill="#86868b">NY、CHI 各一次</text>
+          <text x="799" y="40" font-size="20" fill="#1d1d1f">目标侧对照</text><text x="799" y="66" font-size="14" fill="#86868b">从零 / 微调 / KD</text>
+          <text x="1034" y="40" font-size="20" fill="#1d1d1f">评估与归档</text><text x="1034" y="66" font-size="14" fill="#86868b">多种子、λ、结果表</text>
+          <text x="94" y="98" font-size="13" fill="#86868b">10-27</text><text x="329" y="98" font-size="13" fill="#86868b">10-28</text><text x="564" y="98" font-size="13" fill="#86868b">10-28</text><text x="799" y="98" font-size="13" fill="#86868b">10-28 ~ 10-29</text><text x="1034" y="98" font-size="13" fill="#86868b">11-04</text>
+        </g>
+        <g stroke="#d2d2d7" stroke-width="1" fill="none"><path d="M188 44H270"/><path d="M423 44H505"/><path d="M658 44H740"/><path d="M893 44H975"/></g>
+        <g fill="#d2d2d7"><path d="M270 40l7 4-7 4z"/><path d="M505 40l7 4-7 4z"/><path d="M740 40l7 4-7 4z"/><path d="M975 40l7 4-7 4z"/></g>
+      </svg>
+      <div class="figcap">图 1｜复现执行链路。箭头表示依赖顺序，不表示模型结构。</div>
+    </div>
+    <div class="lines" style="margin-top:calc(var(--u)*2)">
+      <div class="line"><span class="k">环境</span><span class="v">Python 3.11.9 / torch 2.11.0+cu128 / RTX 4060 Laptop 8 GB；GitHub 直连超时，改用 jsDelivr 取同一路径，SHA256 一致。</span></div>
+      <div class="line"><span class="k">移植范围</span><span class="v">STNet.forward、split_x_y、trim_few_shot、GridFlowDataset、metrics；合成形状测试 8 项通过。</span></div>
+      <div class="line"><span class="k">未移植</span><span class="v">functional_forward、region re-weighting、RIAM。</span></div>
+    </div>
+  </div>
+  <footer><span>资料：notes/progress.md（10-27 至 10-29）、docs/UPSTREAM_MAP.md</span><span class="nav"><button data-go="prev">‹</button><span class="pg"><span class="pg-cur">4</span> / <span class="pg-total">15</span></span><button data-go="next">›</button></span></footer>
+</section>
+
+<!-- 05 数据与划分 -->
+<section class="slide">
+  <header><span>SIGNATURE WORK · 组会汇报</span><span>2026-11-04</span></header>
+  <h1>数据与划分</h1>
+  <p class="lede">CrossTReS 网格数据，只用 Taxi pickup 一个通道；时间粒度 1 小时，T = 8784。</p>
+  <div class="body">
+    <table>
+      <thead><tr><th>城市</th><th>数组形状 T×H×W</th><th>Taxi 有效格</th><th>训练窗口</th><th>验证 / 测试</th></tr></thead>
+      <tbody>
+        <tr><td>纽约 NY（源）</td><td>(8784, 20, 23)</td><td class="num">458</td><td class="num">5898</td><td class="num">1440 / 1440</td></tr>
+        <tr><td>芝加哥 CHI（源）</td><td>(8784, 17, 28)</td><td class="num">270</td><td class="num">5898</td><td class="num">1440 / 1440</td></tr>
+        <tr><td>华盛顿 DC（目标）</td><td>(8784, 21, 20)</td><td class="num">207</td><td class="num">72（3 天）</td><td class="num">1440 / 1440</td></tr>
+      </tbody>
+    </table>
+    <div class="lines" style="margin-top:calc(var(--u)*1.4)">
+      <div class="line"><span class="k">切分</span><span class="v">过去 6 小时预测下一小时；val、test 各 60×24 小时；目标城训练窗口取训练段最后 72 小时。</span></div>
+      <div class="line"><span class="k">预处理</span><span class="v">有效格 mask 按原始流量时间求和 &gt; 0；percentile 0.999 min-max；指标在反归一化后、有效格上计算。</span></div>
+      <div class="line"><span class="k">协议差别</span><span class="v">源城教师只在 5898 个训练窗口上训练，未把 train + val + test 拼回；实跑只有上车通道，选题计划含上下车。</span></div>
+      <div class="line"><span class="k">待复核</span><span class="v">代码在切分之前对整段时间轴计算 min-max 统计量，与选题稿「统计量只在训练段估计」不一致。</span></div>
+    </div>
+    <p class="note">有效格数按本仓 mask 统计；文献 460 / 476 / 420 是网格数，口径不同。</p>
+  </div>
+  <footer><span>资料：docs/DATA.md、src/data/dataset.py、src/data/splits.py</span><span class="nav"><button data-go="prev">‹</button><span class="pg"><span class="pg-cur">5</span> / <span class="pg-total">15</span></span><button data-go="next">›</button></span></footer>
+</section>
+
+<!-- 06 模型与设置 -->
+<section class="slide">
+  <header><span>SIGNATURE WORK · 组会汇报</span><span>2026-11-04</span></header>
+  <h1>模型、损失与训练设置</h1>
+  <p class="lede">Phase-1 不换骨干；所有对照共用同一模型与早停规则。</p>
+  <div class="body">
+    <div class="cols">
+      <div>
+        <h2>模型与优化</h2>
+        <div class="lines">
+          <div class="line"><span class="k">骨干</span><span class="v">带 BatchNorm 的 CrossTReS ST-Net；3 个 64 通道残差块、LSTM 隐层 128；输出 (B, 1, N_valid)。</span></div>
+          <div class="line"><span class="k">任务损失</span><span class="v">有效格平方误差，先对 batch 取平均，再对格子求和。</span></div>
+          <div class="line"><span class="k">优化</span><span class="v">batch 8、lr 0.001、weight decay 5e-5、最多 50 epoch；验证 RMSE 连续 5 个 epoch 不下降即停。</span></div>
+          <div class="line"><span class="k">指标</span><span class="v">MAE / RMSE 覆盖全部有效格；MAPE 只在真实流量大于 0 的格子上计算，分母为该流量。</span></div>
+        </div>
+      </div>
+      <div>
+        <h2>现有蒸馏形式</h2>
+        <div class="eq" style="margin:calc(var(--u)*.4) 0 calc(var(--u)*1)"><div class="eqbody">L = L<sub>task</sub> + &lambda; &middot; L<sub>kd</sub></div></div>
+        <div class="lines">
+          <div class="line"><span class="k">教师</span><span class="v">冻结并保持 eval；读取华盛顿归一化窗口，不是「按小时缓存源城隐藏表示」。</span></div>
+          <div class="line"><span class="k">蒸馏项</span><span class="v">学生与教师预测输出的 MSE，与任务损失同一归约；乘子恒为 1，无区域配对。</span></div>
+          <div class="line"><span class="k">开关</span><span class="v">λ 主实验取 1，扫描取 0.1 / 0.5 / 5；pearson_multiplier 全为 false，置 true 时训练入口直接拒绝。</span></div>
+        </div>
+        <p class="note">该损失不是选题第 12 页的「乘子 × 隐藏表示距离」，两者不共用同一组结果。种子 42 主实验的 MAPE 由已有 checkpoint 重算，未重训。</p>
+      </div>
+    </div>
+  </div>
+  <footer><span>资料：docs/RESULTS.md「协议」、src/models/kd.py、src/eval/metrics.py</span><span class="nav"><button data-go="prev">‹</button><span class="pg"><span class="pg-cur">6</span> / <span class="pg-total">15</span></span><button data-go="next">›</button></span></footer>
+</section>
+
+<!-- 07 实验 ID -->
+<section class="slide">
+  <header><span>SIGNATURE WORK · 组会汇报</span><span>2026-11-04</span></header>
+  <h1>已实跑的实验 ID</h1>
+  <p class="lede">七类华盛顿设定在种子 42 / 43 / 44 上可比；源城教师只有种子 42。</p>
+  <div class="body">
+    <table>
+      <thead><tr><th style="width:28%">实验 ID</th><th>设定</th><th style="width:14%">种子</th><th style="width:12%">λ</th></tr></thead>
+      <tbody>
+        <tr><td>G1-src-ny / G1-src-chi</td><td>源城教师，5898 训练窗口</td><td>42</td><td class="num">—</td></tr>
+        <tr><td>G1-tgt-3d</td><td>华盛顿 3 天，从零训练</td><td>42 / 43 / 44</td><td class="num">—</td></tr>
+        <tr><td>G1C-NY2DC / G1C-CHI2DC</td><td>复制源城权重，全参数微调，无蒸馏</td><td>42 / 43 / 44</td><td class="num">—</td></tr>
+        <tr><td>G2-NY2DC / G2-CHI2DC</td><td>冻结教师 + 输出 MSE 蒸馏，学生随机初始化</td><td>42 / 43 / 44</td><td class="num">1</td></tr>
+        <tr><td>G2-NY2DC-init / G2-CHI2DC-init</td><td>同上，学生先复制教师权重，教师另存并冻结</td><td>42 / 43 / 44</td><td class="num">1</td></tr>
+        <tr><td>G2-CHI2DC-l* / -init-l*</td><td>芝加哥方向 λ 扫描，两种初始化</td><td>42</td><td class="num">0.1 – 5</td></tr>
+      </tbody>
+    </table>
+    <p class="note">种子 43 / 44 用 --seed 重跑，文件名带后缀，不覆盖种子 42；没有重训源城教师；λ = 1 沿用已有结果。产物：29 份结果 JSON、58 个 checkpoint、16 份配置；权重、npy、日志不入库。</p>
+  </div>
+  <footer><span>资料：docs/RESULTS.md、notes/progress.md（10-29）、configs/</span><span class="nav"><button data-go="prev">‹</button><span class="pg"><span class="pg-cur">7</span> / <span class="pg-total">15</span></span><button data-go="next">›</button></span></footer>
+</section>
+
+<!-- 08 结果一 -->
+<section class="slide">
+  <header><span>SIGNATURE WORK · 组会汇报</span><span>2026-11-04</span></header>
+  <h1>结果一　种子 42</h1>
+  <p class="lede">华盛顿测试集。单位：每小时上车量；两位小数，四位小数见 docs/RESULTS.md。</p>
+  <div class="body">
+    <div class="cols narrow">
+      <div>
+        <table>
+          <thead><tr><th>实验</th><th>MAE</th><th>RMSE</th><th>MAPE</th></tr></thead>
+          <tbody>
+            <tr><td>G1-tgt-3d</td><td class="num">1.87</td><td class="num">5.55</td><td class="num">75.99</td></tr>
+            <tr><td>G2-NY2DC</td><td class="num">1.75</td><td class="num">5.51</td><td class="num">59.29</td></tr>
+            <tr><td>G2-CHI2DC</td><td class="num">1.75</td><td class="num">5.41</td><td class="num">65.39</td></tr>
+            <tr><td>G1C-NY2DC</td><td class="num">1.72</td><td class="num">5.28</td><td class="num">72.39</td></tr>
+            <tr><td>G1C-CHI2DC</td><td class="num best">1.48</td><td class="num best">5.06</td><td class="num">73.32</td></tr>
+          </tbody>
+        </table>
+        <p class="note">MAPE 只在真实流量大于 0 的格子上计算。标准差 <span class="ph">[待补充]</span>。</p>
+      </div>
+      <div>
+        <div class="hero">1.48</div>
+        <div class="hero-sub">芝加哥权重微调的测试 MAE，本轮华盛顿侧最低；对应 RMSE 5.06。</div>
+        <div class="lines" style="margin-top:calc(var(--u)*1.6)">
+          <div class="line"><span class="k">顺序</span><span class="v">从零训练 → 随机初始化蒸馏 → 复制权重微调，误差依次降低。</span></div>
+          <div class="line"><span class="k">不横比</span><span class="v">源城教师：纽约 4.32 / 15.55 / 57.23，芝加哥 1.85 / 6.37 / 51.61；流量尺度 NY 1212 / CHI 536 / DC 234。</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer><span>数字来源：docs/RESULTS.md（main 056f5c9）「测试集」</span><span class="nav"><button data-go="prev">‹</button><span class="pg"><span class="pg-cur">8</span> / <span class="pg-total">15</span></span><button data-go="next">›</button></span></footer>
+</section>
+
+<!-- 09 结果二 均值 -->
+<section class="slide">
+  <header><span>SIGNATURE WORK · 组会汇报</span><span>2026-11-04</span></header>
+  <h1>结果二　三种子均值</h1>
+  <p class="lede">华盛顿测试集，种子 42 / 43 / 44 的算术平均；顺序为 MAE / RMSE / MAPE。</p>
+  <div class="body">
+    <div class="cols narrow">
+      <div>
+        <table>
+          <thead><tr><th>设定</th><th>三种子均值</th></tr></thead>
+          <tbody>
+            <tr><td>华盛顿从零，3 天</td><td class="num">1.885 / 5.523 / 76.83</td></tr>
+            <tr><td>纽约微调</td><td class="num">1.658 / 5.192 / 72.86</td></tr>
+            <tr><td>芝加哥微调</td><td class="num best">1.517 / 5.057 / 72.19</td></tr>
+            <tr><td>纽约蒸馏，随机初始化</td><td class="num">1.942 / 5.673 / 73.33</td></tr>
+            <tr><td>芝加哥蒸馏，随机初始化</td><td class="num">1.845 / 5.570 / 67.62</td></tr>
+            <tr><td>纽约初始化加蒸馏</td><td class="num">1.763 / 5.753 / 65.76</td></tr>
+            <tr><td>芝加哥初始化加蒸馏</td><td class="num">1.684 / 5.228 / 78.54</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="hero">1.942</div>
+        <div class="hero-sub">纽约随机初始化蒸馏的均值 MAE，高于从零训练的 1.885。</div>
+        <div class="lines" style="margin-top:calc(var(--u)*1.6)">
+          <div class="line"><span class="k">稳定项</span><span class="v">微调在三个种子上均优于从零；芝加哥微调均值 1.517 / 5.057 最低。</span></div>
+          <div class="line"><span class="k">不稳定项</span><span class="v">种子 42 上「蒸馏略好」不能推广；七类设定只重跑华盛顿侧。</span></div>
+          <div class="line"><span class="k">占位</span><span class="v">选题稿要求均值 ± 标准差，标准差 <span class="ph">[待补充]</span>；源城教师未重训。</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer><span>数字来源：docs/RESULTS.md「种子 42 / 43 / 44」</span><span class="nav"><button data-go="prev">‹</button><span class="pg"><span class="pg-cur">9</span> / <span class="pg-total">15</span></span><button data-go="next">›</button></span></footer>
+</section>
+
+<!-- 10 结果二 init -->
+<section class="slide">
+  <header><span>SIGNATURE WORK · 组会汇报</span><span>2026-11-04</span></header>
+  <h1>结果二　教师初始化后蒸馏</h1>
+  <p class="lede">种子 42，λ = 1；学生复制源城权重，教师另存并冻结，华盛顿测试集。</p>
+  <div class="body">
+    <div class="cols narrow">
+      <div>
+        <table>
+          <thead><tr><th>实验</th><th>MAE</th><th>RMSE</th><th>MAPE</th></tr></thead>
+          <tbody>
+            <tr><td>G2-NY2DC-init</td><td class="num">1.74</td><td class="num">5.67</td><td class="num">64.42</td></tr>
+            <tr><td>G2-CHI2DC-init</td><td class="num">1.72</td><td class="num">5.13</td><td class="num">82.25</td></tr>
+          </tbody>
+        </table>
+        <p class="note">协议与华盛顿 3 天设定相同；MAPE 为新定义（真实流量大于 0 的格子）。</p>
+      </div>
+      <div>
+        <div class="lines">
+          <div class="line"><span class="k">纽约方向</span><span class="v">MAE 落在随机初始化蒸馏（1.75）与纯微调（1.72）之间，RMSE 高于两者。</span></div>
+          <div class="line"><span class="k">芝加哥方向</span><span class="v">优于随机初始化蒸馏（1.75 / 5.41），仍差于纯微调（1.48 / 5.06）。</span></div>
+          <div class="line"><span class="k">读法</span><span class="v">复制权重已经给出大部分增益；再叠加输出 MSE 蒸馏没有稳定超过纯微调。</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer><span>数字来源：docs/RESULTS.md「微调加蒸馏」</span><span class="nav"><button data-go="prev">‹</button><span class="pg"><span class="pg-cur">10</span> / <span class="pg-total">15</span></span><button data-go="next">›</button></span></footer>
+</section>
+
+<!-- 11 结果三 -->
+<section class="slide">
+  <header><span>SIGNATURE WORK · 组会汇报</span><span>2026-11-04</span></header>
+  <h1>结果三　芝加哥 λ 扫描</h1>
+  <p class="lede">仅种子 42；λ = 1 沿用已有结果，未重跑。表内为测试集 MAE / RMSE。</p>
+  <div class="body">
+    <div class="cols narrow">
+      <div>
+        <table>
+          <thead><tr><th>初始化</th><th>0.1</th><th>0.5</th><th>1</th><th>5</th></tr></thead>
+          <tbody>
+            <tr><td>随机初始化</td><td class="num">2.00 / 5.66</td><td class="num">2.11 / 5.68</td><td class="num best">1.75 / 5.41</td><td class="num">1.99 / 5.72</td></tr>
+            <tr><td>教师初始化</td><td class="num best">1.48 / 4.93</td><td class="num">1.56 / 5.05</td><td class="num">1.72 / 5.13</td><td class="num">1.94 / 5.68</td></tr>
+          </tbody>
+        </table>
+        <p class="note">四位小数见 docs/RESULTS.md；扫描只改变蒸馏项权重，没有引入区域乘子或配对。</p>
+      </div>
+      <div>
+        <div class="hero">1.4783</div>
+        <div class="hero-sub">教师初始化、λ = 0.1 的测试 MAE；RMSE 4.9331。与纯微调 MAE 1.4773 几乎相同。</div>
+        <div class="lines" style="margin-top:calc(var(--u)*1.4)">
+          <div class="line"><span class="k">趋势</span><span class="v">教师初始化一侧 λ 由 0.1 增至 5，MAE 由 1.48 升至 1.94；随机初始化在 λ = 1 最好。</span></div>
+          <div class="line"><span class="k">占位</span><span class="v">多种子复核 <span class="ph">[待补充]</span>；纽约方向 λ 扫描 <span class="ph">[待补充：未执行]</span>。</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer><span>数字来源：docs/RESULTS.md「芝加哥 λ 扫描」</span><span class="nav"><button data-go="prev">‹</button><span class="pg"><span class="pg-cur">11</span> / <span class="pg-total">15</span></span><button data-go="next">›</button></span></footer>
+</section>
+
+<!-- 12 研究意义 -->
+<section class="slide">
+  <header><span>SIGNATURE WORK · 组会汇报</span><span>2026-11-04</span></header>
+  <h1>结果解读与研究意义</h1>
+  <p class="lede">四条结论只覆盖「输出 MSE 蒸馏、无区域配对」这一阶段。</p>
+  <div class="body">
+    <div class="bigrow"><span class="idx">01</span><span class="txt"><b>基线可用</b><span>四套设定共用同一划分、同一 ST-Net 与早停，后续方法可直接接入同一对照组。</span></span></div>
+    <div class="bigrow"><span class="idx">02</span><span class="txt"><b>初始化与蒸馏增益可分开</b><span>微调在三个种子上稳定优于从零；随机初始化蒸馏在纽约方向均值 1.942，高于从零的 1.885。</span></span></div>
+    <div class="bigrow"><span class="idx">03</span><span class="txt"><b>λ 的量级已测</b><span>教师初始化下 λ 由 0.1 增至 5，MAE 由 1.48 升至 1.94；引入乘子时应把 λ 作为受控变量。</span></span></div>
+    <div class="bigrow"><span class="idx">04</span><span class="txt"><b>边界清楚</b><span>现有蒸馏作用于预测输出；选题要检验的是按 ρ̃ 加权的隐藏表示距离，二者不是同一损失。</span></span></div>
+    <div class="statement">以权重微调为基线，先确定跨城格子配对，再讨论乘子；本阶段的负结果是 Group 3 的对照依据。</div>
+    <p class="note">不写入本次汇报：CrossTReS 原文「约降低 8%」、旧日志千万量级 MAPE、Group 3 / 4 数值 <span class="ph">[待补充：未执行]</span>。</p>
+  </div>
+  <footer><span>依据：docs/RESULTS.md、docs/PPT_HANDOFF.md §5、§8</span><span class="nav"><button data-go="prev">‹</button><span class="pg"><span class="pg-cur">12</span> / <span class="pg-total">15</span></span><button data-go="next">›</button></span></footer>
+</section>
+
+<!-- 13 未完成项 -->
+<section class="slide">
+  <header><span>SIGNATURE WORK · 组会汇报</span><span>2026-11-04</span></header>
+  <h1>未完成项与待补充数值</h1>
+  <p class="lede">以下各项本次均不给具体数值，占位处待实验或统计完成后补齐。</p>
+  <div class="body">
+    <table>
+      <thead><tr><th style="width:38%">项目</th><th style="width:20%">状态</th><th>本次给出的数值</th></tr></thead>
+      <tbody>
+        <tr><td>工作日 24 小时轮廓、跨城一对一配对、ρ̃ 乘子</td><td>仅有 hook</td><td><span class="ph">[待补充：未执行]</span></td></tr>
+        <tr><td>隐藏表示蒸馏（选题第 12 页公式）</td><td>未实现</td><td><span class="ph">[待补充：未执行]</span></td></tr>
+        <tr><td>三种子的标准差</td><td>未计算</td><td><span class="ph">[待补充]</span></td></tr>
+        <tr><td>λ = 0.1 多种子复核、纽约方向 λ 扫描</td><td>部分执行</td><td><span class="ph">[待补充]</span></td></tr>
+        <tr><td>7 天补充实验、下车与单车通道</td><td>未执行</td><td><span class="ph">[待补充：未执行]</span></td></tr>
+        <tr><td>与 CrossTReS / STBaT 完整系统对照</td><td>未执行</td><td><span class="ph">[待补充：未执行]</span></td></tr>
+        <tr><td>CHI / DC 轮廓、ρ 分布、早晚高峰对齐</td><td>下周计算</td><td><span class="ph">[待补充：下周计算]</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note">「未实现」指代码与实验都没有；「未计算」指已有数据但尚未产出该统计量。两者都不以估计值代替。</p>
+  </div>
+  <footer><span>依据：docs/PPT_HANDOFF.md §5.5、docs/EXPERIMENT_PLAN.md</span><span class="nav"><button data-go="prev">‹</button><span class="pg"><span class="pg-cur">13</span> / <span class="pg-total">15</span></span><button data-go="next">›</button></span></footer>
+</section>
+
+<!-- 14 下周规划 · 定义与公式 -->
+<section class="slide">
+  <header><span>SIGNATURE WORK · 组会汇报</span><span>2026-11-04 · 下周规划 1/2</span></header>
+  <h1>下周规划　定义与公式</h1>
+  <p class="lede">由老师定下格子（区域）一对一配对规则；公式先定稿，本阶段不训练。</p>
+  <div class="body">
+    <div class="cols plan">
+      <div>
+        <h2>计划中的公式（尚未实现）</h2>
+        <div class="eqbox">
+          <div class="eq"><div class="eqbody">p<sub>r</sub>[h] = <span class="frac"><span>1</span><span>|T<sub>wd,h</sub>|</span></span> &sum;<sub>t&isin;T<sub>wd,h</sub></sub> x[t, r],　h = 0, …, 23</div><span class="eqn">(1)</span></div>
+          <div class="eq"><div class="eqbody">&Delta;<sub>r</sub>[h] = p<sub>r</sub>[h] &minus; mean<sub>h</sub>(p<sub>r</sub>)<br>&rho;(s,t) = <span class="frac"><span>&sum;<sub>h</sub> &Delta;<sub>s</sub>[h] &Delta;<sub>t</sub>[h]</span><span>( &sum;<sub>h</sub> &Delta;<sub>s</sub>[h]<sup>2</sup> &middot; &sum;<sub>h</sub> &Delta;<sub>t</sub>[h]<sup>2</sup> )<sup>1/2</sup></span></span></div><span class="eqn">(2)</span></div>
+          <div class="eq"><div class="eqbody">&rho;&#771;(s,t) = max(&rho;, 0)<br>L = L<sub>pred</sub> + &lambda; &sum;<sub>i,t</sub> &rho;&#771;<sub>i,&pi;(i)</sub> &middot;<br>&Vert; h<sup>S</sup><sub>i,t</sub> &minus; sg( h<sup>T</sup><sub>&pi;(i), hour(t)</sub> ) &Vert;<sup>2</sup></div><span class="eqn">(3)</span></div>
+          <div class="sym">T<sub>wd,h</sub>：训练段的工作日小时；r：格子（区域）；sg：停止梯度；S / T：学生 / 教师隐藏表示；&lambda;：仅由验证集选择。</div>
+        </div>
+      </div>
+      <div>
+        <h2>先定配对</h2>
+        <div class="hero" style="font-size:calc(var(--u)*2.2)">&pi;(i)</div>
+        <div class="hero-sub">跨城一对一配对：一个目标格子对应至多一个源城格子。规则由老师定。</div>
+        <div class="lines" style="margin-top:calc(var(--u)*1.4)">
+          <div class="line"><span class="k">乘子</span><span class="v">&rho;&#771; = max(&rho;, 0)；负相关区域不接受蒸馏。</span></div>
+          <div class="line"><span class="k">&lambda;</span><span class="v">只在目标验证集上选择，不作为早停判据。</span></div>
+          <div class="line"><span class="k">与已跑实验</span><span class="v">Group 2 是输出 MSE、乘子恒 1、无配对；式 (3) 尚未实现。</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer><span>公式来源：选题汇报第 11–12 页；实现状态见 src/utils/pearson_weekday_profile.py、src/models/kd.py</span><span class="nav"><button data-go="prev">‹</button><span class="pg"><span class="pg-cur">14</span> / <span class="pg-total">15</span></span><button data-go="next">›</button></span></footer>
+</section>
+
+<!-- 15 下周规划 · 统计与核对 -->
+<section class="slide">
+  <header><span>SIGNATURE WORK · 组会汇报</span><span>2026-11-04 · 下周规划 2/2</span></header>
+  <h1>下周规划　统计与核对</h1>
+  <p class="lede">只做统计与核对：不启动训练、不更新 checkpoint、不改动结果表。</p>
+  <div class="body">
+    <div class="cols plan">
+      <div>
+        <h2>轮廓计算（只做统计）</h2>
+        <div class="lines">
+          <div class="line"><span class="k">芝加哥</span><span class="v">源城训练段 5898 小时，工作日掩码，输出 270 × 24。</span></div>
+          <div class="line"><span class="k">华盛顿</span><span class="v">只用 3 天训练段 72 小时，输出 207 × 24。</span></div>
+          <div class="line"><span class="k">限定</span><span class="v">只用训练段，val / test 不进入均值；3 天工作日仅 1–2 天，方差需说明。</span></div>
+        </div>
+        <h2 class="mt">早晚高峰核对</h2>
+        <div class="lines">
+          <div class="line"><span class="k">峰值</span><span class="v">两城峰值小时、峰值偏移是否对齐 <span class="ph">[待补充]</span>。</span></div>
+          <div class="line"><span class="k">分布</span><span class="v">&rho; 分布、匹配与未匹配区域轮廓 <span class="ph">[待补充]</span>。</span></div>
+          <div class="line"><span class="k">判据</span><span class="v">若轮廓不能区分早晚高峰，先回到配对规则。</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="fig">
+          <svg class="f2" viewBox="0 0 440 66" role="img" aria-label="轮廓占位图">
+            <title>工作日 24 小时轮廓占位图</title>
+            <g stroke="#c7c7cc" stroke-width="1" fill="none"><path d="M30 4V52H432"/><path d="M30 52H432" stroke-dasharray="2 3"/></g>
+            <rect x="56" y="10" width="344" height="30" rx="1" fill="none" stroke="#d2d2d7" stroke-width="1" stroke-dasharray="5 4"/>
+            <g font-family="-apple-system, Segoe UI, Microsoft YaHei, sans-serif" font-size="11" fill="#86868b"><text x="0" y="12">流量</text><text x="28" y="64">0</text><text x="224" y="64">12</text><text x="416" y="64">23 h</text></g>
+            <text x="228" y="30" text-anchor="middle" font-family="-apple-system, Segoe UI, Microsoft YaHei, sans-serif" font-size="13" fill="#96682a">CHI / DC 轮廓曲线：[待计算]</text>
+          </svg>
+          <div class="figcap">图 2｜CHI 与 DC 工作日 24 小时轮廓及峰值位置（<span class="ph">[待补充]</span>）；占位图，不含数据。</div>
+        </div>
+        <div class="statement" style="margin-top:calc(var(--u)*1.6)">本阶段不训练。<br>待老师确认：一对一配对规则、负相关是否不分配、0.5 阈值消融是否保留。</div>
+      </div>
+    </div>
+  </div>
+  <footer><span>资料：docs/DATA.md、docs/EXPERIMENT_PLAN.md；本页数值均待计算</span><span class="nav"><button data-go="prev">‹</button><span class="pg"><span class="pg-cur">15</span> / <span class="pg-total">15</span></span><button data-go="next">›</button></span></footer>
+</section>
+
+</div></div>
+<script>
+(function(){
+  var stage=document.getElementById('stage');
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var cur=0;
+  function fit(){
+    var s=Math.min(window.innerWidth/1280,window.innerHeight/720);
+    stage.style.transform='scale('+s+')';
+  }
+  function compact(){
+    slides.forEach(function(s){
+      var b=s.querySelector('.body');
+      if(!b) return;
+      s.style.setProperty('--f','1');
+      b.style.overflow='hidden';
+      var f=1;
+      while(b.scrollHeight>b.clientHeight+1 && f>0.62){
+        f-=0.02;
+        s.style.setProperty('--f',f.toFixed(2));
+      }
+      if(b.scrollHeight>b.clientHeight+1){b.style.overflow='auto';}
+      s.setAttribute('data-f',f.toFixed(2));
+    });
+  }
+  function show(i){
+    cur=Math.max(0,Math.min(slides.length-1,i));
+    slides.forEach(function(el,k){el.classList.toggle('on',k===cur);});
+    [].forEach.call(document.querySelectorAll('.pg-cur'),function(el){el.textContent=cur+1;});
+    [].forEach.call(document.querySelectorAll('.pg-total'),function(el){el.textContent=slides.length;});
+    [].forEach.call(document.querySelectorAll('[data-go="prev"]'),function(el){el.disabled=(cur===0);});
+    [].forEach.call(document.querySelectorAll('[data-go="next"]'),function(el){el.disabled=(cur===slides.length-1);});
+    try{history.replaceState(null,'','#p'+(cur+1));}catch(e){}
+  }
+  [].forEach.call(document.querySelectorAll('[data-go]'),function(el){
+    el.addEventListener('click',function(){show(cur+(el.getAttribute('data-go')==='next'?1:-1));});
+  });
+  document.addEventListener('keydown',function(e){
+    var k=e.key;
+    if(k==='ArrowRight'||k==='ArrowDown'||k==='PageDown'||k===' '||k==='Enter'){e.preventDefault();show(cur+1);}
+    else if(k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'){e.preventDefault();show(cur-1);}
+    else if(k==='Home'){show(0);}
+    else if(k==='End'){show(slides.length-1);}
+  });
+  window.addEventListener('resize',function(){fit();compact();});
+  var m=/^#p(\d+)$/.exec(location.hash);
+  fit();compact();show(m?parseInt(m[1],10)-1:0);
+  if(document.fonts&&document.fonts.ready){document.fonts.ready.then(compact);}
+})();
+</script>
+</body>
+</html>

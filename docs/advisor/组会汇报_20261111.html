@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="q7CJi1GgxL8ERNVGSmjaBs" style=""><head data-page-node-id="Uw44qer18sZedbzEdthlpi">
+<meta charset="UTF-8" data-page-node-id="wHrLzE8pl3LRsOHGzmtObc">
+<meta name="viewport" content="width=device-width, initial-scale=1" data-page-node-id="1Qf7mLwHDHonbK9A0NmBcu">
+<title data-page-node-id="Yn4hkCyaCdBiwVGOQQlTwX">跨城市交通流知识蒸馏 · 组会汇报 2026-11-11</title>
+<style data-page-node-id="HnVj9IJmDKZI4BaZOQsOt4">
+  :root{
+    --ink:#1d1d1f; --sub:#6e6e73; --faint:#86868b;
+    --rule:#d8d8dc; --hair:#e8e8ed; --accent:#0071e3; --warn:#96682a;
+    --u:8px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    background:#000; overflow:hidden;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased; color:var(--ink);
+    display:flex; align-items:center; justify-content:center;
+  }
+  #stage{
+    position:relative; width:1280px; height:720px; flex:none;
+    background:#fff; overflow:hidden;
+    box-shadow:0 24px 80px rgba(0,0,0,.45);
+    transform-origin:center center;
+  }
+
+  .slide{
+    position:absolute; inset:0; padding:52px 72px 46px;
+    display:flex; flex-direction:column;
+    visibility:hidden; opacity:0; transition:opacity .28s ease;
+    background:#fff;
+  }
+  .slide.on{visibility:visible; opacity:1; z-index:2}
+
+  .slide.cover{
+    background:#fff; color:var(--ink);
+    justify-content:center; align-items:center; text-align:center; padding:72px 96px;
+    visibility:hidden;
+  }
+  .slide.cover.on{visibility:visible}
+  .cover .kicker{
+    font-size:15px; letter-spacing:.22em; color:var(--faint);
+    text-transform:uppercase; margin-bottom:28px;
+  }
+  .cover h1{
+    font-size:56px; font-weight:700; line-height:1.22;
+    letter-spacing:-.015em; max-width:1000px;
+  }
+  .cover .sub{
+    margin-top:26px; font-size:21px; line-height:1.75;
+    color:var(--sub); font-weight:400; max-width:860px;
+  }
+  .cover .meta{
+    margin-top:56px; padding-top:22px; border-top:1px solid var(--rule);
+    display:flex; justify-content:center; gap:56px; font-size:14.5px; color:var(--faint); line-height:1.7;
+  }
+  .cover .meta b{display:block; color:var(--ink); font-weight:600; font-size:15.5px}
+
+  header{
+    display:flex; justify-content:flex-end; align-items:baseline;
+    font-size:11.5px; letter-spacing:.16em; color:var(--faint);
+    text-transform:uppercase; padding-bottom:14px; border-bottom:1px solid var(--hair);
+    flex:none;
+  }
+  footer{
+    display:flex; justify-content:flex-end; align-items:center;
+    margin-top:auto; padding-top:12px; border-top:1px solid var(--hair);
+    font-size:11.5px; color:var(--faint); flex:none;
+  }
+  footer .nav{display:flex; align-items:center; gap:14px}
+  footer button{
+    width:30px; height:30px; border:1px solid var(--rule); background:#fff;
+    border-radius:50%; cursor:pointer; font-size:15px; color:var(--sub);
+    line-height:1;
+  }
+  footer button:hover{border-color:var(--ink); color:var(--ink)}
+
+  h1.title{
+    font-size:37px; font-weight:700; letter-spacing:-.012em;
+    line-height:1.28; margin:26px 0 22px; flex:none;
+  }
+
+  .body{flex:1; min-height:0; overflow:hidden; display:flex; flex-direction:column}
+  .body>*{flex-shrink:0}
+  .body::before,.body::after{content:''; flex:1 0 0; min-height:0}
+  .hero.sm .n{font-size:29px}
+  .hero.sm .n em{font-size:15px}
+  .hero.sm .cell{padding:10px 18px 8px 0}
+  .hero.sm .l{margin-top:6px}
+  .slide.center-body .body{display:flex; align-items:center}
+  .slide.center-body .body>.cols{width:100%}
+
+  .cols{display:grid; gap:34px}
+  .cols.c2{grid-template-columns:1fr 1fr}
+  .cols.wide{grid-template-columns:1.32fr 1fr}
+  .cols.narrow{grid-template-columns:.86fr 1.14fr}
+
+  h2{
+    font-size:15px; font-weight:650; letter-spacing:.02em;
+    color:var(--ink); margin:0 0 12px;
+    padding-bottom:8px; border-bottom:1px solid var(--rule);
+  }
+  h2.mt{margin-top:26px}
+
+  .lines{display:flex; flex-direction:column; gap:11px}
+  .line{display:grid; grid-template-columns:86px 1fr; gap:16px; align-items:baseline}
+  .line .k{font-size:13px; font-weight:650; color:var(--ink); letter-spacing:.02em}
+  .line .v{font-size:13.8px; line-height:1.68; color:#3a3a3c}
+
+  .bullets{list-style:none; display:flex; flex-direction:column; gap:10px}
+  .bullets li{
+    font-size:14.2px; line-height:1.7; color:#3a3a3c;
+    padding-left:22px; position:relative;
+  }
+  .bullets li::before{
+    content:""; position:absolute; left:2px; top:.62em;
+    width:7px; height:7px; border-radius:50%; background:var(--ink);
+  }
+
+  p.note{
+    font-size:12.2px; line-height:1.62; color:var(--faint); margin-top:12px;
+  }
+
+  .statement{
+    border-left:2.5px solid var(--ink); padding:4px 0 4px 16px;
+    font-size:14px; line-height:1.72; color:#3a3a3c; margin-top:16px;
+  }
+  .statement strong{color:var(--ink); font-weight:650}
+
+  .ph{color:var(--warn); font-style:normal; font-weight:600}
+  .tag{
+    display:inline-block; font-size:11px; font-weight:650; letter-spacing:.08em;
+    padding:2.5px 9px; border-radius:999px; border:1px solid var(--rule);
+    color:var(--sub); vertical-align:2px;
+  }
+  .tag.done{border-color:#b9d4c2; color:#2c6a3f; background:#f2faf5}
+  .tag.todo{border-color:#e4d3b3; color:var(--warn); background:#fdf8ef}
+
+  .hero{display:flex; gap:0; margin:6px 0 4px}
+  .hero .cell{flex:1; padding:14px 22px 12px 0}
+  .hero .cell + .cell{border-left:1px solid var(--hair); padding-left:26px}
+  .hero .n{font-size:46px; font-weight:700; letter-spacing:-.022em; line-height:1.05; color:var(--ink)}
+  .hero .n em{font-style:normal; font-size:20px; font-weight:600; color:var(--sub); margin-left:3px}
+  .hero .l{font-size:12.5px; color:var(--faint); margin-top:8px; line-height:1.55}
+
+  table{width:100%; border-collapse:collapse; font-size:13.2px}
+  th{
+    text-align:left; font-weight:650; color:var(--faint);
+    font-size:11.2px; letter-spacing:.1em; text-transform:uppercase;
+    padding:0 12px 9px 0; border-bottom:1px solid var(--rule);
+  }
+  td{
+    padding:9.5px 12px 9.5px 0; border-bottom:1px solid var(--hair);
+    color:#3a3a3c; line-height:1.5; vertical-align:baseline;
+  }
+  tr:last-child td{border-bottom:none}
+  td.id{font-weight:650; color:var(--ink); white-space:nowrap}
+  td.num{font-variant-numeric:tabular-nums; white-space:nowrap}
+  td.best{color:var(--ink); font-weight:650}
+  .hl-row td{background:#f6f6f8}
+</style>
+<style id="__dm_no_drag_style__">* { -webkit-user-drag: none !important; }</style><style id="__dm_bindable_badge_style__">[data-sp-bindable="database"]{outline:1px dashed #0088ff;outline-offset:2px;border-radius:4px;}[data-sp-bindable="database"] *{pointer-events:none !important;transition:none !important;animation:none !important;}[data-sp-bindable="database"]{transition:none !important;animation:none !important;}</style></head>
+<body data-page-node-id="fjdLjwp2U2VZyr00maL8eg" style="position: relative;">
+<div id="stage" data-page-node-id="BaJrAnhLEylz54XSV3IF2R" style="transform: scale(0.968939);">
+
+<!-- ================= 01 封面 ================= -->
+<section class="slide cover on">
+  <h1>跨城市交通流预测</h1>
+  <div class="sub">王天遥 Tianyao Wang<br>2026 年 11 月 12 日</div>
+</section>
+
+<!-- ================= 02 基准 ================= -->
+<section class="slide" data-page-node-id="PI0CSivfa6kf4D1ECD0aj6">
+  <header data-page-node-id="BS4CkXkZHiSLuLHtNzCq52"><span data-page-node-id="NpQxvE7P761LFt0snd9DBV">02</span></header>
+  <h1 class="title" data-page-node-id="Qk9UwhzJW0lkwK6nhkoCBF">实验设置与对照基准</h1>
+  <div class="body" data-page-node-id="952IhytY5WlCvWHgDr92Yh" style="zoom: 1;">
+    <div class="cols wide" data-page-node-id="0iHF3jcpEdgJYxYjAZksWp">
+      <div data-page-node-id="7OySKGfmsEFHHdiq9UFp67">
+        <h2 data-page-node-id="uwGttnisJLpUDOMYVtDACX">设定</h2>
+        <div class="lines" data-page-node-id="qLAbzroXsBNVf7N1Td8Aek">
+          <div class="line" data-page-node-id="OXs6IfcjBYOPdTlOCDzwI9"><span class="k" data-page-node-id="68I2i9gngeH1ZkvrM0gOBx">目标城</span><span class="v" data-page-node-id="bb8jQTJcmr4AIOQVrbe6OY">华盛顿 207 个有效 1 公里格子；标签为 2016-08-31 至 09-02 共 72 小时（3 个工作日）。</span></div>
+          <div class="line" data-page-node-id="bIEdEOGsuqoz8qlOSCkiQM"><span class="k" data-page-node-id="9UJLrGkQ3kf3SW6T0FCmOw">分档</span><span class="v" data-page-node-id="lfU1SAXPYZvPxaps5FmTIJ">按每格工作日 24 小时轮廓与最相似源格轮廓的 Pearson 相关分三档：≤ 0.5、(0.5, 0.8]、&gt; 0.8。</span></div>
+          <div class="line" data-page-node-id="Gi9Ktr6Og0hAuvX9zXy4wA"><span class="k" data-page-node-id="thOZHwfJvle1hE0uZy369i">已有模型</span><span class="v" data-page-node-id="prFr1NfCH54MK5Tyf4QkMc" style="">从零训练、源城微调、源城蒸馏。本轮没有重训 ST-Net。</span></div>
+        </div>
+      </div>
+      <div data-page-node-id="Vaq3Cw2B5dAQGhu35qOTwm">
+        <h2 data-page-node-id="MNRsH2BCTzuDUBNVBbOXjV">固定对照</h2>
+        <div class="hero" style="margin-top:4px" data-page-node-id="OFzo1WPodg4kPBJo3jWEgq">
+          <div class="cell" data-page-node-id="SDYHeyDL5mFAl2RADTbihp">
+            <div class="n" data-page-node-id="TqstJK5adjuDSGEyjyKAIm">1.4773<em data-page-node-id="W25bLq2JFZHoqFNEap1MlN">MAE</em></div>
+            <div class="l" data-page-node-id="rTweHhHNZgdqxjsiZ6AVgQ">芝加哥整城微调 · 测试集 · 全程对照</div>
+          </div>
+          <div class="cell" data-page-node-id="mcHOlzb5ESawe2cF0KjlOl">
+            <div class="n" data-page-node-id="68gkswogCjj4NLihqCgCXw">1.7153<em data-page-node-id="wqlqxMUy7lbFrEAC6eKTeT">MAE</em></div>
+            <div class="l" data-page-node-id="yO1I70j3EjBIcyxeVBNWLs">纽约整城微调 · 测试集 · 参照</div>
+          </div>
+        </div>
+        <p class="note" data-page-node-id="GHuTIJtH0TYj2G9YdfXq1n">指标为华盛顿有效格、全部小时上的 MAE，反归一化后计算。后面各页的全市 MAE 升降都相对这两个数读；第 5 页为 46 格子集，另有对照行。</p>
+      </div>
+    </div>
+    </div>
+  <footer data-page-node-id="pLUc6JiRKzkD0FxvskKSbF"><span class="nav" data-page-node-id="VhyB5uaHBKfJE4ezsgfEcb"><button data-go="prev" data-page-node-id="wDu6rkFVAwvjC7FUJp0FvU">‹</button><span data-page-node-id="L8bvwL3tjXDrjqBxh8zwBT">02 / 08</span><button data-go="next" data-page-node-id="leRUU3MIU82zqMNRz55nju">›</button></span></footer>
+</section>
+
+<!-- ================= 03 三日窗口 ================= -->
+<section class="slide" data-page-node-id="4HnWuMLXq4lCDANBN8SMMS">
+  <header data-page-node-id="f814nO6SABHj7cPnUjEMhw"><span data-page-node-id="QFFBTlANTSrFGt0xGyxeMc">03</span></header>
+  <h1 class="title" data-page-node-id="KSdwhxB9o4Dc0hOzIsUhv4">三日窗口与长窗口分档一致性检验</h1>
+  <div class="body" data-page-node-id="pu7gCzPqBkFkzb0KKIYgOZ" style="zoom: 1;">
+    <div class="lines" style="margin-bottom:18px" data-page-node-id="sJK12JvxWWRM3mUktxm2fp">
+      <div class="line" data-page-node-id="ORYWxlLn5yxffOcTxZNf1Y"><span class="k" data-page-node-id="SG3JHMRmEqM2JEsZ9xNEAF">做法</span><span class="v" data-page-node-id="AUFETaEi1TT90rFnMKQvlF">源城取训练前缀 5904 小时的工作日轮廓；华盛顿分别用协议的 72 小时与同样的 5904 小时各算一次最大相关并分档，只统计两次都有定义的 189 格。</span></div>
+      <div class="line" data-page-node-id="QTvGrFbSCbIOfduBGNyWtZ"><span class="k" data-page-node-id="52vOAboFCho5fahhD3qzUv">门槛</span><span class="v" data-page-node-id="Hd6q3w67OAFddRF04Ab4IZ">一致比例 0.7 在看结果之前定下；不过线就不做「按档部分蒸馏」。</span></div>
+    </div>
+    <table data-page-node-id="wXQjOsZMbKYp9CJeLkoz3H">
+      <tbody data-page-node-id="1uaNTxKSfEYAOQ0T5SX2N7"><tr data-page-node-id="V1ZmmMaYRgHAPkHvvpdWOs"><th data-page-node-id="mpYkHNgDRCw2lzjiGuvudf">方向</th><th data-page-node-id="7OOBDoorcslCgxUnEsMECS">两次都有定义</th><th data-page-node-id="lMQqtl3tC5d9SOUoHHo2RA">档位相同</th><th data-page-node-id="PEdtU5Hu64inG2mhwRoKrG">一致比例</th><th data-page-node-id="Gx6m8w5cjc2juGtW1RMugA">72h 判 &gt; 0.8</th><th data-page-node-id="ngRMG8E8DVU6S63spOoPdy">5904h 判 &gt; 0.8</th><th data-page-node-id="H9BjQqU4cUJH4wp7LS6M8c">达标</th></tr>
+      <tr data-page-node-id="gWyn87WoLpq2LGQXBeyZ28"><td class="id" data-page-node-id="oBN0nYX6RNgURiy2kYqp5s">纽约 → 华盛顿</td><td class="num" data-page-node-id="5vCVY6muA0X1p9SdjNK3EM">189</td><td class="num" data-page-node-id="7Dz2oAxLcA5SxjOzdjnZor">88</td><td class="num" data-page-node-id="s1PRCPFwl6519GPtLwciGc">0.4656</td><td class="num" data-page-node-id="JQfSr2VVrstcEZTRIdqDMl">75 格</td><td class="num" data-page-node-id="40GDwPalCBddEQuBPHcJaQ">166 格</td><td data-page-node-id="JrdIpDLtQ1GLSHHndKcZWA"><span class="tag todo" data-page-node-id="CG4zPGlmFoIzYeNEBqo3dn">否</span></td></tr>
+      <tr data-page-node-id="6aNLb8ZtucuqXACKmeJQNJ"><td class="id" data-page-node-id="jixT2gWFLxcSqkkNMTUAis">芝加哥 → 华盛顿</td><td class="num" data-page-node-id="5bsYjNfkDG5d2asIvpEY9N">189</td><td class="num" data-page-node-id="LW5BGzTJkfVRwHvomQzwbL">95</td><td class="num" data-page-node-id="2U9LGrGWpdPunV1mVeKQFx">0.5026</td><td class="num" data-page-node-id="BOD7guWzFndOBEbVojANYn">86 格</td><td class="num" data-page-node-id="pC4XXy9H9aKDtRC1oJ2nV0">178 格</td><td data-page-node-id="ob09N2onsIyAD0HmwJ0NtQ"><span class="tag todo" data-page-node-id="MwDNhDKV6QVVqQ6qJGstHF">否</span></td></tr>
+    </tbody></table>
+    <p class="note" data-page-node-id="wqDLDL7AEm2WE0qhSxGROQ">短窗口里判为高相关的格子只有长窗口的一半上下：纽约 75 对 166，芝加哥 86 对 178。</p>
+  </div>
+  <footer data-page-node-id="fUS3HpSgCZ7edaah4y80kw"><span class="nav" data-page-node-id="UaK4UjUDHBOvfIBcq0jF1j"><button data-go="prev" data-page-node-id="mox9YiGgWOHVGH4TRrp6ol">‹</button><span data-page-node-id="obXNS6goQDGvYDaDofGBHj">03 / 08</span><button data-go="next" data-page-node-id="olUHVVhAsFXc46bdZNNAK5">›</button></span></footer>
+</section>
+
+<!-- ================= 04 归因分析 ================= -->
+<section class="slide" data-page-node-id="JDNF5d6p2FW1OFNwVah04O">
+  <header data-page-node-id="nKXO8D7HtpT8w5MynAXNOX"><span data-page-node-id="BbfwUFofhZHzvsMf7g8RBa">04</span></header>
+  <h1 class="title" data-page-node-id="CF8CT7gRgw2zZ70LsKoPzf">短窗口分档不稳定性的归因分析</h1>
+  <div class="body" data-page-node-id="2qQUYPejIBjmj9QzyegWUS" style="zoom: 1;">
+    <div class="cols c2" data-page-node-id="x8WoYchLIgr10LB4AOwTTS">
+      <div data-page-node-id="HY8GIOdEWTfxbPkVNR9hyn">
+        <h2 data-page-node-id="zhtFA4WYDM9fasLlTwjaDe">流量分层诊断</h2>
+        <table data-page-node-id="lZrFi1AMvZhw32Xd0kihqs">
+          <tbody data-page-node-id="V1wOVdqr87DrCBx5A6CACt"><tr data-page-node-id="7zY7lETFFgXXf2Cmsscqir"><th data-page-node-id="2vt96iusRGO4QWCNC5SlYU">日均上车（华盛顿）</th><th data-page-node-id="Kk0gf8PalZmSgocLtdgybF">格子数</th><th data-page-node-id="patHNp9iprle06o5k6Qiqg">占上车</th><th data-page-node-id="WFOdQiHZ9X2NPF0EtiDUNQ">自身相关中位</th></tr>
+          <tr data-page-node-id="pyUHndPOZnFBcKawy6qUxy"><td class="id" data-page-node-id="BUZrvEDnyO0ngFxDwHtk08">1 – 9</td><td class="num" data-page-node-id="21osXnAvpUC7sWXvvmolzG">84</td><td class="num" data-page-node-id="MhrZor2XWXaFFuHs6Ukl3t">1.2%</td><td class="num" data-page-node-id="23gPG24esY2NesVd3kLNDa">0.4251</td></tr>
+          <tr data-page-node-id="fcmjtH91INqL1VkZZ83FuZ"><td class="id" data-page-node-id="lWOU0PCpL4y0S65BLJ91oT">低于 10</td><td class="num" data-page-node-id="GqLjWsGAdoK4wCh0O5Cxoi">114 / 207</td><td class="num" data-page-node-id="lpGu0Vpe3TlzmzDvREzFWV">1.3%</td><td class="num" data-page-node-id="fsgyA9RhwTb0wEtrB23Sj0">—</td></tr>
+          <tr class="hl-row" data-page-node-id="bWEZAaNPfEoLnoGRMUH5BQ"><td class="id" data-page-node-id="4o1G3YlxiMXQUK8WBMQCJj">不低于 200</td><td class="num" data-page-node-id="7ceu5heeNgyamvRjTpp5CH">27</td><td class="num" data-page-node-id="O55c5aOTEyX0eHD2sCq4c3">87.8%</td><td class="num best" data-page-node-id="RPiJs8kfQk86m7rvEg0BIt">0.9692</td></tr>
+          <tr data-page-node-id="AmHLaN4iWnPZFQrRMkMcr8"><td class="id" data-page-node-id="x59xxWjYVqpl2yr8Tgfnt4">不低于 50</td><td class="num" data-page-node-id="lKj62zDIxR5QKChsJ1PflP">51</td><td class="num" data-page-node-id="1gBnVcWBEjChhXU2BiAflL">—</td><td class="num" data-page-node-id="dPOdjjixWajbq00cz12ZRl">—</td></tr>
+        </tbody></table>
+        <div class="lines" style="margin-top:12px" data-page-node-id="B8gvikUdZGDefVbD2Bn3WY">
+          <div class="line" data-page-node-id="ahsisjlC1Hk410jBeAJEeQ"><span class="k" data-page-node-id="eKMBAvUW5kF1NhauLFxUhP">日均 1–9 档</span><span class="v" data-page-node-id="uc1pb86cumlQKTK5GMhNQm">三天合计中位 12 次上车，24 小时中位 16 小时为 0；档位不同的格子集中在日均 &lt; 50（纽约 98/101、芝加哥 90/94）。</span></div>
+          <div class="line" data-page-node-id="pppRkfANbXBtjhPpyGDaUH"><span class="k" data-page-node-id="85noBhyBJ12MthA868P6Dp">日均 ≥ 200 档</span><span class="v" data-page-node-id="ioktV32dLWsLnHxLWvj7fA">两源城分档均 27 / 27 一致；≥ 50 档一致比例纽约 48/51、芝加哥 47/51。</span></div>
+          <div class="line" data-page-node-id="OX8QHjOS46xvCCg0EIA8IB"><span class="k" data-page-node-id="NMtXFwtypjMj4NaoiJ2Ikx">加权视图</span><span class="v" data-page-node-id="DwSM2TlaMbJ682VRXa2QFj">按上车量加权的一致比例纽约 0.9627、芝加哥 0.9610；日均上车与自身相关的 Spearman 0.8575。</span></div>
+        </div>
+      </div>
+      <div data-page-node-id="H8WX4CQKAgxSmJwHsZoeJ9">
+        <h2 data-page-node-id="iBNM0pRZMxp8UoGEkY8YWu">配对源格是否更换</h2>
+        <table data-page-node-id="Bu2hd0uYas2vroFDZCnQGd">
+          <tbody data-page-node-id="UX9T9YsFtYGE3zbys0cnfx"><tr data-page-node-id="dKt4q1YjusBFv6Qm9FhQSZ"><th data-page-node-id="pPOcwA6oCdsEGG706s5k7R">三天工作日</th><th data-page-node-id="QRUDtvG0D1KZGekJ2VCmdo">档位不同</th><th data-page-node-id="mgpSBzl7JZCAqlmUeYsNXf">换源格</th><th data-page-node-id="ngD9lva2Rre7d8GQxwCNQv">相关差中位</th><th data-page-node-id="4kGtFvcmwKFkJxhJsLoVkn">差 ≤ 0.05</th></tr>
+          <tr data-page-node-id="6XvaWPs1LVMBqlImKUNsZv"><td class="id" data-page-node-id="kiOYCLFdcfRYpKbZesIyHG">纽约 → 华盛顿</td><td class="num" data-page-node-id="mQw6CcNWDWUowXUU6oJLym">101</td><td class="num best" data-page-node-id="nVN7Kiv8dgekiFQNrtmmqd">98</td><td class="num best" data-page-node-id="HQL3eajM5F4eN7nRoEceGU">0.2042</td><td class="num" data-page-node-id="ftLH41Crp6wPm4C6bDtu20">2</td></tr>
+          <tr data-page-node-id="RtDKWw1fb45DhkIdTbjEdj"><td class="id" data-page-node-id="Nxz0lhfbSyMzmD67SOc28g">芝加哥 → 华盛顿</td><td class="num" data-page-node-id="JreGH768CEtetOWGSv59B8">94</td><td class="num best" data-page-node-id="dmQkqDUx4jerK3ti5uiVqo">93</td><td class="num best" data-page-node-id="Yj1sir4hIWCNYas7iN7JRh">0.2084</td><td class="num" data-page-node-id="IPrFnqhktYOLQQaySMmLof">1</td></tr>
+        </tbody></table>
+        <div class="lines" style="margin-top:12px" data-page-node-id="qYPY6djnEVoXCZ0oGsBV3W">
+          <div class="line" data-page-node-id="wAlQmiFfOxGoMTIq6q7lKe"><span class="k" data-page-node-id="OsORxa1U8nlZulfBOErxSc">其余四组</span><span class="v" data-page-node-id="EKh3iCc5rDozJQr2ms8ux0">短窗口加两天周末、再按工作日与周末加节假日分别统计的四种组合：换格 64–96 个、留格仅 1–3 个，相关差中位数 0.1875–0.2307。</span></div>
+          <div class="line" data-page-node-id="gAKUr3vBwaNRRVkzN3DM9H"><span class="k" data-page-node-id="ckrDsfnB14e6AxR5Gg4Ygv">读法</span><span class="v" data-page-node-id="q1zGf8v5OsbnXPSDlnUG17">档位跳变不是相关分数在 0.5 / 0.8 阈值附近抖动，而是换到了相差约 0.2 的另一个源城格子。</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="statement" data-page-node-id="KnzppldStfNbRGKoVBRTQH"><strong data-page-node-id="A5eQubFTZTrhZCBNI9MPrC">意义：</strong>短窗口分档的不一致集中于日均上车少的格子，其直接原因是配对的最相似源格发生更换，而非相关分数在阈值附近波动。</div>
+  </div>
+  <footer data-page-node-id="xBv0gS636wE2QmMhTJsl7q"><span class="nav" data-page-node-id="wA5ZwLA6vyoWbbo5YxhkyF"><button data-go="prev" data-page-node-id="CHPmSInRW7uCoPG5mJ5jTA">‹</button><span data-page-node-id="AlrxbT35aSvUZUjc8Iuyjp">04 / 08</span><button data-go="next" data-page-node-id="zQEVlprck5p8DiiTNUBhXB">›</button></span></footer>
+</section>
+
+<!-- ================= 05 单格匹配预报 ================= -->
+<section class="slide" data-page-node-id="RPOF9L03Ow7pjM7Q2hhNLi">
+  <header data-page-node-id="KjCfkANSS6sTp2WvK88Hbt"><span data-page-node-id="d8ZEu9Of4FPZF1lDBzo5gh">05</span></header>
+  <h1 class="title" data-page-node-id="l70qRbxkSMzkIxTH3y6NE0">基于最相似源格的单格预报迁移</h1>
+  <div class="body" data-page-node-id="zaxtKqKRhfqDcHtsnpNCsn" style="zoom: 1;">
+    <div class="lines" style="margin-bottom:16px" data-page-node-id="YF3S8B5tZa9iXpN03yzlXc">
+      <div class="line" data-page-node-id="mSjAXUcPSXrQmskvk3eP6F"><span class="k" data-page-node-id="EWPQB5DunCatqMfMTG7Xod">对象</span><span class="v" data-page-node-id="WYhCaoELtRquAU4lntem0i">同时满足三天上车 ≥ 150 且与最相似源格的相关 &gt; 0.8 的格子，每个源城各 46 格。</span></div>
+      <div class="line" data-page-node-id="EFRvljVxrsY2sftrdtR2Ev"><span class="k" data-page-node-id="MBPRn7PUDaBZlcW1QR4WMc">方法</span><span class="v" data-page-node-id="bFDu6SQew0MNB5T3ui6Vwr">用该源格 [0, 5832) 小时序列做 6 小时滞后岭回归（惩罚 1）取形状，均值缩放到该格华盛顿水平后，在 72 小时标签上再拟合水平 a + c·形状预测，负值截为 0。验证集必须严格低于对照，才看测试集。</span></div>
+    </div>
+    <table data-page-node-id="Z0Exsv258RxLht2YNTFSUd">
+      <tbody data-page-node-id="gRainOqDoFeHeFW0F0KLVG"><tr data-page-node-id="HiG9sM6vcOYw7ir5l0i8r0"><th data-page-node-id="AIkTrgjJQ4Coh0UMCqSw8D">46 格平均 MAE</th><th data-page-node-id="JDtDFgWWPsn1vikZTcGC6M">纽约 验证</th><th data-page-node-id="OJkAzdahmeLliJ0BTn3dRB">纽约 测试</th><th data-page-node-id="o71udacxz1McfyEPYuyPJ3">芝加哥 验证</th></tr>
+      <tr data-page-node-id="WGkTy1EdaR7yvTfUPmST8u"><td class="id" data-page-node-id="GSHzthFMkjofHhSZlmeamh">匹配单格</td><td class="num" data-page-node-id="b96DXkNrDe7HCYNcjIiYuB">6.4362</td><td class="num" data-page-node-id="fGnCHLwTKS3k70OddyXmhj">5.9586</td><td class="num" data-page-node-id="S2E16nkc1qTr7IPOOSfw5I">6.5973</td></tr>
+      <tr class="hl-row" data-page-node-id="dhysWBipCUUYIpDGHP9FRP"><td class="id" data-page-node-id="jy48hVNdECWaKCSarRQtfG">整城微调（对照）</td><td class="num" data-page-node-id="HJZLC0bfbjh0kBBpse1DLv">6.8981</td><td class="num best" data-page-node-id="vY0Ee8EnCE2OwqkXSkFVB1">5.7476</td><td class="num best" data-page-node-id="koacN3ntiTVBLi6i68KT4B">6.2626</td></tr>
+      <tr data-page-node-id="t84AU1qcS0M1qMjtXxARRR"><td class="id" data-page-node-id="9arNDnT14KaNp8YeHHb79j">只用 72 小时岭回归</td><td class="num" data-page-node-id="U71scnVnPUUKj9CEZCsaGW">6.4334</td><td class="num" data-page-node-id="jpkoq3f1WQVbBGdywHJ8ys">6.0064</td><td class="num" data-page-node-id="zrx5WwCPLf24xE6dis0GNR">6.4442</td></tr>
+    </tbody></table>
+    <p class="note" data-page-node-id="WfP600BLAwzB5F7nHsrMds">纽约验证集平均 MAE 低于对照（46 格中 29 格单独更低），按规定才看测试集，但测试集反而更高；芝加哥验证集平均 MAE 未严格低于对照，按约定未算测试集。缩放到华盛顿三天均值的倍数中位数：纽约 0.2621、芝加哥 0.6298。</p>
+  </div>
+  <footer data-page-node-id="OUSZTqOpTJ3Jiryfn8RrBS"><span class="nav" data-page-node-id="kjLOW1UooEYQJBObKQPSyA"><button data-go="prev" data-page-node-id="4Pvw9KVTwVW6WVpBYM9MeN">‹</button><span data-page-node-id="uRLAWYyCLFwrBfF3whIyf6">05 / 08</span><button data-go="next" data-page-node-id="FMPD7xhVxa5MDTB4Uq9DIu">›</button></span></footer>
+</section>
+
+<!-- ================= 06 两参数校正 ================= -->
+<section class="slide" data-page-node-id="FNUV4lBHPZ6hqLFxukR93s">
+  <header data-page-node-id="lAsVqlzPgH7ljPC1O2AvtW"><span data-page-node-id="sbjwdNKgjfBc5I3Hw0027C">06</span></header>
+  <h1 class="title">优化：位移仿射校正</h1>
+  <div class="body" data-page-node-id="xbMBrNo3m5BExlcGKHGso4" style="zoom: 1;">
+    <div class="lines" style="margin-bottom:16px" data-page-node-id="5zcyVk80MVaIDSWc61eiKO">
+      <div class="line" data-page-node-id="bEcrPBDXDF6OezWgXhQCoz"><span class="k" data-page-node-id="LCzbR13I22frsT7cB8HFVp">方法</span><span class="v" data-page-node-id="RXcVIiFlfuko66WSAoRga0">在 72 小时上拟合 p′ = a·p + b（λ = 72，把 a 拉向 1、b 拉向 0）；低流量的 157 格保持 a = 1、b = 0。同一组系数用到验证与测试的每一个小时。</span></div>
+      <div class="line" data-page-node-id="fjNxPaT1Jo7pvprPRGTyq8"><span class="k" data-page-node-id="ynZK8UidNfLNe78If7bwhF">校正量</span><span class="v" data-page-node-id="nATzhF2OOAavBnCMjPX5WJ">芝加哥高流量格 a 中位数 0.9390、b 中位数 0.6107；纽约 a 0.9890、b 0.1994。</span></div>
+    </div>
+    <div class="lines" style="margin:0 0 16px">
+      <div class="line"><span class="k">校正式</span><span class="v">p&prime;<sub>t</sub> = a &middot; p<sub>t</sub> + b　（p 为整城微调的预测，p&prime; 为校正后输出）</span></div>
+      <div class="line"><span class="k">目标函数</span><span class="v">min<sub>a,b</sub> &sum;<sub>t=1..72</sub> ( y<sub>t</sub> &minus; a&middot;p<sub>t</sub> &minus; b )<sup>2</sup> + &lambda;[ (a &minus; 1)<sup>2</sup> + b<sup>2</sup> ]，&lambda; = 72</span></div>
+      <div class="line"><span class="k">收缩</span><span class="v">惩罚把 a 拉向 1、b 拉向 0；只在三天上车 &ge; 150 的 50 个高流量格上拟合，低流量的 157 格固定 a = 1、b = 0。</span></div>
+    </div>
+    <table data-page-node-id="XdiFf2v51BuzoGOsf4bOym">
+      <tbody data-page-node-id="ZDv1YEZFD1Lk2xa01QXDz8"><tr data-page-node-id="ZRofDh47XU8s6FIAKM6i4h"><th data-page-node-id="QRcIt4de0s5MJqFX8TBIXN">全市 MAE</th><th data-page-node-id="wuHmDhfEENOs9Y26XwchOf">验证集</th><th data-page-node-id="AxMXTHRbAVJlZO7ePWJsWs">测试集</th><th data-page-node-id="yTwCJJGZwioymgiy3Ww3Yf">测试 RMSE</th></tr>
+      <tr data-page-node-id="SeeWqhocTKNIjrqbNjTmkY"><td class="id" data-page-node-id="zDVBPlP3m73aS191DJWG6l">纽约 校正前</td><td class="num" data-page-node-id="uPFRTQFJsKOJLkMEAuEPFg">2.0548</td><td class="num" data-page-node-id="ipkc8EH50iXAGDFHaVCG1D">1.7153</td><td class="num" data-page-node-id="9bsmQMc22tddxz1CWLJz5R">5.2785</td></tr>
+      <tr data-page-node-id="cKfKc9GNnRQ3RtpV8QkrVD"><td class="id" data-page-node-id="BNOF2tzYjXX4R5BWer43Wj">纽约 校正后</td><td class="num" data-page-node-id="NPST2MFfk55cEYHu8IK4uA">2.0360</td><td class="num" data-page-node-id="YwzOc2kIU8cnq6Ggqafm25">1.7054</td><td class="num" data-page-node-id="pB8yg1MHRQdygUEtdcwSw5">5.2262</td></tr>
+      <tr data-page-node-id="vdETHurGXKl2moIrA5VHRi"><td class="id" data-page-node-id="I1zRu17WJrFABBx8gBD7lf">芝加哥 校正前</td><td class="num" data-page-node-id="EwhDlwjFF2bLLzHXGyj8EW">1.7130</td><td class="num" data-page-node-id="ElWDzkqFKDv9bF4yhwEzfd">1.4773</td><td class="num" data-page-node-id="F1c2LHf4yB1LKqDGTg0R3c">5.0578</td></tr>
+      <tr class="hl-row" data-page-node-id="Tp14tn6YNTzzg1g1xzaphg"><td class="id" data-page-node-id="Fikxflfl3reUO3hyzTzrTm">芝加哥 校正后</td><td class="num best" data-page-node-id="cp7CuDAzG7WVOXUnXKNZm4">1.6863</td><td class="num best" data-page-node-id="A9HH6KGALGidVh6KMIFUMm">1.4415</td><td class="num best" data-page-node-id="wwPETK8z7DgUEx6C83LUgu">4.9749</td></tr>
+    </tbody></table>
+    <div class="hero sm" style="margin-top:10px" data-page-node-id="h7NF1Nt4QzsruX9G5IYHaU">
+      <div class="cell" data-page-node-id="CVxPClIOxAMQsVVD1uYkhO">
+        <div class="n" data-page-node-id="TctCE4eIpM6zKZHIACbQTv">1.4415<em data-page-node-id="Fyipht3NwVkVdrm0GzWTVH">MAE</em></div>
+        <div class="l" data-page-node-id="JleqJ05zWkFg0ZomFbCdjU">芝加哥测试集 · 目前最低</div>
+      </div>
+      <div class="cell" data-page-node-id="nf8kke1D3ofNZRLntqDNm4">
+        <div class="n" data-page-node-id="9pV0DXaDtQd92ROfrZRbHv">−0.0358<em data-page-node-id="sXN0kbGlFEcmAqVCuGBTdI">Δ</em></div>
+        <div class="l" data-page-node-id="ba77CBhURMbNFuQZpZHhe9">测试集全市 MAE 下降</div>
+      </div>
+      <div class="cell" data-page-node-id="XIXgFpDSrc60Q4IbslZfH9">
+        <div class="n" data-page-node-id="UnEUQSHTqIY0VqJT3tnGgk">5.0441<em data-page-node-id="csO6TEyrYtgEhstZIbxhJj">高流量 50 格</em></div>
+        <div class="l" data-page-node-id="mlubsiKZ3D8wfAPASqRiz7">5.1922 → 5.0441；低流量 157 格保持 0.2942</div>
+      </div>
+    </div>
+  </div>
+  <footer data-page-node-id="IjMfBV8gOKFicTOoRlzxQg"><span class="nav" data-page-node-id="he7D26zT1gHEnx4lpmEUXj"><button data-go="prev" data-page-node-id="VXV3W94zM2i9QDEClgsdAo">‹</button><span data-page-node-id="p0tJfc0wmq41x8CzAPKZHB">06 / 08</span><button data-go="next" data-page-node-id="iVtJP2Q60ftYSyVhCXoeA5">›</button></span></footer>
+</section>
+
+<!-- ================= 07 下一周 ================= -->
+<section class="slide" data-page-node-id="nW0utq51P61k5VNwRN7NfQ">
+  <header data-page-node-id="GszwHHBlmCT3J6c8M7LM8M"><span data-page-node-id="VFzJQkYq4ivvX2kudtDTbi">07</span></header>
+  <h1 class="title" data-page-node-id="M6Pihd6ZTL2upELzCKFEHp">下一步工作：仿射校正的多种子复核</h1>
+  <div class="body" data-page-node-id="OzmSkE0ZaaCVoDMvp9CKDy" style="zoom: 1;">
+    <div class="cols c2" data-page-node-id="KKiFITlq2KTvZ3fPmV7Jwd">
+      <div data-page-node-id="sDUNCYjakAWpgWcxKAshXA">
+        <h2 data-page-node-id="HOV7BfCOE9b9RlMlNjENrR">复核设计</h2>
+        <div class="lines" data-page-node-id="uU3cRv2uhQ2Yhwc0DfXKJ5">
+          <div class="line" data-page-node-id="E2a3GHkqBznKf5Ci2oitlD"><span class="k" data-page-node-id="mhHPatSqGjFSiJ2rnfZMhA">种子</span><span class="v" data-page-node-id="YcYDCDyDBLvzDEmfiWtoKS">43、44。λ 仍是 72，流量门槛仍是三天上车合计 ≥ 150。</span></div>
+          <div class="line" data-page-node-id="7ZgCv9EqS8YFxc7Bk7V0aG"><span class="k" data-page-node-id="25iYQxGB26DMTUJJYlkFRA">判定</span><span class="v" data-page-node-id="ZnYpWvDC3wKtwaJDK9EBCZ">每个种子先看验证集全市 MAE，必须严格低于该种子的一律微调，才看测试集。</span></div>
+          <div class="line" data-page-node-id="WMYvkVH54WxsTtfnb6Ceas"><span class="k" data-page-node-id="qqJgwqZWB3PpMm5Ml5e2A9">报告</span><span class="v" data-page-node-id="CTZ8S1ELhPrnfSTpm90JqX">看测试集时必须分开写出高流量 50 格与低流量 157 格。</span></div>
+          <div class="line" data-page-node-id="jIyzWv5iU5w9RL0nuKtXPB"><span class="k" data-page-node-id="vQ0WI4YQ0ncP6WtfaXOu5Y">对照</span><span class="v" data-page-node-id="js3ljEw0afQIwu2BE2GyJw">该种子自己的芝加哥整城微调，不是种子 42 的 1.4773。</span></div>
+          <div class="line" data-page-node-id="5vqN62b4jOGwJ0Z8EWMUTP"><span class="k" data-page-node-id="Zkk5UwU3I3xPs11gNq2N7U">不动</span><span class="v" data-page-node-id="UFW5y2WT4bBG2FZCK5l0Lt">0.5、0.8、150 与 λ 都不按这张新表调整。</span></div>
+        </div>
+      </div>
+      <div data-page-node-id="H6wnFD3Q53woc9kqBr5xjD">
+        <h2 data-page-node-id="UYxxNPuo3MNvTwT6mjSefl">优先级依据</h2>
+        <ul class="bullets" data-page-node-id="pQ4KCjA8oTT71y0lxUcglA">
+          <li data-page-node-id="wbTyjXKYLKmBoqZRb8Fx5I">后续分组实验要把「微调 + a、b」当作对照，对照本身必须先站住</li>
+          <li data-page-node-id="PMRfrVdtHZxdSoqmIQWTkg">此前周末/节假日分训正是在多种子上方向不一致才被放弃，教训是单种子结果不足为凭</li>
+          <li data-page-node-id="Eru47Qb0JWvxDRGqowzpSX">三种子同向下降，才谈得上把 a、b 写进方法</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <footer data-page-node-id="ihYc25PJrQ1WMp5sD0Tdvb"><span class="nav" data-page-node-id="ITwTw5pTBuTfBpRfbwfOjA"><button data-go="prev" data-page-node-id="JbppJGuurq5ekBXczMBeve">‹</button><span data-page-node-id="GlsHGGG7NNR6NBbV78SAEH">07 / 08</span><button data-go="next" data-page-node-id="oYZCk35qfT8YvrExL8v4oN">›</button></span></footer>
+</section>
+
+<!-- ================= 08 形状分组迁移 ================= -->
+<section class="slide" data-page-node-id="aywOqMYy9WKAnjKiSMCNuf">
+  <header data-page-node-id="2IH0xmMx1ili2Q0JyyYwQ4"><span data-page-node-id="hwvuDHT9UeUQIpwC2a2svH">08</span></header>
+  <h1 class="title" data-page-node-id="HP8mUOW29umWGyBVtJL0dv">后续方案：基于日周期形状的分组迁移</h1>
+  <div class="body" data-page-node-id="kHIOBeqrFXd6HbGfWCnUgm" style="zoom: 1;">
+    <div class="cols c2" data-page-node-id="MUKEH68jNsW9X6fobuxxxI">
+      <div data-page-node-id="foImMSM6hgSqxZCzZ34L7M">
+        <h2 data-page-node-id="XTsXHtWMVDi6aGNkraMEGU">实验设计</h2>
+        <ul class="bullets" data-page-node-id="9DhveHK7glzyQPnOHXnZmh">
+          <li data-page-node-id="toDeCovr0R82E3bYQvhlUP">源城里按工作日 24 小时形状把上车多的格子聚成约 8 组，同组共用一个小模型；输入含该格自身近几小时与邻域合计，用长历史训练</li>
+          <li data-page-node-id="e7QC8nQGEduCo5l3V9C4nq">迁到华盛顿时，用该格这三天的形状去选组，不匹配单个源格；组模型只修正形状，再与整城微调合成</li>
+          <li data-page-node-id="ZxLsSKZdCq2jWJWQupwreG">水平仍用第 6 页的 a、b 在 72 小时上拟合，只在三天上车合计 ≥ 150 的格子上做</li>
+          <li data-page-node-id="rLcPEt540U0jHa9JuVkYcl">卷积与 LSTM 结构不动，不逐格重训</li>
+        </ul>
+      </div>
+      <div data-page-node-id="5CMiynf6lpTp3cUI8DRNo9">
+        <h2 data-page-node-id="eSRdPyYEAYAN8GXrjl6fth">判定标准</h2>
+        <div class="lines" data-page-node-id="9SPuaAQWLJ3ZRyDtrSvFfr">
+          <div class="line" data-page-node-id="Fjp5FVjmTKPfKqnePv8riu"><span class="k" data-page-node-id="Hd2ORqHVZWJGM8XXIW2HoV">对照</span><span class="v" data-page-node-id="K0bhK8MjeNFLJY0CpSY4Yf">芝加哥整城微调 + a、b。</span></div>
+          <div class="line" data-page-node-id="sRIiBAb84ffqXBh4AGGlv0"><span class="k" data-page-node-id="G6NP0XoOOgbQ87cX2F7uD6">停止</span><span class="v" data-page-node-id="XFXbvmoSkrqjX02GFh97jA">验证集全市 MAE 不更低就停，不看测试集。</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer data-page-node-id="z9wzzLGKETxxEuxioayqvo"><span class="nav" data-page-node-id="ps6wWYEred3h4aBkT7LmGz"><button data-go="prev" data-page-node-id="gkQ7AINayYn35BwOeqiXh4">‹</button><span data-page-node-id="nDSzsdUYA1f7qIe6pPb1uz">08 / 08</span><button data-go="next" data-page-node-id="uFWrABHjS81LPIVFjH0re8">›</button></span></footer>
+</section>
+
+</div>
+
+<script data-page-node-id="n3nZXBXNgUyQ0neJiyWW1O">
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var cur = 0;
+  function show(i){
+    if(i < 0 || i >= slides.length) return;
+    for(var j = 0; j < slides.length; j++){ slides[j].classList.remove('on'); }
+    cur = i;
+    slides[cur].classList.add('on');
+    fit(slides[cur]);
+  }
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' '){ e.preventDefault(); show(cur+1); }
+    else if(e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); show(cur-1); }
+    else if(e.key === 'Home'){ e.preventDefault(); show(0); }
+    else if(e.key === 'End'){ e.preventDefault(); show(slides.length-1); }
+  });
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-go]');
+    if(!b) return;
+    show(b.getAttribute('data-go') === 'next' ? cur+1 : cur-1);
+  });
+
+  function fit(sl){
+    var body = sl.querySelector('.body');
+    if(!body) return;
+    body.style.zoom = '1';
+    var guard = 0;
+    while(body.scrollHeight > body.clientHeight + 1 && guard < 24){
+      var z = parseFloat(body.style.zoom || '1') - 0.03;
+      if(z < 0.68) break;
+      body.style.zoom = String(z);
+      guard++;
+    }
+  }
+
+  function resize(){
+    var s = document.getElementById('stage');
+    var k = Math.min(window.innerWidth / 1320, window.innerHeight / 760);
+    s.style.transform = 'scale(' + k + ')';
+  }
+  window.addEventListener('resize', function(){ resize(); fit(slides[cur]); });
+  resize();
+  var initial = 0;
+  for(var k = 0; k < slides.length; k++){
+    if(slides[k].classList.contains('on')){ initial = k; break; }
+  }
+  show(initial);
+})();
+</script>
+
+
+</body></html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>系统结构</title>
+<style>
+  :root {
+    --ink: #1c2128;
+    --muted: #59636e;
+    --line: #d0d7de;
+    --paper: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 450;
+    line-height: 1.6;
+  }
+  header, main { width: min(1160px, calc(100% - 32px)); margin: 0 auto; }
+  header { padding: 28px 0 4px; }
+  h1 { font-size: 26px; font-weight: 650; margin: 0 0 8px; }
+  h2 { font-size: 18px; font-weight: 650; margin: 28px 0 8px; }
+  p { margin: 8px 0; font-size: 15.5px; }
+  .lede { margin: 0; color: var(--muted); font-size: 15.5px; }
+  .figure {
+    background: #fff;
+    border: 1px solid var(--line);
+    margin: 14px 0 6px;
+    overflow-x: auto;
+  }
+  .figure svg { display: block; min-width: 1100px; }
+  figcaption { margin: 0 0 8px; color: var(--muted); font-size: 14px; }
+  figcaption strong { color: var(--ink); }
+</style>
+</head>
+<body>
+<header>
+  <h1>系统结构</h1>
+  <p class="lede">纽约或芝加哥的上车记录先训出一个时空网络，再在华盛顿仅有的三天上微调。微调给出的预测，按格子用一个强度 κ 做收缩校正，得到最终的下一小时上车量。</p>
+</header>
+<main>
+  <h2>图 1</h2>
+  <div class="figure" role="img" aria-label="从三城上车网格到微调预测，再到按格收缩校正的数据流">
+    <svg viewBox="0 0 1100 980" width="1100" height="980" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0 0 L10 5 L0 10 Z" fill="#3d4754"/>
+        </marker>
+        <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0 0 L10 5 L0 10 Z" fill="#9a5b12"/>
+        </marker>
+      </defs>
+      <style>
+        .t { font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; fill: #1c2128; font-weight: 500; }
+        .h { font-size: 15px; font-weight: 700; }
+        .s { font-size: 13px; font-weight: 500; }
+        .lab { font-size: 12.5px; font-weight: 650; fill: #3d4754; }
+      </style>
+
+      <rect x="16" y="16" width="1068" height="500" rx="10" fill="#f4f8fb" stroke="#d5e2ee"/>
+      <text class="t h" x="32" y="42" fill="#1a4f7a">预测</text>
+
+      <rect x="32" y="62" width="280" height="132" rx="6" fill="#e8f2fa" stroke="#1a4f7a" stroke-width="1.6"/>
+      <text class="t h" x="46" y="88">三城上车网格</text>
+      <text class="t s" x="46" y="112">纽约、芝加哥、华盛顿</text>
+      <text class="t s" x="46" y="132">每小时一个格子的上车数</text>
+      <text class="t s" x="46" y="152">一年，8784 个小时</text>
+      <text class="t s" x="46" y="172">有效格：458 / 270 / 207</text>
+
+      <line x1="312" y1="128" x2="348" y2="128" stroke="#3d4754" stroke-width="1.7" marker-end="url(#a)"/>
+      <text class="t lab" x="316" y="118">原始计数</text>
+
+      <rect x="350" y="62" width="300" height="132" rx="6" fill="#e8f2fa" stroke="#1a4f7a" stroke-width="1.6"/>
+      <text class="t h" x="364" y="88">分城归一化</text>
+      <text class="t s" x="364" y="112">先按 99.9 分位截断</text>
+      <text class="t s" x="364" y="132">再做 min-max 到本城尺度</text>
+      <text class="t s" x="364" y="152">三座城各自算上下限</text>
+      <text class="t s" x="364" y="172">下限取 max(0, 最小值)</text>
+
+      <line x1="650" y1="128" x2="686" y2="128" stroke="#3d4754" stroke-width="1.7" marker-end="url(#a)"/>
+      <text class="t lab" x="654" y="118">归一化网格</text>
+
+      <rect x="688" y="62" width="376" height="132" rx="6" fill="#e8f2fa" stroke="#1a4f7a" stroke-width="1.6"/>
+      <text class="t h" x="702" y="88">做成样本</text>
+      <text class="t s" x="702" y="112">用过去 6 小时，预测下一小时</text>
+      <text class="t s" x="702" y="132">源城用前面整段训练小时</text>
+      <text class="t s" x="702" y="152">华盛顿只留最后 72 小时</text>
+      <text class="t s" x="702" y="172">2016-08-31 至 09-02</text>
+
+      <path d="M760 194 V230 H247 V250" fill="none" stroke="#3d4754" stroke-width="1.7" marker-end="url(#a)"/>
+      <path d="M980 194 V214 H806 V250" fill="none" stroke="#3d4754" stroke-width="1.7" marker-end="url(#a)"/>
+      <text class="t lab" x="400" y="224">源城训练小时</text>
+      <text class="t lab" x="820" y="210">华盛顿 72 小时</text>
+
+      <rect x="32" y="250" width="430" height="150" rx="6" fill="#fff6ec" stroke="#9a5b12" stroke-width="1.6"/>
+      <text class="t h" x="46" y="276">源城上训练 ST-Net</text>
+      <text class="t s" x="46" y="302">只在源城自己的训练小时上学习</text>
+      <text class="t s" x="46" y="322">损失是有效格的平方误差</text>
+      <text class="t s" x="46" y="342">先对一个 batch 取平均，再对格子求和</text>
+      <text class="t s" x="46" y="362">验证集用来决定何时停下</text>
+      <text class="t s" x="46" y="382">得到可迁移的网络权重</text>
+
+      <path d="M462 326 H538" fill="none" stroke="#9a5b12" stroke-width="1.7" stroke-dasharray="6 4" marker-end="url(#aw)"/>
+      <text class="t lab" x="468" y="316" fill="#9a5b12">复制权重</text>
+
+      <rect x="548" y="250" width="516" height="150" rx="6" fill="#fff6ec" stroke="#9a5b12" stroke-width="1.6"/>
+      <text class="t h" x="562" y="276">在华盛顿三天上微调</text>
+      <text class="t s" x="562" y="302">换上华盛顿的有效格掩码，参数全部解开</text>
+      <text class="t s" x="562" y="322">只用这 72 小时的任务损失，不再加别的项</text>
+      <text class="t s" x="562" y="342">网络输出经过 sigmoid，落在 0 到 1</text>
+      <text class="t s" x="562" y="362">再乘回华盛顿自己的截断区间</text>
+      <text class="t s" x="562" y="382">得到上车量预测 p</text>
+
+      <rect x="32" y="418" width="500" height="82" rx="6" fill="#fff" stroke="#9a5b12" stroke-width="1.4"/>
+      <text class="t h" x="46" y="442">两个 ST-Net 是同一个结构</text>
+      <text class="t s" x="46" y="464">6 小时共用 3×3 卷积和 3 个残差块</text>
+      <text class="t s" x="46" y="484">按格子进 LSTM，sigmoid 后留有效格</text>
+
+      <path d="M806 400 V524 H157 V586" fill="none" stroke="#3d4754" stroke-width="1.7" marker-end="url(#a)"/>
+      <text class="t lab" x="560" y="518">上车量预测 p</text>
+
+      <rect x="16" y="540" width="1068" height="420" rx="10" fill="#f8f5fb" stroke="#e0d4ee"/>
+      <text class="t h" x="32" y="566" fill="#5c3d82">按格收缩</text>
+
+      <rect x="32" y="586" width="250" height="150" rx="6" fill="#fff" stroke="#5c3d82" stroke-width="1.6"/>
+      <text class="t h" x="46" y="612">先看这一格忙不忙</text>
+      <text class="t s" x="46" y="638">用三天的原始上车合计</text>
+      <text class="t s" x="46" y="658">满 150 的 50 个格子</text>
+      <text class="t s" x="46" y="678">进入右边的校正</text>
+      <text class="t s" x="46" y="706">不满的格子</text>
+      <text class="t s" x="46" y="726">预测 p 直接送出去</text>
+
+      <path d="M157 736 V910 H961 V760" fill="none" stroke="#3d4754" stroke-width="1.6" marker-end="url(#a)"/>
+      <text class="t lab" x="420" y="902">不满 150 的格子，原预测直接送出</text>
+
+      <line x1="282" y1="660" x2="318" y2="660" stroke="#3d4754" stroke-width="1.7" marker-end="url(#a)"/>
+      <text class="t lab" x="286" y="650">过门格的 p</text>
+
+      <rect x="320" y="586" width="500" height="214" rx="6" fill="#f3eaf8" stroke="#5c3d82" stroke-width="1.6"/>
+      <text class="t h" x="336" y="612">用 κ 把预测往「少改」的方向收</text>
+      <text class="t s" x="336" y="638">先用这 72 小时算出该格预测的平均值 p̄</text>
+      <text class="t s" x="336" y="660">校正拆成两截：偏离平均的部分乘 α，整体再加 c</text>
+      <text class="t s" x="336" y="684">p′ = p + α(p − p̄) + c</text>
+      <text class="t s" x="336" y="708">拟合时惩罚 α p̄ 和 c，力度由 κ 决定</text>
+      <text class="t s" x="336" y="728">κ 越大，校正越接近「原预测不动」</text>
+      <text class="t s" x="336" y="752">一个城市、一次训练只定一个 κ</text>
+      <text class="t s" x="336" y="774">在这三天里留一天轮流试，取误差最小的</text>
+
+      <line x1="820" y1="690" x2="856" y2="690" stroke="#3d4754" stroke-width="1.7" marker-end="url(#a)"/>
+      <text class="t lab" x="824" y="680">p′</text>
+
+      <rect x="858" y="620" width="206" height="140" rx="6" fill="#fff" stroke="#1e6b45" stroke-width="1.6"/>
+      <text class="t h" x="872" y="648">下一小时上车量</text>
+      <text class="t s" x="872" y="674">过门格用 p′</text>
+      <text class="t s" x="872" y="694">其余格用原来的 p</text>
+      <text class="t s" x="872" y="720">拼回华盛顿</text>
+      <text class="t s" x="872" y="740">207 个有效格</text>
+    </svg>
+  </div>
+  <figcaption><strong>图 1.</strong> 实线是数据，虚线是权重复制。上面一半把源城学到的网络搬到华盛顿，在三天上微调，得到上车量预测。下面一半只改那些三天里上车较多的格子：用一个全城共用的 κ，把「形状上的修正」和「整体高低」一起往不改的方向收。</figcaption>
+
+  <h2>数据走到哪</h2>
+  <p>原始上车数按城市分开做截断和 min-max，所以进网络之前，每座城都在自己的尺度里。滑窗之后，源城的长序列用来训练 ST-Net；华盛顿只把最后 72 个小时拿来微调。微调时网络换的是华盛顿的有效格，损失仍然只看预测和真实上车的平方差。</p>
+  <p>网络吐出来的是 0 到 1 之间的数，乘回华盛顿的截断区间后才是上车量 p。p 按格子分两路：三天合计不到 150 的格子不再处理；过了这道门的格子，先在这 72 小时上求预测均值，再解 α 和 c。α 管这一小时相对均值偏高还是偏低，c 管这一格整体偏高还是偏低。κ 是这两项往回拉的力度，三天里用留一天定下来，同一个城市同一次微调共用一个值。校正后的 p′ 和没改的格子拼在一起，就是最终的下一小时上车量。</p>
+</main>
+</body>
+</html>

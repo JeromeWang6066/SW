@@ -1,0 +1,120 @@
+{
+  "trained": false,
+  "seed": 42,
+  "gate": 150,
+  "commercial_classes": [
+    "金融",
+    "购物",
+    "住宿",
+    "公司",
+    "餐饮"
+  ],
+  "summary": {
+    "n_valid": 207,
+    "n_zero_poi": 10,
+    "dominant_share_median": 0.4,
+    "dominant_share_p25": 0.29545454545454547,
+    "frac_dominant_below_0.4": 0.47342995169082125,
+    "residential_poi_total": 46.0,
+    "residential_share_ge_0.3": 0,
+    "neighbor_same_median": 0.75,
+    "road_positive": 207,
+    "road_diagonal": 149158.0,
+    "ratio_n": 35,
+    "ratio_gap_median": 0.019848802733762827,
+    "gate_n": 50,
+    "gate_and_commercial": 20,
+    "gate_not_commercial": 30,
+    "commercial_not_gate": 21,
+    "finetune_mae": 1.4773075183814701
+  },
+  "groups": [
+    {
+      "label": "商业就业",
+      "n": 41,
+      "trip_share": 0.5445610089302717,
+      "ae_share": 0.44304688125721303,
+      "three_median": 135.0,
+      "n_gate": 20,
+      "mae_scratch": 4.034566866098664,
+      "mae_finetune": 3.304510076977704,
+      "mae_kd": 3.6421318263628173
+    },
+    {
+      "label": "居住",
+      "n": 0,
+      "trip_share": 0.0,
+      "ae_share": 0.0,
+      "three_median": null,
+      "n_gate": 0,
+      "mae_scratch": null,
+      "mae_finetune": null,
+      "mae_kd": null
+    },
+    {
+      "label": "混合",
+      "n": 156,
+      "trip_share": 0.4550966901118801,
+      "ae_share": 0.5546710914126621,
+      "three_median": 23.5,
+      "n_gate": 30,
+      "mae_scratch": 1.3950012349822105,
+      "mae_finetune": 1.0873070072408062,
+      "mae_kd": 1.3396765048050472
+    },
+    {
+      "label": "无兴趣点",
+      "n": 10,
+      "trip_share": 0.0003423009578481593,
+      "ae_share": 0.0022820273301249073,
+      "three_median": 1.0,
+      "n_gate": 0,
+      "mae_scratch": 0.40705172029220393,
+      "mae_finetune": 0.06978500193127224,
+      "mae_kd": 0.3613284499363767
+    }
+  ],
+  "methods": [
+    {
+      "name": "一律芝加哥微调",
+      "mae": 1.4773075183814701,
+      "delta_vs_finetune": 0.0,
+      "n_not_finetune": 0
+    },
+    {
+      "name": "三天不少于 150 才按芝加哥分档",
+      "mae": 1.473658719349523,
+      "delta_vs_finetune": -0.0036487990319471475,
+      "n_not_finetune": 4
+    },
+    {
+      "name": "只在商业就业格按芝加哥分档",
+      "mae": 1.493140279413862,
+      "delta_vs_finetune": 0.01583276103239184,
+      "n_not_finetune": 20
+    },
+    {
+      "name": "商业就业且三天不少于 150 才按芝加哥分档",
+      "mae": 1.474499198113307,
+      "delta_vs_finetune": -0.0028083202681630226,
+      "n_not_finetune": 3
+    },
+    {
+      "name": "每个格子事后取三者最小，上界",
+      "mae": 1.427615614658733,
+      "delta_vs_finetune": -0.04969190372273702,
+      "n_not_finetune": 34
+    },
+    {
+      "name": "只在三天少于 150 的格子上取事后最小，上界",
+      "mae": 1.470900726831249,
+      "delta_vs_finetune": -0.006406791550221058,
+      "n_not_finetune": 6
+    }
+  ],
+  "reading": [
+    "华盛顿有效格 207 个，其中 10 个没有兴趣点。有兴趣点的格子里，最大一类占比的中位数是 0.40，低于 0.4 的占 47.3%。和周围有效格标签相同的比例，中位数是 0.75。",
+    "三天上车不少于 150 的有 50 个，其中商业就业 20 个，不是商业就业的 30 个。商业就业但没过这道门的有 21 个。",
+    "种子 42 的芝加哥微调测试 MAE 是 1.4773。只在过门格子上按档拼接，MAE 变为 1.4737，差 -0.0036。再要求商业就业，MAE 变为 1.4745，差 -0.0028。门下格子即使事后每格挑误差最小的模型，全城 MAE 也只再低 0.0064。"
+  ]
+}

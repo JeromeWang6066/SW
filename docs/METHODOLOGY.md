@@ -1,6 +1,6 @@
 # 方法与数据流
 
-日期：2026-11-16。这一页按当前仓库里的脚本和文档，把已经做完的方法串成一条管线。指标的出处是 [RESULTS.md](RESULTS.md)、[CALENDAR_RESULTS.md](CALENDAR_RESULTS.md) 和 [profiles/](profiles/README.md)。和论文比相对下降见 [PAPER_COMPARISON.md](PAPER_COMPARISON.md)。匹配源格的归一化见 [profiles/matched_cell_normalization.md](profiles/matched_cell_normalization.md)。按格 \(a,b\) 的公式见 [profiles/cell_affine_explain.md](profiles/cell_affine_explain.md)。
+日期：2026-11-16。这一页按当前仓库里的脚本和文档，把已经做完的方法串成一条管线。系统结构图在 [architecture.html](architecture.html)，用浏览器打开即可。指标的出处是 [RESULTS.md](RESULTS.md)、[CALENDAR_RESULTS.md](CALENDAR_RESULTS.md) 和 [profiles/](profiles/README.md)。和论文比相对下降见 [PAPER_COMPARISON.md](PAPER_COMPARISON.md)。匹配源格的归一化见 [profiles/matched_cell_normalization.md](profiles/matched_cell_normalization.md)。按格 \(a,b\) 的公式见 [profiles/cell_affine_explain.md](profiles/cell_affine_explain.md)。
 
 [HANDOFF.md](HANDOFF.md) 后半仍是 2026-11-04 前后的交接，分组是否跑完以本页和 RESULTS 为准。Group 3 的工作日 Pearson 乘子还没有实现，这里只作为已批准、公式未定的后续记一笔。
 

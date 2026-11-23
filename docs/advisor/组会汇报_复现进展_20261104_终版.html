@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="Mgi3YSRJakZd8vx5fH7xNm" style=""><head data-page-node-id="Q8LQrFrcXqGyaU6FqvxjmR">
+<meta charset="UTF-8" data-page-node-id="gLHoiOwt7AkXEfgqTMkGFT">
+<meta name="viewport" content="width=device-width, initial-scale=1" data-page-node-id="csU8AleydukryEBnldTRnH">
+<title data-page-node-id="EVNfydQqCsrpQetcJ7Nmjx">跨城市交通流知识蒸馏 · 复现实验进展汇报</title>
+<style data-page-node-id="OH2DydzgUFHhtrP52vTZOo">
+  :root{
+    --ink:#1d1d1f; --sub:#6e6e73; --faint:#86868b;
+    --rule:#d8d8dc; --hair:#e8e8ed; --accent:#0071e3; --warn:#96682a;
+    --u:8px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    background:#000; overflow:hidden;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased; color:var(--ink);
+    display:flex; align-items:center; justify-content:center;
+  }
+  #stage{
+    position:relative; width:1280px; height:720px; flex:none;
+    background:#fff; overflow:hidden;
+    box-shadow:0 24px 80px rgba(0,0,0,.45);
+    transform-origin:center center;
+  }
+
+  /* ---- 幻灯片：visibility 切换，避免叠页 ---- */
+  .slide{
+    position:absolute; inset:0; padding:52px 72px 46px;
+    display:flex; flex-direction:column;
+    visibility:hidden; opacity:0; transition:opacity .28s ease;
+    background:#fff;
+  }
+  .slide.on{visibility:visible; opacity:1; z-index:2}
+
+  /* 封面：白底，与内页一致 */
+  .slide.cover{
+    background:#fff; color:var(--ink);
+    justify-content:center; align-items:center; text-align:center; padding:72px 96px;
+    visibility:hidden;
+  }
+  .slide.cover.on{visibility:visible}
+  .cover .kicker{
+    font-size:15px; letter-spacing:.22em; color:var(--faint);
+    text-transform:uppercase; margin-bottom:28px;
+  }
+  .cover h1{
+    font-size:58px; font-weight:700; line-height:1.22;
+    letter-spacing:-.015em; max-width:1000px;
+  }
+  .cover .sub{
+    margin-top:26px; font-size:21px; line-height:1.75;
+    color:var(--sub); font-weight:400; max-width:860px;
+  }
+  .cover .meta{
+    margin-top:56px; padding-top:22px; border-top:1px solid var(--rule);
+    display:flex; justify-content:center; gap:56px; font-size:14.5px; color:var(--faint); line-height:1.7;
+  }
+  .cover .meta b{display:block; color:var(--ink); font-weight:600; font-size:15.5px}
+
+  /* 页眉页脚 */
+  header{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-size:11.5px; letter-spacing:.16em; color:var(--faint);
+    text-transform:uppercase; padding-bottom:14px; border-bottom:1px solid var(--hair);
+    flex:none;
+  }
+  footer{
+    display:flex; justify-content:flex-end; align-items:center;
+    margin-top:auto; padding-top:12px; border-top:1px solid var(--hair);
+    font-size:11.5px; color:var(--faint); flex:none;
+  }
+  footer .nav{display:flex; align-items:center; gap:14px}
+  footer button{
+    width:30px; height:30px; border:1px solid var(--rule); background:#fff;
+    border-radius:50%; cursor:pointer; font-size:15px; color:var(--sub);
+    line-height:1;
+  }
+  footer button:hover{border-color:var(--ink); color:var(--ink)}
+
+  /* 标题区 */
+  h1.title{
+    font-size:37px; font-weight:700; letter-spacing:-.012em;
+    line-height:1.28; margin:26px 0 8px; flex:none;
+  }
+  .lede{
+    font-size:16.5px; line-height:1.72; color:var(--sub);
+    max-width:1060px; margin-bottom:18px; flex:none;
+  }
+
+  /* 内容区：唯一测量高度的容器 */
+  .body{flex:1; min-height:0; overflow:hidden}
+  .slide.center-body .body{display:flex; align-items:center}
+  .slide.center-body .body>.cols{width:100%}
+
+  /* 文本组件 */
+  .cols{display:grid; gap:34px}
+  .cols.c2{grid-template-columns:1fr 1fr}
+  .cols.wide{grid-template-columns:1.32fr 1fr}
+  .cols.narrow{grid-template-columns:.86fr 1.14fr}
+  .cols.plan{grid-template-columns:1.12fr 1fr}
+
+  h2{
+    font-size:15px; font-weight:650; letter-spacing:.02em;
+    color:var(--ink); margin:0 0 12px;
+    padding-bottom:8px; border-bottom:1px solid var(--rule);
+  }
+  h2.mt{margin-top:26px}
+
+  .lines{display:flex; flex-direction:column; gap:11px}
+  .line{display:grid; grid-template-columns:86px 1fr; gap:16px; align-items:baseline}
+  .line .k{font-size:13px; font-weight:650; color:var(--ink); letter-spacing:.02em}
+  .line .v{font-size:13.8px; line-height:1.68; color:#3a3a3c}
+
+  .bullets{list-style:none; display:flex; flex-direction:column; gap:10px}
+  .bullets li{
+    font-size:14.2px; line-height:1.7; color:#3a3a3c;
+    padding-left:22px; position:relative;
+  }
+  .bullets li::before{
+    content:""; position:absolute; left:2px; top:.62em;
+    width:7px; height:7px; border-radius:50%; background:var(--ink);
+  }
+  .bullets.plain li{padding-left:0}
+  .bullets.plain li::before{display:none}
+
+  p.note{
+    font-size:12.2px; line-height:1.62; color:var(--faint); margin-top:12px;
+  }
+
+  .statement{
+    border-left:2.5px solid var(--ink); padding:4px 0 4px 16px;
+    font-size:14px; line-height:1.72; color:#3a3a3c; margin-top:16px;
+  }
+  .statement strong{color:var(--ink); font-weight:650}
+
+  .ph{color:var(--warn); font-style:normal; font-weight:600}
+  .tag{
+    display:inline-block; font-size:11px; font-weight:650; letter-spacing:.08em;
+    padding:2.5px 9px; border-radius:999px; border:1px solid var(--rule);
+    color:var(--sub); vertical-align:2px;
+  }
+  .tag.done{border-color:#b9d4c2; color:#2c6a3f; background:#f2faf5}
+  .tag.todo{border-color:#e4d3b3; color:var(--warn); background:#fdf8ef}
+
+  /* 大数字 */
+  .hero{display:flex; gap:0; margin:6px 0 4px}
+  .hero .cell{flex:1; padding:14px 22px 12px 0}
+  .hero .cell + .cell{border-left:1px solid var(--hair); padding-left:26px}
+  .hero .n{font-size:46px; font-weight:700; letter-spacing:-.022em; line-height:1.05; color:var(--ink)}
+  .hero .n em{font-style:normal; font-size:20px; font-weight:600; color:var(--sub); margin-left:3px}
+  .hero .l{font-size:12.5px; color:var(--faint); margin-top:8px; line-height:1.55}
+
+  /* 表格 */
+  table{width:100%; border-collapse:collapse; font-size:13.2px}
+  th{
+    text-align:left; font-weight:650; color:var(--faint);
+    font-size:11.2px; letter-spacing:.1em; text-transform:uppercase;
+    padding:0 12px 9px 0; border-bottom:1px solid var(--rule);
+  }
+  td{
+    padding:9.5px 12px 9.5px 0; border-bottom:1px solid var(--hair);
+    color:#3a3a3c; line-height:1.5; vertical-align:baseline;
+  }
+  tr:last-child td{border-bottom:none}
+  td.id{font-weight:650; color:var(--ink); white-space:nowrap}
+  td.num{font-variant-numeric:tabular-nums; white-space:nowrap}
+  td.best{color:var(--ink); font-weight:650}
+  .hl-row td{background:#f6f6f8}
+
+  /* 公式 */
+  .eqbox{display:flex; flex-direction:column; gap:0}
+  .eq{
+    display:flex; justify-content:space-between; align-items:center; gap:20px;
+    padding:15px 0; border-bottom:1px solid var(--hair);
+  }
+  .eq:last-child{border-bottom:none}
+  .eq .eqbody{
+    font-size:16.5px; line-height:1.95; color:var(--ink);
+    font-family:"Cambria Math","Times New Roman",Georgia,serif;
+  }
+  .eq .eqbody .roman{font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif; font-size:13.5px}
+  .eqn{font-size:12.5px; color:var(--faint); flex:none; font-variant-numeric:tabular-nums}
+  .frac{display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px}
+  .frac>span:first-child{border-bottom:1.2px solid var(--ink); padding:0 8px 2px}
+  .frac>span:last-child{padding:2px 8px 0}
+  .sym{font-size:11.8px; line-height:1.75; color:var(--faint); margin-top:14px}
+
+  /* 图 */
+  .fig{margin-top:12px}
+  .fig svg{display:block; width:100%}
+  .figcap{font-size:11.8px; line-height:1.6; color:var(--faint); margin-top:10px}
+
+  /* 下周规划强调条 */
+  .planbar{
+    display:flex; align-items:baseline; gap:18px;
+    padding:13px 0 13px 16px; border-left:2.5px solid var(--accent);
+    margin-bottom:16px;
+  }
+  .planbar .t{font-size:14.5px; font-weight:650; color:var(--ink); flex:none}
+  .planbar .d{font-size:13.2px; color:var(--sub); line-height:1.6}
+
+  .noborder{border:none !important; padding-bottom:4px !important}
+</style>
+<style id="__dm_no_drag_style__" data-page-node-id="C90DjOm6aKO7F3s9bRmA9A">* { -webkit-user-drag: none !important; }</style><style id="__dm_bindable_badge_style__" data-page-node-id="aKmeIGzxoE60eLDDvFDk6B">[data-sp-bindable="database"]{outline:1px dashed #0088ff;outline-offset:2px;border-radius:4px;}[data-sp-bindable="database"] *{pointer-events:none !important;transition:none !important;animation:none !important;}[data-sp-bindable="database"]{transition:none !important;animation:none !important;}</style></head>
+<body style="position: relative;" data-page-node-id="BfPsACCTGt5T4Yy6siW8QC">
+<div id="stage" style="transform: scale(1.64474);" data-page-node-id="SWXlmjXJM4Tthjaijq4c4h">
+
+<!-- ================= 01 封面 ================= -->
+<section class="slide cover on" data-page-node-id="TCeyGumBnocEHoafHUhrlF">
+  
+  <h1 data-page-node-id="ND9gdDz1RelDO1u2tVIJJY">基于日周期轮廓相关的<br data-page-node-id="Uu5UvkmAHdGEF8j8APs5AZ">跨城市交通流知识蒸馏</h1>
+  <div class="sub" style="font-weight: 400;" data-page-node-id="NHjK3QBHb3W0uyMjnwn9nU">复现实验进展汇报&nbsp;<br data-page-node-id="8QqxoPoQ3Zxfwj39EV73DG"></div>
+  <div class="meta" data-page-node-id="pmdqEP3S0hG7eiZZmfDosz">
+    <div data-page-node-id="QBfVL95A4ZwjlW5b9Ol0Ve"><b data-page-node-id="GQHmgjF7EurS3mUzYlAW2F">王天遥 Tianyao Wang</b>学生</div>
+    <div data-page-node-id="bILXZOfDdgGdiBPPTVc2dQ"><b data-page-node-id="dQVEZRByKf6yynvhFR7wNq">2026-11-04</b>组会汇报</div>
+    
+    
+  </div>
+</section>
+
+<!-- ================= 02 问题与设定 ================= -->
+<section class="slide" data-page-node-id="WOBdYzBrFfVlOZDXUpKCzj">
+  <header data-page-node-id="LAHFTaoxvOkcyEyZlYQDxu"><span data-page-node-id="0skXcG2WaJ1cTzFRs0fJeG">问题定义</span><span data-page-node-id="n8dLskYKo75cw7D6LYHldk">02</span></header>
+  <h1 class="title" data-page-node-id="HXNiX45gRBRRMV7yacjHg3">网格不对齐下的少样本跨城预测</h1>
+  <p class="lede" data-page-node-id="KnT6aHcqeZ5afYLUg0vzO7">源城（纽约 / 芝加哥）数据充足，目标城（华盛顿）仅有 3 天训练数据；两城网格无法逐格对应，区域编号不能直接互拷。</p>
+  <div class="body" data-page-node-id="xmQUXn2D9H3z9q2F4YXA2y" style="zoom: 1;">
+    <div class="cols wide" data-page-node-id="i5if9NXJEjCGlAjzHOkwLA">
+      <div data-page-node-id="WxfTPAujuNGGiRKExu6oIp">
+        <h2 data-page-node-id="h7lMjsBdLIVJv7P6YQ4KKH">任务设定</h2>
+        <div class="lines" data-page-node-id="HntXI4VvvES6xLluVCK7rX">
+          <div class="line" data-page-node-id="UsbEGOmrfGpyniZTghG0lC"><span class="k" data-page-node-id="pENTZ2lgGfB3I8yMOBRqBJ">输入 / 输出</span><span class="v" data-page-node-id="ZYj2iti2bjy2OjYBJRZGa3">过去 6 小时网格出租车上车量，预测下一小时。</span></div>
+          <div class="line" data-page-node-id="HSBwZWNyPYbsdfRACxIs04"><span class="k" data-page-node-id="wrZG9tNqipKXmPzpvDwDuR">源城教师</span><span class="v" data-page-node-id="m6QRqi8Z2QpckifztzH2Cc">纽约或芝加哥上训练 ST-Net，训练后冻结。</span></div>
+          <div class="line" data-page-node-id="RgExGeGcFrsi0GPiZfdepW"><span class="k" data-page-node-id="PLKybIHH8eHUBIFqjz3z7R">目标城</span><span class="v" data-page-node-id="eCjQNp0EBFXSAmkYOxG7Vm">华盛顿，STBaT 式 3 天 few-shot（72 小时）。</span></div>
+          <div class="line" data-page-node-id="AhEzHZSGx9KzL0XKJXqFHB"><span class="k" data-page-node-id="qk3FCNg1AIkTBRPmFA96Yc">核心问题</span><span class="v" data-page-node-id="I9GO38IbbtsMqpF3KbiS8e">在区域不对齐的前提下，跨城知识迁移能否稳定优于目标城从零训练。</span></div>
+          <div class="line" data-page-node-id="2zYEskb9Gijxts7DCw4wQu"><span class="k" data-page-node-id="NER29avYVY1uA8YGEetfhH">阶段范围</span><span class="v" data-page-node-id="rhGxsc1Csm4rXJeV8D4o9j">第一阶段仅预测出租车上车量；下车量、单车通道未纳入。</span></div>
+        </div>
+        <div class="statement" data-page-node-id="yTVoUkia78LTzuAJvywy8s">研究假设：以工作日 24 小时轮廓相关 ρ̃ 调制蒸馏项，可降低不相似区域带来的负迁移。<strong data-page-node-id="pQ8tR0q3ewiI2F9eD9pGZW">该假设本次尚未检验。</strong></div>
+      </div>
+      <div data-page-node-id="pFd5G3PTtWq3jkqggO6lDb">
+        <h2 data-page-node-id="BA6uIsyQRKAshf1kwHhCTr">数据概览</h2>
+        <table data-page-node-id="JE42xZQwFGdUYMnukrIvhD">
+          <tbody data-page-node-id="WkFwbiwRhWzhBlzptjxO3E"><tr data-page-node-id="LXs6mng4Q3fB0qIwZwNLtX"><th data-page-node-id="P6dEvjJn0RF6HR83xDTge3">城市</th><th data-page-node-id="ftnqxFFMRGDFCWPC7Qc8JV">网格</th><th data-page-node-id="yWYj5Bgj9t0t901UCjSeIH">有效格</th><th data-page-node-id="1cDcWlo7XhCGYqtLfMJJw8">角色</th></tr>
+          <tr data-page-node-id="2mvIbKSEUCvIBPSRbfDnnS"><td class="id" data-page-node-id="DuqK4bsHFkMnV49ZZbqaUO">纽约 NY</td><td class="num" data-page-node-id="po24WJpUQsLmc96DHnN3FV">20 × 23</td><td class="num" data-page-node-id="K5cZZWh2fgpfqeNsfytrg5">458</td><td data-page-node-id="M8B8I76KHU95vF2XilGpeB">源城</td></tr>
+          <tr data-page-node-id="fdVALdQllS3FTFUweA4SFP"><td class="id" data-page-node-id="GEaAhmppwrmTVpk5yCmL6j">芝加哥 CHI</td><td class="num" data-page-node-id="OOTSCz2CA3Kc32VQCPeQ09">17 × 28</td><td class="num" data-page-node-id="va3Hof1CtKEs0ysjvcDdXr">270</td><td data-page-node-id="Nlc2rm3tr6tL7B7GezybOm">源城</td></tr>
+          <tr data-page-node-id="ceNiCCQKwPHAA725XgLPtc"><td class="id" data-page-node-id="MGGcPSS9xSEY4LECyN4Vve">华盛顿 DC</td><td class="num" data-page-node-id="Xms8IMJKaIjUeuE1GA81sN">21 × 20</td><td class="num" data-page-node-id="fqyH0zcBqacAvlTTlHTWDL">207</td><td data-page-node-id="SLgJAjs4CtR4jBKV3Hgozp">目标城</td></tr>
+        </tbody></table>
+        <p class="note" data-page-node-id="r6espuPxyDMECk0vOvbLdx">数据为 CrossTReS 公开包 crosstres_data.zip 的 Taxi pickup 通道，T = 8784 小时（约一年）。有效格指流量和 &gt; 0 的格子；与文献中的网格总数（460 / 476 / 420）口径不同。</p>
+      </div>
+    </div>
+  </div>
+  <footer data-page-node-id="BIaen3YPlGmW9TfYchpSDf"><span class="nav" data-page-node-id="DtHvu7Lam2k2T1MBdRS7de"><button data-go="prev" data-page-node-id="c0S6hVHAJO4gOlaTW00xfo">‹</button><span data-page-node-id="hL9YzzUX3KfFqJ4u0wPaI4">02 / 11</span><button data-go="next" data-page-node-id="ouFMihMpBGB781oCUKbiMS">›</button></span></footer>
+</section>
+
+<!-- ================= 03 计划 vs 实跑 ================= -->
+<section class="slide" data-page-node-id="0UVBb7rW9CDiFUyAVmzuok">
+  <header data-page-node-id="p0tEnBNJDl9Ss8IaESu4xR"><span data-page-node-id="MxCchVMXV6aYsvgvXTQPyO">实验设计</span><span data-page-node-id="TEw7n6il1b2l57kPXBlCyX">03</span></header>
+  <h1 class="title" data-page-node-id="sGpz0W491MGzZvnSXuQPvi" style="">当前实验复现进度​​</h1>
+  <p class="lede" data-page-node-id="KzoaxsfritQyneUxOe8kBw">选题定义了四组递进对照；目前已完成前两组的等价实验，核心的乘子对照尚未开始。</p>
+  <div class="body" data-page-node-id="hrHTaZjPGtNGPmqh41Ji3E" style="zoom: 1;">
+    <table data-page-node-id="NWEC4V5ZxVktOdWYMH9mpv">
+      <tbody data-page-node-id="OAf7d8s9OeXZjCDkEHxVvm"><tr data-page-node-id="VviP6w7sEdtDnUmT1MdxV1"><th style="width:56px" data-page-node-id="CfrAQKwBEZ5pAFsrngBLRz">组</th><th style="width:300px" data-page-node-id="ctO3HvyO5roKh4rIYTNqxo">选题计划</th><th data-page-node-id="VCa0QRgh2H3jVUHVwdPD5n">实际执行</th><th style="width:96px" data-page-node-id="9M0BAbPpbLrq0T1MnSqhMW">状态</th></tr>
+      <tr data-page-node-id="P9OIKh91rBzUfm9wNCdlL4">
+        <td class="id" data-page-node-id="CvXTf6hqogS8gFDNgsjaNM">①</td>
+        <td data-page-node-id="wLuzBqhLOEMPp1vamFBSrs">华盛顿 3 天，随机初始化从零训练</td>
+        <td data-page-node-id="PVR5l1QNRBDQfTtFz8AVb9">G1-tgt-3d，已完成并三种子重跑</td>
+        <td data-page-node-id="snMMckPTrq8E9cucwJksBH"><span class="tag done" data-page-node-id="YDYhst2HqgeaGagtud7XE1">已完成</span></td>
+      </tr>
+      <tr data-page-node-id="1ne0TUvowbSoiEsRShBUqb">
+        <td class="id" data-page-node-id="caDyQ5GSlJlPebjJYUuPwi">②</td>
+        <td data-page-node-id="HmCQ7Ho0tondCypeiHGrlt">复制源城权重，λ = 0，仅微调</td>
+        <td data-page-node-id="6V5kRoU7nyvgxMN8AIXYCw">G1-C（NY→DC、CHI→DC），全参数微调，无蒸馏</td>
+        <td data-page-node-id="nnH5SNoayxcRctL17hN1uj"><span class="tag done" data-page-node-id="gFwItClqTP57qqVoqEH9iM">已完成</span></td>
+      </tr>
+      <tr data-page-node-id="NEDBpZEwp1y9kjjqERi4fk">
+        <td class="id" data-page-node-id="J8TD6d0Q3plBQnNjUPugAv">③</td>
+        <td data-page-node-id="JP7nX8Ot22AqNDIQMfYIEG">同一配对上均匀蒸馏，乘子恒为 1</td>
+        <td data-page-node-id="RImQiIXtPtHQHlcxujr7bP">实跑为 Group 2：预测输出上的 MSE 蒸馏，教师直接读取华盛顿窗口，<strong data-page-node-id="H2ZGOtE1M0lzoWozxe4Zs5">无区域配对</strong>，乘子恒 1</td>
+        <td data-page-node-id="Y9IVXDIgoGJqCSpzQ3FKqn"><span class="tag done" data-page-node-id="0vKPbHuJCT1NbCY7y4cOS4">替代版本</span></td>
+      </tr>
+      <tr data-page-node-id="aO4r0DAMdjccYwdHyE2vKj">
+        <td class="id" data-page-node-id="4cSsqClBKeK2gu8qhZYviV">④</td>
+        <td data-page-node-id="SeGLlJg2h1UARtlWiM7GVf">同一配对，乘子为截断 Pearson ρ̃</td>
+        <td data-page-node-id="agWYkbhzV7JZUIGSMY06jy">未实现。pearson_weekday_profile.py 仅保留接口</td>
+        <td data-page-node-id="ldXY6mEjjXffHn0tpfYmtB"><span class="tag todo" data-page-node-id="lgkEbsdp41nNWV1XxHAD9O">未做</span></td>
+      </tr>
+    </tbody></table>
+    
+    <p class="note" data-page-node-id="aMOX8XFRtmE7MJwWrDKYVK">另有两项计划外补充实验：教师初始化后再蒸馏（G2-*-init）、芝加哥 → 华盛顿的 λ 扫描。这两项用于回答「蒸馏收益来自初始化还是蒸馏项」。</p>
+  </div><footer data-page-node-id="RnAvvHAnGdg6H01RaI8pzH"><span class="nav" data-page-node-id="HwhbozIfzZI9CXuKidC8Sv"><button data-go="prev" data-page-node-id="nBtFTc4PcwsesTCmkf7sLc">‹</button><span data-page-node-id="jn8NFwPWHl0cHQxAblnyXr">03 / 11</span><button data-go="next" data-page-node-id="7FKmgDhLmvkGLhpn1EHeZl">›</button></span></footer>
+  
+</section>
+
+<!-- ================= 04 复现流程 ================= -->
+<section class="slide" data-page-node-id="soQHMIsJmMpwtG9H20hwVU">
+  <header data-page-node-id="PuEILQ1EvkC4xIWmfZXEnn"><span data-page-node-id="63GMjkWfhjG4ENDSOWWCUS">复现流程</span><span data-page-node-id="Gn8OCwMPKnfTHZZpAMeKPz">04</span></header>
+  <h1 class="title" data-page-node-id="tGiS5k59Z2kjEhLFivlHcy">执行链路</h1>
+  <p class="lede" data-page-node-id="ISOIQUhBbnoiStEWKg0fTD">从数据落地到指标产出的完整链条。前四步已完成，第五步（乘子方法）为下一阶段。</p>
+  <div class="body" data-page-node-id="LHkGyEtGSvrYKnpNzpuSOQ" style="zoom: 1;">
+    <div class="fig" data-page-node-id="AVlRWxFa5P6GRdEC0wi4Aw">
+      <svg viewBox="0 0 1120 132" role="img" aria-label="复现执行链路" data-page-node-id="6bxBvG7zNKgdER2AjGbHd2" style="">
+        <title data-page-node-id="VYey1HURZKi1r1trZCi3LS">复现执行链路</title>
+        <g font-family="-apple-system, Segoe UI, Microsoft YaHei, sans-serif" data-page-node-id="K6H6W8abICoA7rjdJVIBJe">
+          <!-- 节点 -->
+          <g data-page-node-id="t2O16bRiZfX6d3LTphDhTL">
+            <rect x="4" y="18" width="196" height="72" rx="10" fill="#1d1d1f" data-page-node-id="J6DWPMlmRNe5tYoNZ13500"></rect>
+            <text x="102" y="48" text-anchor="middle" font-size="14.5" font-weight="650" fill="#fff" data-page-node-id="UWIWxmYUruLQ8q0I1r013F">① 数据落地</text>
+            <text x="102" y="70" text-anchor="middle" font-size="11.5" fill="#a1a1a6" data-page-node-id="yVMHWDoOh0DRZWyEXuJXQH">zip 核验 · 形状检查</text>
+          </g>
+          <g data-page-node-id="hNsBOXqr966tl1NHmp2Emi">
+            <rect x="238" y="18" width="196" height="72" rx="10" fill="#1d1d1f" data-page-node-id="HKYTGqHAG9s8o1QeLTVBqV"></rect>
+            <text x="336" y="48" text-anchor="middle" font-size="14.5" font-weight="650" fill="#fff" data-page-node-id="7lWF85zJVCsCEScNIodjVr">② 源城教师</text>
+            <text x="336" y="70" text-anchor="middle" font-size="11.5" fill="#a1a1a6" data-page-node-id="Ru5f9pDDVPGSNeHhf0FHRk">ST-Net · 训练后冻结</text>
+          </g>
+          <g data-page-node-id="UycEu39YLnCDwXqWWLtUBK">
+            <rect x="472" y="18" width="196" height="72" rx="10" fill="#1d1d1f" data-page-node-id="SS9FQkzW8guUBwpTHFFL3A"></rect>
+            <text x="570" y="48" text-anchor="middle" font-size="14.5" font-weight="650" fill="#fff" data-page-node-id="LVdv0R5JqSt7lE4z2DireS">③ 时间划分</text>
+            <text x="570" y="70" text-anchor="middle" font-size="11.5" fill="#a1a1a6" data-page-node-id="UCxbl0BvFcBeVoZLtxN9Sh">val / test 各 1440 h</text>
+          </g>
+          <g data-page-node-id="jCvrCOaYuCcUwkqNhEKdEN">
+            <rect x="706" y="18" width="196" height="72" rx="10" fill="#1d1d1f" data-page-node-id="GfrTspcm5z0UEO7lygomIg"></rect>
+            <text x="804" y="48" text-anchor="middle" font-size="14.5" font-weight="650" fill="#fff" data-page-node-id="oGCeGVqQp2xEdDvGUaNGcN">④ 对照训练</text>
+            <text x="804" y="70" text-anchor="middle" font-size="11.5" fill="#a1a1a6" data-page-node-id="85FTYIEjXXmcCWmrOlKE5R">G1 / G1-C / G2 / λ 扫描</text>
+          </g>
+          <g data-page-node-id="147EFKV9knZhSCgGO3n7Iy">
+            <rect x="940" y="18" width="176" height="72" rx="10" fill="none" stroke="#c7c7cc" stroke-width="1.4" stroke-dasharray="5 4" data-page-node-id="GsfeeNcWvsGEjf32yKUBGP"></rect>
+            <text x="1028" y="48" text-anchor="middle" font-size="14.5" font-weight="650" fill="#1d1d1f" data-page-node-id="MGBb1OJAQIBQKkZJGdmnVD">⑤ 乘子方法</text>
+            <text x="1028" y="70" text-anchor="middle" font-size="11.5" fill="#96682a" data-page-node-id="FwhBNVYBNCrbBzbm7Mo6BA">轮廓 → 匹配 → ρ̃</text>
+          </g>
+          <!-- 箭头 -->
+          <g stroke="#c7c7cc" stroke-width="1.4" fill="none" data-page-node-id="k0dYhWBScvd5UFwtGVGXAU">
+            <path d="M202 54H230" marker-end="url(#ar)" data-page-node-id="QcpsI4Fq0D4rPyrLpG02fK"></path>
+            <path d="M436 54H464" marker-end="url(#ar)" data-page-node-id="1DCcdLKMpd1WuWfxOTF5Ld"></path>
+            <path d="M670 54H698" marker-end="url(#ar)" data-page-node-id="R35wIilSgo5TmXHwuJXaJJ"></path>
+            <path d="M904 54H932" marker-end="url(#ar)" data-page-node-id="FwRGIhIueQ4leh7pKcZs4W"></path>
+          </g>
+          <defs data-page-node-id="Fh3bKpwVmXoI9iQDQh2Cb4">
+            <marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto" data-page-node-id="ROI5Q1kE1Yl9PmwGXbw6FH" style="">
+              <path d="M0 0L8 4L0 8Z" fill="#c7c7cc" data-page-node-id="Od9qfAP9PjaxOgtbmJSlyF"></path>
+            </marker>
+          </defs>
+          <!-- 状态行 -->
+          <text x="102" y="116" text-anchor="middle" font-size="11" font-weight="650" fill="#2c6a3f" data-page-node-id="8AsdnJKZN0G3KSodFCtu4U">完成</text>
+          <text x="336" y="116" text-anchor="middle" font-size="11" font-weight="650" fill="#2c6a3f" data-page-node-id="cGXqrouTwF2XGkyHByli9P">完成</text>
+          <text x="570" y="116" text-anchor="middle" font-size="11" font-weight="650" fill="#2c6a3f" data-page-node-id="IJwMJfBCtnMf3amlNzFTHZ">完成</text>
+          <text x="804" y="116" text-anchor="middle" font-size="11" font-weight="650" fill="#2c6a3f" data-page-node-id="HFNC1ABGbPKTiTpZEKn5yM">完成 · 29 份结果</text>
+          <text x="1028" y="116" text-anchor="middle" font-size="11" font-weight="650" fill="#96682a" data-page-node-id="1sCtIA54DF8dBoesCnTEpC">未启动</text>
+        </g>
+      </svg>
+      <div class="figcap" data-page-node-id="7ucqtrKpl8GE2CvDEhwC3w">图 1｜复现执行链路。实线框为已完成步骤，虚线框为下一阶段；轮廓与配对只使用训练段统计。</div>
+    </div>
+    <div class="cols c2" style="margin-top:26px" data-page-node-id="hB0gCYrPRPKcd9QaVdPHb4">
+      <div data-page-node-id="glxdjcQv2vckwcOuaKRI8q">
+        <h2 data-page-node-id="zokrqcF0X24T94GhQgI7NT">已完成的产出</h2>
+        <ul class="bullets" data-page-node-id="BcTBmkNWr8HGROf7w3bWMX">
+          <li data-page-node-id="EDr1mluK3PNdjxZF4oI8D3">29 份结果 JSON、58 个 checkpoint、16 份实验配置</li>
+          <li data-page-node-id="M4SyuEw8UoAVxN0L5B4BLp">三种子（42 / 43 / 44）华盛顿七类设定复跑</li>
+          <li data-page-node-id="JLkXxj7ZBUWCegqaMyNl4b">MAPE 口径修正并对既有 checkpoint 重算</li>
+        </ul>
+      </div>
+      <div data-page-node-id="55FGpGR3EpmrXYQkLDu8ks">
+        <h2 data-page-node-id="LDUSTrfjhjbbcn0X7mYoSY">环境</h2>
+        <ul class="bullets" data-page-node-id="lhmwsLL2KKaDVap3cywMHE">
+          <li data-page-node-id="neKLqk39PGmAuFYrZxZm2k">Windows · RTX 4060 Laptop 8GB · torch 2.11.0+cu128</li>
+          <li data-page-node-id="1vnXBnd8k3FAHanKUfY0dp">Python 3.11.9；训练入口 scripts/run_group1.py 等</li>
+          <li data-page-node-id="GDc3G3cNXjX13Tu5yjKngQ">权重与原始数据按 .gitignore 保留本机</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <footer data-page-node-id="Rc0j14RvE1FpWQNgpoSuqA"><span class="nav" data-page-node-id="PZMFjDuBX5qca2FmuTyELg"><button data-go="prev" data-page-node-id="LQSPVYIwL7t1Q2ctmPtlFi">‹</button><span data-page-node-id="c8BIipzCTAWD1uLZt4EGHz">04 / 11</span><button data-go="next" data-page-node-id="siHdlFDala0lrY97Rf8RpG">›</button></span></footer>
+</section>
+
+<!-- ================= 05 数据与划分 ================= -->
+<section class="slide" data-page-node-id="u3cmIDbuaRVSN6KFtOdw0j">
+  <header data-page-node-id="5W05vGLeBF9e47LhVVrVq5"><span data-page-node-id="VYcaAidWgA6BW0CCqkmMCF">实验设置</span><span data-page-node-id="kXK9m9ywcnIrf63bKgRFgt">05</span></header>
+  <h1 class="title" data-page-node-id="Ti6usJhcEfIHixPXdsTkpq">数据划分与协议</h1>
+  <p class="lede" data-page-node-id="wKaACoI8B9xywtisDHuvsd">沿用 CrossTReS 的网格与 STBaT 的 3 天切分，但源城训练范围与原文存在一处必须声明的差异。</p>
+  <div class="body" data-page-node-id="yWBO6JGAMTzG4AWJcIHdSM" style="zoom: 1;">
+    <div class="cols c2" data-page-node-id="nKj02x35KUERG5wXo93iFW">
+      <div data-page-node-id="v0CRyQai7KHuIIuK7CA5AU">
+        <h2 data-page-node-id="tNrryydJOdk6bxg3bmLQhI">时间划分</h2>
+        <div class="lines" data-page-node-id="TuaLzCX5g0z0F3AxrOyWMY">
+          <div class="line" data-page-node-id="fvfsduwKCtyDOsdDzDVWKk"><span class="k" data-page-node-id="NiHjGKTmdEsfeTwvk8iphQ">测试集</span><span class="v" data-page-node-id="jOc7b8UP7fBV18P99gl7HD">时间轴末尾 1440 小时（约 60 天），仅评估一次。</span></div>
+          <div class="line" data-page-node-id="QTHH0oChqBr2sPBkZROUKe"><span class="k" data-page-node-id="AE9FEz7nFkEjDOtYcufWA3">验证集</span><span class="v" data-page-node-id="EvyLRpOlNZwvFEpru18gdD">测试集之前 1440 小时，用于早停。</span></div>
+          <div class="line" data-page-node-id="kGFcOR0ObMk5D8CLwq90eI"><span class="k" data-page-node-id="MZG0S3BTAtQmpbsDtxegFD">源城训练</span><span class="v" data-page-node-id="TovQEQQkAVnbhS9o2cHMfE">其余前缀，共 5898 个训练窗口。</span></div>
+          <div class="line" data-page-node-id="2gWRYKdOw6Hn0hiXvZRyAR"><span class="k" data-page-node-id="haq04NXZyTKmxs027kNFVo">目标城训练</span><span class="v" data-page-node-id="RvsnjHgPSGXtqiBHlnBpCk">训练段最后 72 小时（3 天）。</span></div>
+        </div>
+        <div class="statement" data-page-node-id="p3x8B1Mb4iDUMMkorNrjIW" style=""><strong data-page-node-id="WVam98svH2irfmGP70pjbH">协议差异：</strong>源城教师只在 5898 个训练窗口上训练，未如 CrossTReS 原文将 train+val+test 拼接预训练。</div>
+      </div>
+      <div data-page-node-id="hEdqlAR2D5UwVioKSpcWNF">
+        <h2 data-page-node-id="jBTIMgdqcs0Ia67Sw1eJLh">预处理与归一化</h2>
+        <div class="lines" data-page-node-id="oXHXR9SF5lAhJj6ZEQsCIc">
+          <div class="line" data-page-node-id="wkZ7JDdfN31eZXVgRepry1"><span class="k" data-page-node-id="OoqLdYKUbtKr2rhNGrJQnA">通道</span><span class="v" data-page-node-id="d3ZSwmwH1v7Ogz7hMoue5n">仅 Taxi pickup 单通道；下车与单车数据未使用。</span></div>
+          <div class="line" data-page-node-id="uK0avZypVM4IXf5HqtroFi"><span class="k" data-page-node-id="fMASN6174rS1agGY98aLLz">窗口</span><span class="v" data-page-node-id="a7B4foQ4YNrSHT4ti1gvCx">过去 6 小时 → 下一小时，滑动构造。</span></div>
+          <div class="line" data-page-node-id="Ll9OsJ6knvI6txAZftcKMz"><span class="k" data-page-node-id="lpmVxMUsDk5YKHfdoEwHo9">归一化</span><span class="v" data-page-node-id="NpqPSrPY8IBh1mV30FDckt">percentile 0.999 的 min-max；指标在反归一化后计算。</span></div>
+          <div class="line" data-page-node-id="fHvGAwIN8J6q6edZwF6hv4"><span class="k" data-page-node-id="UsVRFAuuRLt8xdQwpq8FNR">有效格</span><span class="v" data-page-node-id="ULVxEj0fCE1o7nWJcsissA">仅在流量和 &gt; 0 的格子上计误差。</span></div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  <footer data-page-node-id="DXWraBvq8zycvUOuH5JlSQ"><span class="nav" data-page-node-id="te10qTZhwGfqQgagFcAwJZ"><button data-go="prev" data-page-node-id="KcXBkeEz9Gy7Llvu9Azf7U">‹</button><span data-page-node-id="nyZ7OhYPztZgtwiKP0n9fh">05 / 11</span><button data-go="next" data-page-node-id="JmPd5NsyTTC5HwK3AjkA3k">›</button></span></footer>
+</section>
+
+<!-- ================= 06 模型与训练 ================= -->
+<section class="slide" data-page-node-id="52WYtfyGPFkqxHc1w3czWQ">
+  <header data-page-node-id="ABOZH3jXn25ulbeSSD3Ry1"><span data-page-node-id="6yx8M5RDOifq0UGfrRHwp9">实验设置</span><span data-page-node-id="mNJz4woycovfeYK2l883p8">06</span></header>
+  <h1 class="title" data-page-node-id="63DusCHl2S6akADaIC3wcq">模型、损失与训练</h1>
+  <p class="lede" data-page-node-id="1qY6O1NzI7uVRZDlHAZoyw">骨干为 CrossTReS ST-Net，第一阶段不更换网络；蒸馏发生在预测输出上。</p>
+  <div class="body" data-page-node-id="umC6VnmKzS3RKZc92FGxp9" style="zoom: 1;">
+    <div class="cols c2" data-page-node-id="LkCmREi5H2p1h19eMtFWTt">
+      <div data-page-node-id="yHArTIDuBjUvimu6Pwq8Tn">
+        <h2 data-page-node-id="JgjFOMWObfOg2xXmvj1wln">模型与优化</h2>
+        <div class="lines" data-page-node-id="H98A0g4q4GlA7s2B6U4vTG">
+          <div class="line" data-page-node-id="B0uDODlTlYR3ePZSd6lixz"><span class="k" data-page-node-id="MFSiiE0sWFLO5kCBTdVXTq">骨干</span><span class="v" data-page-node-id="vNmA1vjvsg70165f0nXoZ0">ST-Net：3 个 64 通道残差块 + LSTM 128，含 BatchNorm。</span></div>
+          <div class="line" data-page-node-id="XrO0GBr9kVJKkedJAoRXs4"><span class="k" data-page-node-id="KWl8O0DiuAgJPE3AaNNZSa">任务损失</span><span class="v" data-page-node-id="BoRgxXBfrUTx8Xa5U4Omam">有效格平方误差；batch 上取平均，格子上求和。</span></div>
+          <div class="line" data-page-node-id="xpx3AYSvciqhFVzMu5d9qT"><span class="k" data-page-node-id="4HVoF4KzqbcsQHkDRcUecG">优化</span><span class="v" data-page-node-id="FgKz6222Bai0HFvMxJ2spT">batch 8，学习率 1e-3，权重衰减 5e-5。</span></div>
+          <div class="line" data-page-node-id="UgOkmougqDlgV25tn9KWDs"><span class="k" data-page-node-id="nptWpICe42Fa2debLCrSAA">早停</span><span class="v" data-page-node-id="ukuzCzueiNQd62BnNFNPJw">最多 50 epoch，验证 RMSE 连续 5 epoch 不升则停。</span></div>
+        </div>
+      </div>
+      <div data-page-node-id="p3S9vAXgHH8v4w8sP1UyDe">
+        <h2 data-page-node-id="egZsTRR4TK5z37XFxKUVBG" style="">蒸馏损失​</h2>
+        <div class="lines" data-page-node-id="TF6sQX1swxuYSTYEFb6ZWA">
+          <div class="line" data-page-node-id="KXhlXam6mT8EBpkJDNhcLE"><span class="k" data-page-node-id="DMSe7yQX5O5Jo7Lm3DI91Z">形式</span><span class="v" data-page-node-id="BGh7VAIfDMz4e0rpx3RtvR">L = L<sub data-page-node-id="EexgOuzNnKIWlex7U4NbqH">task</sub> + λ · L<sub data-page-node-id="5LPuurK6CHEylQur2bwvkn">kd</sub>，主实验 λ = 1。</span></div>
+          <div class="line" data-page-node-id="nZTblZXibc9hW2EMwQ286O"><span class="k" data-page-node-id="4rfmb7HsrmnxRiqiVPAQFV">L<sub data-page-node-id="zljTBJQErtblJMKmMwPnY3">kd</sub></span><span class="v" data-page-node-id="ajIs6xDJrM1eqUOeUpGoCJ">预测输出上的 MSE；教师冻结，直接读取华盛顿归一化窗口。</span></div>
+          <div class="line" data-page-node-id="jkoH3EFEFAFjA54XXnLnED"><span class="k" data-page-node-id="beIfJEK5pN7Nv35I6J7wH9">归约</span><span class="v" data-page-node-id="HJXCj1QlLTfV8jhtyUj25a">与任务损失一致：batch 平均、格子求和。</span></div>
+          <div class="line" data-page-node-id="IExBmgLcS5hxlISsN13EoK"><span class="k" data-page-node-id="y2xVVvKz9vIW3IIxIaX7Fn">缺失</span><span class="v" data-page-node-id="SgFzrGttq5WmkOCSNzBt7n">无区域配对、无 ρ̃ 乘子、无隐藏表示蒸馏。</span></div>
+        </div>
+        <div class="statement" data-page-node-id="8VSdY1T29vQCE1wTcXLmzu">G1-C 为复制源城权重后全参数微调，只有任务损失，作为迁移下限对照。</div>
+      </div>
+    </div>
+  </div>
+  <footer data-page-node-id="aW4VXI2w1olkvHi0iFjMM1"><span class="nav" data-page-node-id="1uW3npDrWBVPRgSSK6JCJb"><button data-go="prev" data-page-node-id="rFZLUrGdmTehakwRQtYtmT">‹</button><span data-page-node-id="eQRMGtvyA680Fo3TPtYdUF">06 / 11</span><button data-go="next" data-page-node-id="m6a77VbeRotZzHN2n6asOw">›</button></span></footer>
+</section>
+
+<!-- ================= 07 结果 A ================= -->
+<section class="slide" data-page-node-id="ihGcaAPe51AYnWYMS5Tl9E">
+  <header data-page-node-id="whL0Fu7mFG4nmXu609TzH7"><span data-page-node-id="pHqPNInR5anLnGKcxVNcLe">结果</span><span data-page-node-id="84yd7skZNQU92esP8JSmww">07</span></header>
+  <h1 class="title" data-page-node-id="cpjKpApgjeo4dtMFFeUM5M">种子 42 · 华盛顿测试集主对照</h1>
+  <p class="lede" data-page-node-id="ZFcAwXAKKZSWr5Trq7aMJw">单位为每小时上车量。源城教师的绝对误差因流量尺度不同，不与下表横比。</p>
+  <div class="body" data-page-node-id="kQKz0c6L3nS0I9dcbV3HYq" style="zoom: 1;">
+    <table data-page-node-id="eky4mysAzA1mmLtfGQAp67">
+      <tbody data-page-node-id="1NpIDPaokZ1H76NppWYeHn"><tr data-page-node-id="mSIBPtmklKjf572Bx9Rsh8"><th data-page-node-id="ZamroNF2uGSz537zsziQ4C">实验</th><th data-page-node-id="751DBURMrJYqBTFmagO10W">设定</th><th data-page-node-id="j8hk7ADZBFYFQRYtkWHbGU">最佳 epoch</th><th data-page-node-id="26QWaBqOPp1HDKAN8uEYpn">MAE</th><th data-page-node-id="Uzs8XxQdVL79piqMzswNZQ">RMSE</th><th data-page-node-id="Q1a34aCNEfCbnHtpQN3Zpe">MAPE</th></tr>
+      <tr data-page-node-id="qNZAABASJSQJOCB9FSbREq"><td class="id" data-page-node-id="B97EEKyThx5LoYX2AfmmND">G1-tgt-3d</td><td data-page-node-id="9SRSAGxlAUy3TCbb5BmfeZ">华盛顿从零训练，3 天</td><td class="num" data-page-node-id="G19C7zFBzsIdAUGrMr5fyZ">16</td><td class="num" data-page-node-id="Sn5OIxuuSYLiYFqoSW5NeZ">1.87</td><td class="num" data-page-node-id="PM8OWuIPPTKdFx0sZg4w6e">5.55</td><td class="num" data-page-node-id="f9CA7PWDTZRvYXzKiDqenx">75.99</td></tr>
+      <tr data-page-node-id="1iJXROWCP1A0pUEOanOmpc"><td class="id" data-page-node-id="dlzGdpmMlMAHtXfzYzmqbL">G2-NY2DC</td><td data-page-node-id="jDJBXS9ig7CQ6J4s9Vjck4">冻结纽约教师 + 蒸馏，随机初始化</td><td class="num" data-page-node-id="CgcJC3EzoRt4FONuwrFcY3">17</td><td class="num" data-page-node-id="aMlAOSMM7xC1ifDggIsQXr">1.75</td><td class="num" data-page-node-id="jSOBm1WmF02snxuEK7iahO">5.51</td><td class="num" data-page-node-id="YY9CtkBZSnquwypmoKPXkG">59.29</td></tr>
+      <tr data-page-node-id="JeUP9GdHldsQbnQYB0OGMQ"><td class="id" data-page-node-id="9HeqsGyGutVpCkHI6TeMje">G2-CHI2DC</td><td data-page-node-id="YVZuJPNuerfZtYfSFSwRvk">冻结芝加哥教师 + 蒸馏，随机初始化</td><td class="num" data-page-node-id="hmaeccT1FHi5M2BqseOGgH">12</td><td class="num" data-page-node-id="8Q8xmN0pwd03Xg7tdErUdN">1.75</td><td class="num" data-page-node-id="Dd7c1AHgKCDVLDbpEGfKpD">5.41</td><td class="num" data-page-node-id="AaUvGuUjph44pljWdvejQQ">65.39</td></tr>
+      <tr data-page-node-id="wk0xQW5xYUvSRBJos9cAlw"><td class="id" data-page-node-id="dEizstvG4BQ9Dm4vHouWBi">G1C-NY2DC</td><td data-page-node-id="tJJY06nbNqFPjjWtD3yLIn">纽约权重微调，无蒸馏</td><td class="num" data-page-node-id="PtUjgy2Oq9lFoIZQAYab3M">3</td><td class="num" data-page-node-id="3sefKTp2oPkmwng3dWJKse">1.72</td><td class="num" data-page-node-id="qBheit2KszvN1AA27yLrM5">5.28</td><td class="num" data-page-node-id="Y9DKugvHu2aWG1dDaOoqEE">72.39</td></tr>
+      <tr class="hl-row" data-page-node-id="K4cPzSWTpCWkgtnMrZAlqx"><td class="id" data-page-node-id="pI7oybG4OpZjMZ2pdOvqId">G1C-CHI2DC</td><td data-page-node-id="4ZhoXcHHhTfKBCcpcNLh7H">芝加哥权重微调，无蒸馏</td><td class="num" data-page-node-id="iK2BV3mYdadBGbufOnM9aQ">1</td><td class="num best" data-page-node-id="xySlRgVCofJraTXIESDizW">1.48</td><td class="num best" data-page-node-id="zMpQI3AThS7x45ol7kw9pL">5.06</td><td class="num" data-page-node-id="XD48jOHuWlI9RzRbjbyWeZ">73.32</td></tr>
+    </tbody></table>
+    <div class="hero" style="margin-top:22px" data-page-node-id="vuygHtRwmUWuN5Zyy8DYXn">
+      <div class="cell" data-page-node-id="yIBFJw2Vg5gL0ZmHJRUF5g">
+        <div class="n" data-page-node-id="E1QbI7DdWqHXDoZ25dqcqq">1.48<em data-page-node-id="h7lOPrTR9NmrewIbOL9LWf">MAE</em></div>
+        <div class="l" data-page-node-id="BKqvlrU54VeYn3X3GYH5Fx">芝加哥微调，本轮华盛顿最低</div>
+      </div>
+      <div class="cell" data-page-node-id="g5kBALt7tFtsoce5CTBOV2">
+        <div class="n" data-page-node-id="vm8mfCFCzQzxKNvT60VCS6">1.87<em data-page-node-id="veX95TDnrGNCohZ4i4LjIv">MAE</em></div>
+        <div class="l" data-page-node-id="HcoFAOMb9EX2icT2ZnkSUq">从零训练基线</div>
+      </div>
+      <div class="cell" data-page-node-id="R7Sb43AJEMfFfUIMtXExN3">
+        <div class="n" data-page-node-id="6AdGSZww3nrYudsTo0AU6t">5.06<em data-page-node-id="3wdJ5CdO4LKJXkfhkrOBx5">RMSE</em></div>
+        <div class="l" data-page-node-id="9jAXf3gXaTAfGAGJ1Vw2WR">芝加哥微调，本轮华盛顿最低</div>
+      </div>
+      <div class="cell" data-page-node-id="YqNt5FVl3DOSbjMCot9zQ0">
+        <div class="n" data-page-node-id="P3agCxIi9bDrGOJRql6OfB">1<em data-page-node-id="QPwE6DvswgXhZYsNW6Y0Uv">epoch</em></div>
+        <div class="l" data-page-node-id="wWEJVIN28j2Z8xideV9By1">微调收敛极快，最快一组仅 1 个 epoch</div>
+      </div>
+    </div>
+    <p class="note" data-page-node-id="3RSlVs6z4Ggyheuk9KNAu1">MAPE 按新口径对既有 checkpoint 重算，未重新训练。本轮内复制权重微调优于随机初始化蒸馏；蒸馏相对从零训练的提升幅度有限。</p>
+  </div>
+  <footer data-page-node-id="J98XZTuUgoGVv1nEH3KFAL"><span class="nav" data-page-node-id="mjEPYxDLhxjwMHtRjV0YrJ"><button data-go="prev" data-page-node-id="9sH7Fqg29Dt5lKUWR9O7RX">‹</button><span data-page-node-id="fq2iHKwvwUQWxHet8RrzRE">07 / 11</span><button data-go="next" data-page-node-id="nuEcDl6IG46AN2o1b0EmzM">›</button></span></footer>
+</section>
+
+<!-- ================= 08 结果 B ================= -->
+<section class="slide" data-page-node-id="fDqJGbILTANlo2KdzXIPhQ">
+  <header data-page-node-id="BKK76BTuGRuilqAi8wC6d3"><span data-page-node-id="Shwgc8ukLno4w0fH1vxWQE">结果</span><span data-page-node-id="fTmHFRWEkCbu2O1TiUxPOm">08</span></header>
+  <h1 class="title" data-page-node-id="7RBsosktm6qL8tKcpcGAbJ">三种子均值（42 / 43 / 44）</h1>
+  <p class="lede" data-page-node-id="W1hvfxrLydWbFl6mOxO1L1">仅重跑华盛顿七类设定，源城教师未重训。下表为测试集算术平均。</p>
+  <div class="body" data-page-node-id="E92BvCxwLxOVnytk7zm0Y3" style="zoom: 1;">
+    <table data-page-node-id="rdmLzOTmFNchvV8A8lsXNS">
+      <tbody data-page-node-id="mIueXSjq0GU6YQnx0pbEcr"><tr data-page-node-id="CHFtrBzkBA21h1FK8FWOg7"><th data-page-node-id="XlRVUhdZiOBhqKNdXQpfpY">设定</th><th data-page-node-id="IkMnmK5QGw0cF7tcTFt2kd">MAE 均值</th><th data-page-node-id="KABFMSXmE5YMuhhhlF6xD2">RMSE 均值</th><th data-page-node-id="5PbPiaVHHUH2ClphqcEusA">MAPE 均值</th><th data-page-node-id="hmfuScHPB0Gee2AK5vKmRT">稳定性观察</th></tr>
+      <tr data-page-node-id="4pUEkbMGXH8F0L3HhWQHoa"><td class="id" data-page-node-id="PL8QXYuh6XuCvI26Gn6D6v">华盛顿从零，3 天</td><td class="num" data-page-node-id="5EEGuPDKklChe4wXmEoUyO">1.885</td><td class="num" data-page-node-id="Fxzux380Jv3kYDxSGKBoix">5.523</td><td class="num" data-page-node-id="1BAnjkL9e0Q0Qh7sS6pdTS">76.83</td><td data-page-node-id="OTznBv28NN7SkVZfcXPes5">基线</td></tr>
+      <tr data-page-node-id="j8eXSLHFqCYnGDiI1eLHns"><td class="id" data-page-node-id="RSg5j8V46u9ZRKIYMA6Mwo">纽约微调</td><td class="num" data-page-node-id="2rsS0tHlDhLhkSagRDbu9i">1.658</td><td class="num" data-page-node-id="7JaUKFFanzCWar8L1JdBZ5">5.192</td><td class="num" data-page-node-id="f9qxIstlYTBKIe8knG8P6H">72.86</td><td data-page-node-id="Bn6HXXgjJ9kTNtEb3jHRdo">稳定优于从零</td></tr>
+      <tr class="hl-row" data-page-node-id="RQAFs9lOkfrFaHKh1h2rZU"><td class="id" data-page-node-id="1J3lOrNOq5EcxBCfYC0qso">芝加哥微调</td><td class="num best" data-page-node-id="LdWpxVTcma0aR1sOMSZI6o">1.517</td><td class="num best" data-page-node-id="t5Lt2FUIzbHdn5rHisfjBm">5.057</td><td class="num best" data-page-node-id="WyvLZDdXcwFEDv3zxgf4P7">72.19</td><td data-page-node-id="4BriRrES4idWqKQPopywLN">全部设定中最低</td></tr>
+      <tr data-page-node-id="RvwSxnmW2HJuCR0eVM1z1Z"><td class="id" data-page-node-id="S3Nx8FLHC6zYgFUAJPQCQx">纽约蒸馏，随机初始化</td><td class="num" data-page-node-id="MOEaxDufrmf78niP8XTFHm">1.942</td><td class="num" data-page-node-id="gh1tF1K2tdcKDkGVPFmd2q">5.673</td><td class="num" data-page-node-id="C1HY7wVUQxat4KvH7vno0C">73.33</td><td data-page-node-id="QDaOBt1MlpX0rwodtOXg4z">均值反而高于从零</td></tr>
+      <tr data-page-node-id="lW293tSBHcJCKUT3fxsq8t"><td class="id" data-page-node-id="e0LWp6bpGk6TOuXatmTcdp">芝加哥蒸馏，随机初始化</td><td class="num" data-page-node-id="Wfyke1TlXCnTHBwaGWgGaw">1.845</td><td class="num" data-page-node-id="BiwMIXP5Cn45zLQeHRJFPp">5.570</td><td class="num" data-page-node-id="wuWh6eOL5Ggah7hCHGoJpn">67.62</td><td data-page-node-id="FGHLSnxaWcXDyKykMAiPPg">种子间波动较大</td></tr>
+      <tr data-page-node-id="GNMXEDWQvgMcRZCoeCYk16"><td class="id" data-page-node-id="WO1MASAxCq3AV5QLwVed9z">纽约初始化加蒸馏</td><td class="num" data-page-node-id="WR9GBSeAKqI2LHsz3XZtLT">1.763</td><td class="num" data-page-node-id="6zkTsdQ7FiYu3dSONdTGv3">5.753</td><td class="num" data-page-node-id="VqyghOGi9Gjwc6lbL9oTTz">65.76</td><td data-page-node-id="GIGYn5FtWm6kgOYKuMoeKG">RMSE 高于纯微调</td></tr>
+      <tr data-page-node-id="yypWENEGd9wiS7AdIJganG"><td class="id" data-page-node-id="OHFGHgDEHLKZqGetD8xrWG">芝加哥初始化加蒸馏</td><td class="num" data-page-node-id="SNpFlfBt3a6T3PTGu2HuQ4">1.684</td><td class="num" data-page-node-id="nAVAUb0VdCTeNcu1elV0YN">5.228</td><td class="num" data-page-node-id="JnE9wYuE073oRHHIPbAp0u">78.54</td><td data-page-node-id="nXMkMWY9msfLAwn6m3TjAD">优于随机蒸馏，逊于微调</td></tr>
+    </tbody></table>
+    <div class="statement" data-page-node-id="sLhreX2JEhLIFHIZx3wrgH"><strong data-page-node-id="tC2OtNPOkWPbqQ6G7JhG8a">稳健结论：</strong>复制权重再微调是最稳定的迁移手段。标准输出蒸馏<strong data-page-node-id="PUBst4Em3XIfGq6uTyVYCF">没有</strong>稳定收益——纽约方向随机初始化蒸馏的均值 MAE（1.942）高于从零训练（1.885），种子 42 上「蒸馏略好」不能写成一般结论。</div>
+    
+  </div>
+  <footer data-page-node-id="dzFbAAofbMVLHVFEXICGXY"><span class="nav" data-page-node-id="OxvYl9wr25exZCOeRnWEYW"><button data-go="prev" data-page-node-id="362LL75vADpW7COn4aMaoK">‹</button><span data-page-node-id="xhBd2bBzyt9ebLdD7FbC3T">08 / 11</span><button data-go="next" data-page-node-id="UJfs0z7W62Ui5GgItQckKz">›</button></span></footer>
+</section>
+
+<!-- ================= 09 解读与意义 ================= -->
+<section class="slide center-body" data-page-node-id="7C90Gw5WzfEhsA3erFnv5A">
+  <header data-page-node-id="WYzqP3wzNgrpbBUiOhjI2r"><span data-page-node-id="IAViCemehEYop9Comnj5QJ">讨论</span><span data-page-node-id="hShFLHnIUSmAs6kHs9UvYy">09</span></header>
+  <h1 class="title" data-page-node-id="6VVX8IpdDBjpLttU8PkreP">结果解读与研究意义</h1>
+  
+  <div class="body" data-page-node-id="1j3zNbKSd1Nj4WHMYvHSub" style="zoom: 1;">
+    <div class="cols c2" data-page-node-id="Ci87h2xEsyzQcvLM2afR8o">
+      <div data-page-node-id="D4Bl83nEKK354IIyODVSbr">
+        <h2 data-page-node-id="XfahbCaChaKQ4MCSdPLnwa" style="">现有结果</h2>
+        <ul class="bullets" data-page-node-id="kbVGKpuTEz5xfH0oOA5YqG">
+          <li data-page-node-id="bceYuFWDlrGtk3wAFN08cX">3 天少样本下，跨城迁移（至少权重复制）显著优于从零训练</li>
+          <li data-page-node-id="3sXuuppFnYf4IE1tOlV6eW">迁移收益主要来自初始化本身，而非当前形式的蒸馏项</li>
+          
+          <li data-page-node-id="Dbc0DwROYYVTKpSUSEPBiF">评估管线、指标口径、复现脚本已可重复运行</li>
+        </ul>
+      </div>
+      <div data-page-node-id="bbO0PlEgRj9GJHkIqnmHNT">
+        <h2 data-page-node-id="P0S4V29kGxE7AjKyFOxVGD">对研究命题的意义</h2>
+        <ul class="bullets" data-page-node-id="vz41VDbC0mmA4uyILZAEQB">
+          <li data-page-node-id="TWJmbfGzG8DZewwLPbBH8T">标准蒸馏的不稳定性（NY 方向均值劣于基线）恰好印证了负迁移的存在</li>
+          <li data-page-node-id="BjyDScYS4rLxza2CzBGSBl">这为 ρ̃ 乘子提供了动机：不加区分地蒸馏可能损害目标城</li>
+          <li data-page-node-id="gQvgwmdrmHQZlwvLLYHhXr">微调基线（CHI 微调 1.517 / 5.057）成为 Group 3 / 4 必须超越的参照</li>
+          <li data-page-node-id="pX1NhLU5wEgscVnbPyjxxP">乘子方法应与「同配对、乘子恒 1」公平对比，而非只比从零训练</li>
+        </ul>
+        
+      </div>
+    </div>
+  </div>
+  <footer data-page-node-id="E4uqa2B2vP7TYyC2anb6fc"><span class="nav" data-page-node-id="sICDCTCW6AFm4TXrGNyanN"><button data-go="prev" data-page-node-id="AhCbCrgrhDmvrAViavwWYE">‹</button><span data-page-node-id="vBnqexawHVIRXiG8nzoiTR">09 / 11</span><button data-go="next" data-page-node-id="EnPBpuXykU1T0bfOBLw2sW">›</button></span></footer>
+</section>
+
+<!-- ================= 10 下周规划 · 公式 ================= -->
+<section class="slide" data-page-node-id="FpgY9Q3bcS7JVcW8FwgbCz">
+  <header data-page-node-id="SSQ2TuBv1TWTh7QnDrGcYh"><span data-page-node-id="25wsDgK5Nt20hJAyngknDU">下周规划</span><span data-page-node-id="BWfDF8E59Se1Yioq2HMmlr">10</span></header>
+  <h1 class="title" data-page-node-id="vt3rDlqlJev1aMRQtdhWtP">先定配对，再谈乘子</h1>
+  <div class="body" data-page-node-id="KX7iapjZI3U9DtSNTuZ7Dm" style="zoom: 0.85;">
+    <div class="planbar" data-page-node-id="7nm9V5NLiF1ZloMc4YMQML">
+      <div class="t" data-page-node-id="XG6jAryNp7TinfVxxLwQAd">由老师定下格子（区域）一对一配对规则</div>
+      <div class="d" data-page-node-id="CLUO4rgMWuxCxVkof5CGgv">配对 π 决定蒸馏项的求和范围，是本阶段唯一需要决策的输入。</div>
+    </div>
+    <div class="cols plan" data-page-node-id="vAfdpgRQ0oYnUOvv6seLw2">
+      <div data-page-node-id="h8UiCxC5OPgxm6Rv1gXEyO">
+        <h2 data-page-node-id="OsyYNZE0mtm0SVm1eLeflA" style="">计划公式​</h2>
+        <div class="eqbox" data-page-node-id="SqBPLSfDAXFvSW19gc5gm6">
+          <div class="eq" data-page-node-id="Ok3UUTY4xiKRCqMH8e3oji">
+            <div class="eqbody" data-page-node-id="MocFZM5zAlhfkjnivP6wND">p<sub data-page-node-id="p8P82feOZT0s7pVhPYU6cC">r</sub>[h] = <span class="frac" data-page-node-id="7AfOG3Y25q3NpK4ldQLZ4D"><span data-page-node-id="i6goVXUEoXd3PL8mIignXu">1</span><span data-page-node-id="5QXcBaG9f7phLcpNXcLOgB">|T<sub data-page-node-id="4z8MOPi205K7QkKW2su25k">wd,h</sub>|</span></span> ∑<sub data-page-node-id="7z0gQ3kA7hYCiGBFcDelbC">t∈T<sub data-page-node-id="3dLXPAB3ubQqpvpZz4O85H">wd,h</sub></sub> x[t, r],&nbsp;&nbsp;h = 0, …, 23</div>
+            <span class="eqn" data-page-node-id="OpZ2k2AkNQ8dZiXc6xoFvb">(1)</span>
+          </div>
+          <div class="eq" data-page-node-id="xMO5EuHDjyec8Giv446szo">
+            <div class="eqbody" data-page-node-id="UtIsJ0EleLCzYSfK4opUA1">
+              Δ<sub data-page-node-id="vGJI3Yl2FOYxGop43BFpav">r</sub>[h] = p<sub data-page-node-id="RItEQo689kCEphXvQStlIu">r</sub>[h] − mean<sub data-page-node-id="XKrwiKJLffzychv1jBO0OF">h</sub>(p<sub data-page-node-id="79f3KAbyAGNLJPCnVlgEnj">r</sub>)<br data-page-node-id="Ny1VrJlMEaxBH8TZ4h0tje">
+              ρ(s,t) = <span class="frac" data-page-node-id="eYqGHPfzPENHF8HYf7JhST"><span data-page-node-id="ydaHZ1j46SUBUH5wVkAKGW">∑<sub data-page-node-id="EgxpQjHXkbvljEE6SBCXlh">h</sub> Δ<sub data-page-node-id="DF5WoGxrgDm5MYikGjtdHN">s</sub>[h] Δ<sub data-page-node-id="5sqdsKu3b0VCnTQAU2CfMX">t</sub>[h]</span><span data-page-node-id="7JIC1TEx54G5FVwwKQoRhm">( ∑<sub data-page-node-id="v7dPXHXrK9QClFNRap0Hyt">h</sub> Δ<sub data-page-node-id="CQFPC9qs7JKptFwAuJDIgz">s</sub>[h]<sup data-page-node-id="UW3MxekrnnGhNMSfxTsQCk">2</sup> · ∑<sub data-page-node-id="BAuJ1l6mqArxerTOPTVnej">h</sub> Δ<sub data-page-node-id="ETGEBwMtVRfihL0AEwieHd">t</sub>[h]<sup data-page-node-id="0Wm4PJgpGpHdXqdSD5iBcp">2</sup> )<sup data-page-node-id="V3lnaRCZ46BGFLby8LAfhe">1/2</sup></span></span>
+            </div>
+            <span class="eqn" data-page-node-id="PlzOjpqX67zCl5YJ3CE31X">(2)</span>
+          </div>
+          <div class="eq" data-page-node-id="e9FUqB8Z4PiDG1GSYPIi3M">
+            <div class="eqbody" data-page-node-id="DRIQP9g9GycGtOU7cNXOzE" style="">
+              ρ̃(s,t) = max(ρ, 0)<br data-page-node-id="9mhPFIxN8BsXWPLiHpUCa4">
+              L = L<sub data-page-node-id="5rSObNsEQl8nh7nzZ4QtGP">pred</sub> + λ ∑<sub data-page-node-id="EH0zZ8DO63dzGY5vxai7GB">i,t</sub> ρ̃<sub data-page-node-id="6NOxs4ustBAhBhVM1WRNSX">i,π(i)</sub> ‖ h<sup data-page-node-id="qM1iCiDq8n5un4HPbDI5Lk">S</sup><sub data-page-node-id="YrU2EwKk4TVMEsPEAy0tGt">i,t</sub> − sg( h<sup data-page-node-id="BmDMu8VvIobxKiVpkFmHd6">T</sup><sub data-page-node-id="3BMw2rHrbMDsL0CoCPA0kH">π(i), hour(t)</sub> ) ‖<sup data-page-node-id="YtXIHuoXG1Y9vQIDvQB2YT">2</sup>
+            </div>
+            <span class="eqn" data-page-node-id="8dHHDVuGuXXfkrUkhF2HQM">(3)</span>
+          </div>
+        </div>
+        <div class="sym" data-page-node-id="2Ndev8ju1REaR4YXk9Oewq">
+          T<sub data-page-node-id="SJDUuFEJP6st9PwHKLZ9Op">wd,h</sub>：训练段中工作日且时刻为 h 的小时集合；r：格子；π：跨城一对一配对，规则由老师定；
+          sg：停止梯度；S / T：学生 / 教师隐藏表示；λ：仅由验证集选择。<br data-page-node-id="m8ZDDshA0iV3bKnUKuBOWG">
+          式 (3) 为计划形式。已完成的 Group 2 使用 L<sub data-page-node-id="ZOIiJYosSD9JW3BrLFqMye">task</sub> + λL<sub data-page-node-id="UCIhH8T8biPrVJxa4pjdKS">kd</sub>：蒸馏项为输出 MSE，乘子恒 1，无配对。
+        </div>
+      </div>
+      <div data-page-node-id="xMvSbcGHGK2uiu2PuDAFE0">
+        <h2 data-page-node-id="eVHTOqT7Sex0Ifjd2icIhi">公式要回答什么</h2>
+        <ul class="bullets" data-page-node-id="oJmxQLzHjhhhbx0i6D5gqs">
+          <li data-page-node-id="JNp2IINM1QIT5z393PxWto">式 (1) 把每格压缩为 24 维工作日平均轮廓，去除日期噪声</li>
+          <li data-page-node-id="T4a77s4mZLNEYKpVsCoNUq">式 (2) 在去均值轮廓上取 Pearson 相关，度量两格的日周期形状相似度</li>
+          <li data-page-node-id="rH7jMgHxaG1LgMchKtOD6Y">式 (3) 用 ρ̃ = max(ρ, 0) 截断负相关，仅对相似格施加隐藏表示蒸馏</li>
+          <li data-page-node-id="DSIYqdxueglFHDR5ZHX3v9">乘子不可学习，不引入额外参数，便于与恒 1 对照做消融</li>
+        </ul>
+        
+      </div>
+    </div>
+  </div>
+  <footer data-page-node-id="zlMtX3ReVezkOxFhE3U0fU"><span class="nav" data-page-node-id="t94VHrkGuAeGA3FChKOGlq"><button data-go="prev" data-page-node-id="z63f79hR0KHFm78Or45x5Y">‹</button><span data-page-node-id="BxCWdL0YCViMKFjo6odxQ1">10 / 11</span><button data-go="next" data-page-node-id="KkW8Vf1EpXaXsmdihjGOD5">›</button></span></footer>
+</section>
+
+<!-- ================= 11 下周规划 · 统计核对 ================= -->
+<section class="slide" data-page-node-id="5ifXm5J4QPrpvJddC3JLBE">
+  <header data-page-node-id="RCEpfcSSz9oGEbR0sKQ8FP"><span data-page-node-id="4OiB1Q9HhNvtyBCFXLk6Us">下周规划</span><span data-page-node-id="mmAwoI9aQoAb1hJBMs5VWB">11</span></header>
+  <h1 class="title" data-page-node-id="tfABB56bWn753cXUdoWYsP">轮廓计算与高峰核对</h1>
+  <p class="lede" data-page-node-id="pDaRTnHd9PGeJCWUyIv9cH">只做统计与核对，为公式提供输入；不进入训练阶段。</p>
+  <div class="body" data-page-node-id="wZQKacQAWOl8rLOqIW758k" style="zoom: 0.79;">
+    <div class="cols wide" data-page-node-id="1Y8WMIgiku3fBfDrBcHNLA">
+      <div data-page-node-id="VMfdU8wuAgS8LcRc8Rr0Zt">
+        <h2 data-page-node-id="27EhzMExXNftdgDE6DRsgh">轮廓计算（只做统计）</h2>
+        <div class="lines" data-page-node-id="Gesf1GnyRMhcd6YcSoVdsh">
+          <div class="line" data-page-node-id="UIRp8uuDYEuhHMaLDC7bw1"><span class="k" data-page-node-id="1mke1kQAIkxUQdprtfoKc5">芝加哥</span><span class="v" data-page-node-id="ExI9clGgS3seGmlfxlWHhm">源城训练段 5898 小时，工作日掩码，输出 270 × 24 轮廓矩阵。</span></div>
+          <div class="line" data-page-node-id="vYcEFj2oPrBgU849xLI4Mz"><span class="k" data-page-node-id="psoKpVqXcrS6F5hfoJHNsQ">华盛顿</span><span class="v" data-page-node-id="ymmqlifpiBPgjEQ2ZdYlUp">仅 3 天训练段 72 小时，工作日掩码，输出 207 × 24 轮廓矩阵。</span></div>
+          <div class="line" data-page-node-id="1Y9jjxUCBefTr7XBgHAONF"><span class="k" data-page-node-id="WJOOC8vFE45mtFrtZFFglq">限定</span><span class="v" data-page-node-id="QaPJfdJxjbRbn2UBvAFk00">轮廓与配对只用训练段；验证、测试不进入均值。3 天内工作日可能仅 1–2 天，方差需在结果中说明。</span></div>
+          <div class="line" data-page-node-id="cTpKeimc6abeiP2aP8NX9a"><span class="k" data-page-node-id="DI5uMrYm8ez2AFHR3iz9tu">口径</span><span class="v" data-page-node-id="2uXwql1Hc7tGEsO4nB8Tfa">工作日定义与小时索引对齐需确认（代码现存 TODO）；周末策略另定。</span></div>
+        </div>
+        <h2 class="mt" data-page-node-id="LAF9LhasFRjKjkEPE9ozGY">早晚高峰核对</h2>
+        <div class="lines" data-page-node-id="BDtpj1tvDuYDsRgRmQSPfO">
+          <div class="line" data-page-node-id="3UNl0DTHACNAVqtQSoAo0x"><span class="k" data-page-node-id="uCIrkcxTu5FHVoIaP68CGI">峰值</span><span class="v" data-page-node-id="hc2yUAfmxaqv41wwNlCRrS">两城各自早高峰（7–9 h）与晚高峰（17–19 h）的峰值小时。</span></div>
+          <div class="line" data-page-node-id="KQcv8zUMKfqYSAAmMPOtCF"><span class="k" data-page-node-id="V5o5AgkK4Xd5tm8Z3p85g4">对齐</span><span class="v" data-page-node-id="dy0mTB9R4lwoqtlKcku9Qg">源城与目标城峰值偏移是否在 ±1 h 内 <span class="ph" data-page-node-id="isKzRPgiDOhxbVSzWzryTi" style=""></span>。</span></div>
+          <div class="line" data-page-node-id="wFXbe10d7xCTfNdSdB7tax"><span class="k" data-page-node-id="hLt0mDwVkPWjRnZHR324IN">分布</span><span class="v" data-page-node-id="cE8N2pQQMhlftsGvGOdEZ3">全部配对的 ρ 分布、负相关比例、匹配与未匹配区域的轮廓对照 。</span></div>
+        </div>
+        
+      </div>
+      <div data-page-node-id="ud3Z0CIEAZ9tPjDnMGabEA">
+        <div class="fig" data-page-node-id="kQJbqWtnMC8SVDrGlRTSAl">
+          
+          
+        </div>
+        
+        
+      </div>
+    </div>
+  </div>
+  <footer data-page-node-id="NfFv6WZHv9cbSTBcNYl24w"><span class="nav" data-page-node-id="rQBccviimR6EDDY2dUDGXi"><button data-go="prev" data-page-node-id="QqCcQDBQYCGZkoEzQ7Sg5c">‹</button><span data-page-node-id="YWyu4wDljiTPf8dAV7ByvK">11 / 11</span><button data-go="next" data-page-node-id="XcNhBou8gQoHQXuYq1karH">›</button></span></footer>
+</section>
+
+</div>
+
+<script data-page-node-id="w5BALa4T7niMOZUx0R38Q7">
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var cur = 0;
+  function show(i){
+    if(i < 0 || i >= slides.length) return;
+    for(var j = 0; j < slides.length; j++){ slides[j].classList.remove('on'); }
+    cur = i;
+    slides[cur].classList.add('on');
+    fit(slides[cur]);
+  }
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' '){ e.preventDefault(); show(cur+1); }
+    else if(e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); show(cur-1); }
+    else if(e.key === 'Home'){ e.preventDefault(); show(0); }
+    else if(e.key === 'End'){ e.preventDefault(); show(slides.length-1); }
+  });
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-go]');
+    if(!b) return;
+    show(b.getAttribute('data-go') === 'next' ? cur+1 : cur-1);
+  });
+
+  /* 逐页内容高度自适应：只缩放内容区，防止溢出 */
+  function fit(sl){
+    var body = sl.querySelector('.body');
+    if(!body) return;
+    body.style.zoom = '1';
+    var guard = 0;
+    while(body.scrollHeight > body.clientHeight + 1 && guard < 24){
+      var z = parseFloat(body.style.zoom || '1') - 0.03;
+      if(z < 0.68) break;
+      body.style.zoom = String(z);
+      guard++;
+    }
+  }
+
+  /* 画布自适应窗口 */
+  function resize(){
+    var s = document.getElementById('stage');
+    var k = Math.min(window.innerWidth / 1320, window.innerHeight / 760);
+    s.style.transform = 'scale(' + k + ')';
+  }
+  window.addEventListener('resize', function(){ resize(); fit(slides[cur]); });
+  resize();
+  var initial = 0;
+  for(var k = 0; k < slides.length; k++){
+    if(slides[k].classList.contains('on')){ initial = k; break; }
+  }
+  show(initial);
+})();
+</script>
+
+</body></html>
