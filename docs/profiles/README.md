@@ -70,3 +70,4 @@ python scripts/04_grid_profiles.py
 中心化按格仿射和旧公式 λ=72 的对照见 [cell_affine_v2.md](cell_affine_v2.md)。
 钟点偏差、L1 仿射、中位数截距和残差门见 [cell_affine_next.md](cell_affine_next.md)。
 钟点偏差是否靠局部碰上，见 [cell_affine_robust.md](cell_affine_robust.md)。
+种子 45 和 46 的工作日核对见 [cell_affine_seedcheck.md](cell_affine_seedcheck.md)。
