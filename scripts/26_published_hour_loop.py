@@ -163,7 +163,7 @@ def _collect(net, dataset, indices: np.ndarray, mask, device, value_scale: float
     return np.concatenate(preds, axis=0), np.concatenate(trues, axis=0)
 
 
-def stage_prefix(v2_cache: Path, out_dir: Path, processed: Path, checkpoints: Path, device_name: str) -> int:
+def stage_prefix(v2_cache: Path, out_dir: Path, processed: Path, checkpoints: Path, device_name: str, seeds: tuple[int, ...] = SEEDS) -> int:
     import torch
     from src.data.dataset import prepare_city_windows
     from src.utils.config import load_config
@@ -190,7 +190,7 @@ def stage_prefix(v2_cache: Path, out_dir: Path, processed: Path, checkpoints: Pa
     prefix_rows = np.arange(PREFIX_HOUR - 6, TRAIN_HOUR - 6)
     overlap_rows = np.arange(TRAIN_HOUR - 6, VAL_HOUR - 6)
     for source in SOURCES:
-        for seed in SEEDS:
+        for seed in seeds:
             path = _checkpoint(checkpoints, source, seed)
             print(f"prefix {source} seed {seed}", flush=True)
             net = route._load_net(path, mask, device, model_cfg)
@@ -550,10 +550,12 @@ def main() -> int:
     parser.add_argument("--processed-dir", type=Path, default=ROOT / "data" / "processed")
     parser.add_argument("--checkpoint-dir", type=Path, default=ROOT / "checkpoints")
     parser.add_argument("--device", default="cuda", choices=("cuda", "cpu"))
+    parser.add_argument("--seeds", type=int, nargs="*", default=None)
     args = parser.parse_args()
     v2_cache = _default_v2(args.v2_cache)
     if args.stage == "prefix":
-        return stage_prefix(v2_cache, args.cache_dir, args.processed_dir, args.checkpoint_dir, args.device)
+        seeds = tuple(args.seeds) if args.seeds else SEEDS
+        return stage_prefix(v2_cache, args.cache_dir, args.processed_dir, args.checkpoint_dir, args.device, seeds)
     return stage_score(v2_cache, args.cache_dir, args.out_dir, test=args.stage == "score-test")
 
 
