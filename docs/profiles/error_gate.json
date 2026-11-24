@@ -1,0 +1,135 @@
+{
+  "passed": true,
+  "failures": [],
+  "verdicts": [
+    {
+      "mode": "once",
+      "distance": "level",
+      "choice": null,
+      "verdict": "未采用"
+    },
+    {
+      "mode": "once",
+      "distance": "wape",
+      "choice": null,
+      "verdict": "未采用"
+    },
+    {
+      "mode": "once",
+      "distance": "profile",
+      "choice": null,
+      "verdict": "未采用"
+    },
+    {
+      "mode": "once",
+      "distance": "utility",
+      "choice": {
+        "tau": 0.0,
+        "ny": 2.0455501316961273,
+        "chi": 1.6923071053940717,
+        "ny_cells": 38.0,
+        "chi_cells": 42.0
+      },
+      "tasks": [
+        {
+          "source": "ny",
+          "seed": 42,
+          "mae": 1.679266367767906,
+          "rmse": 5.078774701951749,
+          "weekend_mae": 1.5922523158224284,
+          "base_mae": 1.6923723727177442,
+          "base_rmse": 5.083956656877606,
+          "cells": 38.0
+        },
+        {
+          "source": "ny",
+          "seed": 43,
+          "mae": 1.6173184146764041,
+          "rmse": 5.024669950664828,
+          "weekend_mae": 1.520933585568955,
+          "base_mae": 1.623862153267933,
+          "base_rmse": 5.025429065091425,
+          "cells": 39.0
+        },
+        {
+          "source": "ny",
+          "seed": 44,
+          "mae": 1.6299083159589212,
+          "rmse": 5.156315061238335,
+          "weekend_mae": 1.497941413614655,
+          "base_mae": 1.628764555460544,
+          "base_rmse": 5.104499649019481,
+          "cells": 32.0
+        },
+        {
+          "source": "chi",
+          "seed": 42,
+          "mae": 1.4437157930145454,
+          "rmse": 4.851938403149443,
+          "weekend_mae": 1.3283123064875335,
+          "base_mae": 1.4488480326984072,
+          "base_rmse": 4.845247819263972,
+          "cells": 42.0
+        },
+        {
+          "source": "chi",
+          "seed": 43,
+          "mae": 1.5136848236307514,
+          "rmse": 4.877937246838814,
+          "weekend_mae": 1.3947150804042927,
+          "base_mae": 1.5157189055969116,
+          "base_rmse": 4.865929600731718,
+          "cells": 36.0
+        },
+        {
+          "source": "chi",
+          "seed": 44,
+          "mae": 1.5119049707485985,
+          "rmse": 4.9760546812095185,
+          "weekend_mae": 1.4078347349547,
+          "base_mae": 1.5170658320850063,
+          "base_rmse": 4.966275726928046,
+          "cells": 41.0
+        }
+      ],
+      "bootstrap": {
+        "ny": {
+          "point": -0.013106004949838006,
+          "low": -0.015999707286888563,
+          "high": -0.010159085420106578
+        },
+        "chi": {
+          "point": -0.0051322396838621165,
+          "low": -0.007333436655328506,
+          "high": -0.002713161286154418
+        }
+      },
+      "verdict": "无法区分",
+      "stable": false
+    },
+    {
+      "mode": "daily",
+      "distance": "level",
+      "choice": null,
+      "verdict": "未采用"
+    },
+    {
+      "mode": "daily",
+      "distance": "wape",
+      "choice": null,
+      "verdict": "未采用"
+    },
+    {
+      "mode": "daily",
+      "distance": "profile",
+      "choice": null,
+      "verdict": "未采用"
+    },
+    {
+      "mode": "daily",
+      "distance": "utility",
+      "choice": null,
+      "verdict": "未采用"
+    }
+  ]
+}

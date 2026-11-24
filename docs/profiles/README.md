@@ -69,3 +69,5 @@ python scripts/04_grid_profiles.py
 1km 格子的日上车量和三天轮廓见 [cell_volume.md](cell_volume.md)。
 中心化按格仿射和旧公式 λ=72 的对照见 [cell_affine_v2.md](cell_affine_v2.md)。
 已发表钟点偏差按同类日重估的闭环见 [clock_hour_loop.md](clock_hour_loop.md)。
+150 门前面四道误差判断的对照见 [error_gate.md](error_gate.md)。
+150 门以下按留出日加入闭环的对照见 [add_below_gate.md](add_below_gate.md)。
