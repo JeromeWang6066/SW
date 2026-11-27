@@ -12,6 +12,7 @@
 - [profiles/cell_affine_explain.md](profiles/cell_affine_explain.md) — 按格 \(a,b\) 与 λ=72
 - [RESULTS.md](RESULTS.md) — 已实跑指标
 - [advisor/2026-11-formula-meeting.md](advisor/2026-11-formula-meeting.md) — 录音 7。文首英文 Agent brief 是操作说明：先把按格公式写成能从目标函数推到 `ã`、`c` 的一页，再在 150 门之前加误差反馈。不新增实验数字。中文各节是会后整理，不是逐字稿
+- [advisor/2026-11-27-meeting.md](advisor/2026-11-27-meeting.md) — 录音 10（2026-11-27）。现方法先写成完整草稿；≥150 是硬门槛，门附近用相关再筛；按小时最小二乘是离线 inference。闭环若要做，方向是 recursive least squares 或 Kalman 跟踪，会上没定协议。周一前写稿，不许生成、不许抄
 
 Group 3 的 Pearson 乘子仍未实现。下文写的 HEAD `056f5c9` 是 2026-11-04 的交接快照，不是现在的 `main`。
 
