@@ -68,3 +68,5 @@ python scripts/04_grid_profiles.py
 相似格子的形状混合见 [shape_blend.md](shape_blend.md)。
 1km 格子的日上车量和三天轮廓见 [cell_volume.md](cell_volume.md)。
 中心化按格仿射和旧公式 λ=72 的对照见 [cell_affine_v2.md](cell_affine_v2.md)。
+钟点偏差、L1 仿射、中位数截距和残差门见 [cell_affine_next.md](cell_affine_next.md)。
+钟点偏差是否靠局部碰上，见 [cell_affine_robust.md](cell_affine_robust.md)。
